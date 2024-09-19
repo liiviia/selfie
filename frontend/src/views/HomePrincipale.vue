@@ -1,10 +1,10 @@
 <template>
   <div class="home-principale">
-    <!-- Header Navbar -->
+    
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
       <div class="container-fluid d-flex justify-content-between align-items-center">
         
-        <!-- Hamburger menu a sinistra -->
+        
         <div class="hamburger-menu">
           <input id="menu__toggle" type="checkbox" />
           <label class="menu__btn" for="menu__toggle">
@@ -13,7 +13,7 @@
           
         </div>
         
-        <!-- Scritta ToDo APP a destra -->
+       
         <a class="navbar-brand" href="/">ToDo APP</a>
   
         <div class="collapse navbar-collapse" id="navbarNavDropdown">
@@ -27,7 +27,7 @@
       </div>
     </nav>
 
-    <!-- Main Content -->
+    
     <div class="container mt-4 p-3 p-md-4">
       <img class="w3-image img-fluid" src="https://images.hdqwalls.com/wallpapers/abstract-shapes-4k-q2.jpg" alt="Me" style="max-width: 100%; max-height: 100%; height: auto; width: auto;">
       <div class="responsive-container">
