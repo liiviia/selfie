@@ -26,8 +26,8 @@ router.post('/activities', async (req, res) => {
 
 router.get('/activities', async (req, res) => {
     try {
-      const activities = await Activity.find(); // Recupera tutte le attività dal database
-      res.status(200).json(activities); // Restituisce le attività come JSON
+      const activities = await Activity.find(); 
+      res.status(200).json(activities); 
     } catch (error) {
       res.status(500).json({ error: 'Errore durante il recupero delle attività' });
     }
