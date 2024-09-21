@@ -24,7 +24,13 @@ router.post('/pomsPOST', async (req, res) => {
 
 router.get('/poms', async (req, res) => {
     try {
-      const poms = await Pom.find();
+      const username = req.query.username;
+
+      if (!username) {
+        return res.status(400).json({ message: 'Username è necessario' });
+      }
+
+      const poms = await Pom.find({author: username });
       res.status(200).json(poms);
     } catch (error) {
       res.status(500).json({ error: 'Errore durante il recupero delle sessioni Pomodoro' });
