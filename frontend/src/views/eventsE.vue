@@ -1,8 +1,8 @@
 <template>
-  <div>
+  <div class="event-list">
     <h1>Lista Eventi</h1>
     <ul>
-      <li v-for="event in events" :key="event._id">
+      <li v-for="event in events" :key="event._id" class="event-item">
         <h2>{{ event.title }}</h2>
         <p>{{ event.description }}</p>
         <p><strong>Data:</strong> {{ formatDate(event.date) }}</p>
@@ -65,12 +65,38 @@ export default {
 </script>
 
 <style scoped>
+.event-list {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #343a40;
+}
+
 ul {
   list-style-type: none;
+  padding: 0;
 }
-li {
+
+.event-item {
   margin-bottom: 20px;
   border-bottom: 1px solid #ccc;
   padding-bottom: 10px;
+}
+
+.event-item h2 {
+  color: #007bff;
+  margin: 0;
+}
+
+.event-item p {
+  margin: 5px 0;
 }
 </style>
