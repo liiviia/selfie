@@ -40,13 +40,26 @@ router.post('/events', async (req, res) => {
 
 
 
-exports.getEvents = async (req, res) => {
-    try {
-      const events = await Event.find();
-      res.status(200).json(events);
-    } catch (error) {
-      res.status(500).json({ message: 'Errore durante il recupero degli eventi', error });
+router.get('/eventsGET', async (req, res) => {
+  try {
+    const username = req.query.username;
+
+    if (!username) {
+      return res.status(400).json({ message: 'Username è necessario' });
     }
-  };
+
+    const events = await Event.find({author: username }); 
+    res.json(events); 
+  } catch (error) {
+    console.error('Errore nel recupero degli eventi:', error);
+    res.status(500).json({ error: 'Errore nel recupero degli eventi' });
+  }
+});
+
 
 module.exports = router;
+
+
+
+
+
