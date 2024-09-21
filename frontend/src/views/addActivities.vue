@@ -1,26 +1,26 @@
 <template>
-  <div>
+  <div class="activity-form">
     <h1>Aggiungi una nuova attività</h1>
-    <form @submit.prevent="submitActivity">
-      <div>
+    <form @submit.prevent="submitActivity" class="form-container">
+      <div class="form-group">
         <label for="title">Titolo:</label>
-        <input v-model="newActivity.title" id="title" required>
+        <input v-model="newActivity.title" id="title" required class="form-input">
       </div>
       
-      <div>
+      <div class="form-group">
         <label for="description">Descrizione:</label>
-        <textarea v-model="newActivity.description" id="description"></textarea>
+        <textarea v-model="newActivity.description" id="description" class="form-textarea"></textarea>
       </div>
       
-      <div>
+      <div class="form-group">
         <label for="deadline">Scadenza:</label>
-        <input v-model="newActivity.deadline" type="date" id="deadline" required>
+        <input v-model="newActivity.deadline" type="date" id="deadline" required class="form-input">
       </div>
       
-      <button type="submit">Aggiungi Attività</button>
+      <button type="submit" class="submit-button">Aggiungi Attività</button>
     </form>
 
-    <p v-if="message">{{ message }}</p>
+    <p v-if="message" class="status-message">{{ message }}</p>
   </div>
 </template>
 
@@ -56,7 +56,7 @@ export default {
         
         this.message = 'Attività aggiunta con successo!';
       } catch (error) {
-        this.message = error;
+        this.message = 'Errore: ' + error;
         console.error('Errore:', error);
       }
     }
@@ -65,5 +65,66 @@ export default {
 </script>
 
 <style scoped>
+.activity-form {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
 
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #343a40;
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: block;
+}
+
+.form-input, .form-textarea {
+  padding: 10px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 16px;
+  width: 100%;
+}
+
+.form-textarea {
+  height: 100px;
+  resize: none;
+}
+
+.submit-button {
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.submit-button:hover {
+  background-color: #0056b3;
+}
+
+.status-message {
+  text-align: center;
+  margin-top: 20px;
+  color: green;
+}
 </style>
