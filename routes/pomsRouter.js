@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Pom = require('../models/pom'); 
 
-router.post('/poms', async (req, res) => {
+router.post('/pomsPOST', async (req, res) => {
   try {
     const { username, tempoStudio, tempoPausa, ripetizioni } = req.body;
     const newPom = new Pom({
@@ -15,8 +15,10 @@ router.post('/poms', async (req, res) => {
     const savedPom = await newPom.save();
     res.status(201).json(savedPom);
   } catch (error) {
-    res.status(500).json({ error: 'Errore durante il salvataggio della sessione pomodoro' });
-  }
+    console.error('Errore durante il salvataggio:', error);
+    res.status(500).json({ error: error.message });
+}
+
 });
 
 
