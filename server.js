@@ -6,6 +6,7 @@ const authRoutes = require('./routes/authRoutes');
 const noteRoutes = require('./routes/noteRoutes');
 const pomsRoutes = require('./routes/pomsRouter');
 const eventRoutes = require('./routes/eventRoutes');
+const accountRoutes = require('./routes/accountRoutes');
 const activityRoutes = require('./routes/activityRoutes');
 const registerRoutes = require('./routes/registerRoutes');
 const { scheduleEmailReminders } = require('./cronTask'); 
@@ -23,6 +24,7 @@ app.use('/api', pomsRoutes);
 app.use('/api', eventRoutes);
 app.use('/api', activityRoutes);
 app.use('/api', registerRoutes);
+app.use('/api', accountRoutes); 
 app.use(express.static(path.join(__dirname, 'frontend/frontend/dist')));
 
 app.get('*', (req, res) => {
