@@ -12,6 +12,7 @@ import pomodoroTempo from '../views/pomodoroTempo.vue'
 import pomSession from '../views/pomSession.vue'
 import registratiAccedi from '../views/registratiAccedi.vue'
 import editNote from '../views/editNote.vue';
+import accountUtente from '@/views/accountUtente.vue';
 
 
 const routes = [
@@ -19,6 +20,12 @@ const routes = [
     path: '/',
     name: 'userLogin',
     component: UserLogin,
+  },
+
+  {
+    path: '/accountUtente',
+    name: 'accountUtente',
+    component: accountUtente,
   },
 
   {
