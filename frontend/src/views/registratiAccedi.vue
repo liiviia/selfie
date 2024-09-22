@@ -8,6 +8,14 @@
           <input v-model="user.username" id="username" class="registration__input" placeholder="Nome Utente" required />
         </div>
         <div class="registration__field">
+          <i class="registration__icon fas fa-envelope"></i>
+          <input v-model="user.email" id="email" class="registration__input" placeholder="Email" type="email" required />
+        </div>
+        <div class="registration__field">
+          <i class="registration__icon fas fa-phone"></i>
+          <input v-model="user.phoneNumber" id="phoneNumber" class="registration__input" placeholder="Numero di Telefono" required />
+        </div>
+        <div class="registration__field">
           <i class="registration__icon fas fa-lock"></i>
           <input v-model="user.password" type="password" id="password" class="registration__input" placeholder="Password" required />
         </div>
@@ -20,6 +28,7 @@
 </template>
 
 
+
 <script>
 import axios from 'axios';
 
@@ -28,6 +37,8 @@ export default {
     return {
       user: {
         username: '',
+        email: '',      
+        phoneNumber: '',
         password: ''
       },
       message: ''
@@ -42,17 +53,19 @@ export default {
         this.$router.push('/');
         this.user = {
           username: '',
+          email: '',       
+          phoneNumber: '', 
           password: ''
         };
       } catch (error) {
         this.message = 'Errore durante la registrazione.';
-        this.message=error;
         console.error('Errore:', error);
       }
     }
   }
 };
 </script>
+
 
 <style scoped>
 .registration {
