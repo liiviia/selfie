@@ -5,6 +5,7 @@ const activitySchema = new mongoose.Schema({
   description: { type: String },
   deadline: { type: Date, required: true },
   author: { type: String, required: true },
+  email: { type: String, required: true }, 
   completed: { type: Boolean, default: false }
 });
 
