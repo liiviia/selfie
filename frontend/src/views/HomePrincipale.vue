@@ -18,6 +18,7 @@
             <li class="nav-item"><a class="nav-link" href="/activities">Lista attività</a></li>
             <li class="nav-item"><a class="nav-link" href="/pomSession">Sessioni Pomodoro</a></li>
             <li class="nav-item"><a class="nav-link" href="/accountUtente">Gestisci il tuo Account</a></li>
+            <li class="nav-item"> <button class="nav-link" @click="logout">Logout</button></li>
           </ul>
         </div>
       </div>
@@ -37,21 +38,28 @@
             </div>
             <div class="carousel-inner">
               <div class="carousel-item active">
-                <div class="d-block w-100 text-center p-4">
-                  <h2>Ultimo Evento</h2>
-                  <p><strong>Titolo:</strong> {{ lastEventTitle }}</p>
-                  <p><strong>Descrizione:</strong> {{ lastEventDescription }}</p>
-                  <p><strong>Data:</strong> {{ lastEventDate }}</p>
-                </div>
-              </div>
-              <div class="carousel-item">
-                <div class="d-block w-100 text-center p-4">
-                  <h2>Ultima Attività</h2>
-                  <p><strong>Titolo:</strong> {{ lastActivityTitle }}</p>
-                  <p><strong>Descrizione:</strong> {{ lastActivityDescription }}</p>
-                  <p><strong>Scadenza:</strong> {{ lastActivityDeadline }}</p>
-                </div>
-              </div>
+  <div class="d-block w-100 text-center p-4">
+    <h2>Ultimo Evento</h2>
+    <p v-if="noEventsMessage">{{ noEventsMessage }}</p>
+    <p v-else>
+      <strong>Titolo:</strong> {{ lastEventTitle }}<br>
+      <strong>Descrizione:</strong> {{ lastEventDescription }}<br>
+      <strong>Data:</strong> {{ lastEventDate }}
+    </p>
+  </div>
+</div>
+
+<div class="carousel-item">
+  <div class="d-block w-100 text-center p-4">
+    <h2>Ultima Attività</h2>
+    <p v-if="noActivitiesMessage">{{ noActivitiesMessage }}</p>
+    <p v-else>
+      <strong>Titolo:</strong> {{ lastActivityTitle }}<br>
+      <strong>Descrizione:</strong> {{ lastActivityDescription }}<br>
+      <strong>Scadenza:</strong> {{ lastActivityDeadline }}
+    </p>
+  </div>
+</div>
             </div>
             <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
               <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -81,7 +89,9 @@ export default {
       lastEventDate: '',
       lastActivityTitle: '',
       lastActivityDescription: '',
-      lastActivityDeadline: ''
+      lastActivityDeadline: '',
+      noEventsMessage: '' ,
+      noActivitiesMessage: '' 
     };
   },
   mounted() {
@@ -95,16 +105,25 @@ export default {
         const response = await axios.get('/api/events/last', {
           params: { username: username }
         });
-      this.lastEventTitle = response.data.title;
-      this.lastEventDescription = response.data.description;
-      this.lastEventDate = new Date(response.data.date).toLocaleDateString();
-        
+        if (response.data) {
+          this.lastEventTitle = response.data.title;
+          this.lastEventDescription = response.data.description;
+          this.lastEventDate = new Date(response.data.date).toLocaleDateString();
+          this.noEventsMessage = ''; 
+        } else {
+          this.noEventsMessage = 'Non ci sono eventi imminenti'; 
+        }
 
       } catch(error) {
         console.error('Errore nel recupero degli eventi:', error);
 
       }
     },
+
+    logout() {
+     localStorage.clear();
+    this.$router.push('/'); 
+  },
   
   
   async getLastActivity() {
@@ -114,9 +133,14 @@ export default {
         params: { username: username }
       });
 
+      if (response.data) {
       this.lastActivityTitle = response.data.title;
       this.lastActivityDescription = response.data.description;
-      this.lastActivityDeadline = new Date(response.data.deadline).toLocaleDateString(); 
+      this.lastActivityDeadline = new Date(response.data.deadline).toLocaleDateString();
+      this.noActivitiesMessage = ''; 
+    } else {
+      this.noActivitiesMessage = 'Non ci sono attività imminenti'; 
+    } 
 
     } catch(error) {
       console.error('Errore nel recupero delle attività:', error);
