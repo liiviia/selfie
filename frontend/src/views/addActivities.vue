@@ -57,6 +57,7 @@ export default {
         };
         
         this.message = 'Attività aggiunta con successo!';
+        this.$router.push('/homePrincipale'); 
       } catch (error) {
         this.message = 'Errore: ' + error;
         console.error('Errore:', error);
