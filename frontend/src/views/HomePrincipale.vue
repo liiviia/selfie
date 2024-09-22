@@ -33,6 +33,9 @@
             <li class="nav-item">
               <a class="nav-link" href="/pomSession">Sessioni Pomodoro</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/accountUtente">gestisci il tuo Account</a>
+            </li>
           </ul>
         </div>
       </div>
