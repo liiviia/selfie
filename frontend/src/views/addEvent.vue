@@ -144,6 +144,7 @@ export default {
           notificationAdvanceDays: '',
           notificationRepeat: ''
         };
+        this.$router.push('/homePrincipale'); 
       } catch (error) {
         console.error('Errore durante l\'aggiunta dell\'evento:', error);
       }
