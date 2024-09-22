@@ -35,6 +35,7 @@ export default {
         description: '',
         deadline: '',
         author: localStorage.getItem('username') || 'Guest',
+        email: localStorage.getItem('email') || '',
         completed: false
       },
       message: ''
@@ -51,6 +52,7 @@ export default {
           description: '',
           deadline: '',
           author: this.newActivity.author,
+          email: this.newActivity.email,
           completed: false
         };
         
