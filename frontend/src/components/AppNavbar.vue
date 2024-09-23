@@ -4,7 +4,7 @@
     <div class="collapse" id="navbarToggleExternalContent">
       <div class="bg-white p-4">
         <ul class="navbar-nav d-flex justify-content-center">
-        <li class="nav-item">
+          <li class="nav-item">
             <router-link class="nav-link" to="/homePrincipale" @click="closeNavbar">Home</router-link>
           </li>
           <li class="nav-item">
@@ -53,20 +53,43 @@
             {{ currentPage }}
           </div>
         </div>
+
+        <!-- Time Machine Controls - Mostra solo nelle pagine specificate -->
+        <div v-if="showTimeMachine" class="time-machine-control">
+          <div>
+            <label for="date">Data:</label>
+            <input type="date" v-model="timeMachineDate">
+            <label for="time">Ora:</label>
+            <input type="time" v-model="timeMachineTime">
+            <button @click="setTimeMachine">Imposta</button>
+            <button @click="resetTimeMachine">Reset</button>
+          </div>
+          <div>
+            <p>Orologio: {{ simulatedTime }}</p>
+          </div>
+        </div>
       </div>
     </nav>
   </div>
 </template>
 
 <script>
-// Importa solo il modulo Collapse di Bootstrap
 import { Collapse } from 'bootstrap';
 
 export default {
+  data() {
+    return {
+      timeMachineDate: '',  
+      timeMachineTime: '',  
+      simulatedTime: '--:--:--', 
+      intervalId: null, 
+      currentSimulatedTime: null 
+    };
+  },
   computed: {
     currentPage() {
       const routeNameMap = {
-        '/': 'Login', // Titolo della pagina di login
+        '/': 'Login', 
         '/homePrincipale': 'Home',
         '/pomodoroTempo': 'Pomodoro',
         '/todo': 'Lista Note',
@@ -79,6 +102,17 @@ export default {
         '/accountUtente': 'Gestisci il tuo Account',
       };
       return routeNameMap[this.$route.path] || ''; // Mostra il nome della pagina corrente
+    },
+    showTimeMachine() {
+      // Controlla se la pagina corrente è una di quelle in cui vogliamo mostrare la Time Machine
+      const routesWithTimeMachine = [
+        '/todo',              // Lista Note
+        '/calendarEvent',      // Calendario
+        '/eventsE',            // Lista Eventi
+        '/activities',         // Lista Attività
+        '/pomSession'          // Sessioni Pomodoro
+      ];
+      return routesWithTimeMachine.includes(this.$route.path);
     }
   },
   methods: {
@@ -101,10 +135,38 @@ export default {
     logout() {
       localStorage.clear();
       this.$router.push('/'); // Ritorna alla pagina di login
+    },
+    setTimeMachine() {
+      if (this.timeMachineDate && this.timeMachineTime) {
+        // Crea un nuovo oggetto Date usando la data e l'ora impostate
+        const newDateTime = new Date(`${this.timeMachineDate}T${this.timeMachineTime}`);
+        this.currentSimulatedTime = newDateTime; // Memorizza il tempo simulato
+        this.simulatedTime = this.currentSimulatedTime.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        this.startTimeFlow();
+      }
+    },
+    resetTimeMachine() {
+      clearInterval(this.intervalId); // Ferma lo scorrimento del tempo
+      this.simulatedTime = '--:--:--'; 
+      this.currentSimulatedTime = null; 
+    },
+    startTimeFlow() {
+      // Prima ferma ogni intervallo precedente
+      clearInterval(this.intervalId);
+
+      this.intervalId = setInterval(() => {
+        
+        if (this.currentSimulatedTime) {
+          this.currentSimulatedTime.setSeconds(this.currentSimulatedTime.getSeconds() + 1); // Incrementa di 1 secondo
+          this.simulatedTime = this.currentSimulatedTime.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+      }, 1000); // Aggiorna ogni secondo
     }
   }
 };
 </script>
+
+
 
 <style scoped>
 .navbar {
@@ -125,5 +187,33 @@ export default {
 .collapse {
   margin: 0;
   padding: 0;
+}
+
+.time-machine-control {
+  display: flex;
+  align-items: center;
+}
+
+.time-machine-control input {
+  margin-right: 10px;
+  padding: 5px;
+  border-radius: 8px; 
+  border: 1px solid #ccc; 
+  outline: none;
+}
+
+.time-machine-control button {
+  margin-right: 10px;
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  font-size: 0.9em;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.time-machine-control button:hover {
+  background-color: #0056b3;
 }
 </style>

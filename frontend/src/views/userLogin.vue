@@ -32,20 +32,31 @@ export default {
       errorMessage: ''
     };
   },
+  /* created() {
+    const token = localStorage.getItem('token'); 
+    if (token) {
+      // Puoi eventualmente fare una richiesta per verificare se il token è valido
+      this.$router.push('/homePrincipale');
+    }
+  }, */
   methods: {
     async login() {
-  try {
-    const response = await axios.post('/api/auth/login', {
-      username: this.username,
-      password: this.password
-    });
-    localStorage.setItem('token', response.data.token);
-    localStorage.setItem('username', this.username);
-    this.$router.push('/homePrincipale'); 
-  } catch (error) {
-    this.errorMessage = error.response.data.message;
-  }
-}
+      try {
+        const response = await axios.post('/api/auth/login', {
+          username: this.username,
+          password: this.password
+        });
+        // Salva il token nel localStorage
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('username', this.username);
+
+        // Reindirizza l'utente alla home page
+        this.$router.push('/homePrincipale'); 
+      } catch (error) {
+        // Mostra il messaggio di errore in caso di problemi con il login
+        this.errorMessage = error.response?.data?.message || 'Errore durante il login';
+      }
+    }
   }
 };
 </script>

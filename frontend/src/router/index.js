@@ -26,6 +26,7 @@ const routes = [
     path: '/accountUtente',
     name: 'accountUtente',
     component: accountUtente,
+    meta: { requiresAuth: true }
   },
 
   {
@@ -45,12 +46,14 @@ const routes = [
     path: '/todo',
     name: 'ToDoApp',
     component: ToDoApp,
+    meta: { requiresAuth: true }
   },
 
   {
     path: '/edit-note/:id',
     name: 'editNote',
     component: editNote,
+    meta: { requiresAuth: true }
   },
 
 
@@ -58,24 +61,28 @@ const routes = [
     path: '/activities',
     name: 'activities',
     component: activities,
+    meta: { requiresAuth: true }
   },
 
   {
     path: '/addActivities',
     name: 'addActivities',
     component: addActivities,
+    meta: { requiresAuth: true }
   },
 
   {
     path: '/addEvent',
     name: 'addEvent',
     component: addEvent,
+    meta: { requiresAuth: true }
   },
 
   {
     path: '/calendarEvent',
     name: 'calendarEvent',
     component: calendarEvent,
+    meta: { requiresAuth: true }
   },
 
 
@@ -83,6 +90,7 @@ const routes = [
     path: '/eventsE',
     name: 'eventsE',
     component: eventsE,
+    meta: { requiresAuth: true }
   },
 
 
@@ -90,12 +98,14 @@ const routes = [
     path: '/pomodoroTempo',
     name: 'pomodoroTempo',
     component: pomodoroTempo,
+    meta: { requiresAuth: true }
   },
 
   {
     path: '/pomSession',
     name: 'pomSession',
     component: pomSession,
+    meta: { requiresAuth: true }
   },
 
   {
@@ -103,11 +113,6 @@ const routes = [
     name: 'registratiAccedi',
     component: registratiAccedi,
   },
-
-
-
-
-
 ];
 
 const router = createRouter({
@@ -115,9 +120,16 @@ const router = createRouter({
   routes,
 });
 
+/*// Verifica se l'utente è autenticato controllando il token di accesso nel localStorage
+router.beforeEach((to, from, next) => {
+  const isAuthenticated = localStorage.getItem('userToken'); 
 
-
-
-
+  // Se la rotta richiede autenticazione e l'utente non è autenticato
+  if (to.matched.some(record => record.meta.requiresAuth) && !isAuthenticated) {
+    next('/'); // Reindirizza alla pagina di login
+  } else {
+    next(); // Altrimenti consenti l'accesso
+  }
+});*/
 
 export default router;
