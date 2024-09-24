@@ -3,85 +3,87 @@ const router = express.Router();
 const Event = require('../models/Event');
 
 router.post('/events', async (req, res) => {
-  const {
-    title, description, date, time, duration, repeatFrequency, daysOfWeek,
-    dayOfMonth, repeatCount, repeatUntil, location, author,
-    notificationMechanism, notificationAdvanceMinutes,
-    notificationAdvanceHours, notificationAdvanceDays, notificationRepeat
-  } = req.body;
-
   try {
+    const {
+      title,
+      description,
+      date,
+      startTime,
+      duration,
+      isRecurring,
+      frequency,
+      recurrencePattern,
+      numberOfOccurrences,
+      location,
+      author,
+      notificationMechanism,
+      notificationTime,
+      repeatNotification,
+    } = req.body;
+
+    let notificationMechanismArray = [];
+
+    if (Array.isArray(notificationMechanism)) {
+      notificationMechanismArray = notificationMechanism; 
+    } else if (typeof notificationMechanism === 'string') {
+      notificationMechanismArray = notificationMechanism.split(','); 
+    }
+
     const newEvent = new Event({
       title,
       description,
       date,
-      time,
+      startTime,
       duration,
-      repeatFrequency,
-      daysOfWeek: daysOfWeek ? daysOfWeek.split(',') : [],
-      dayOfMonth,
-      repeatCount,
-      repeatUntil,
+      isRecurring,
+      frequency,
+      recurrencePattern,
+      numberOfOccurrences,
       location,
       author,
-      notificationMechanism: notificationMechanism ? notificationMechanism.split(',') : [],
-      notificationAdvanceMinutes,
-      notificationAdvanceHours,
-      notificationAdvanceDays,
-      notificationRepeat
+      notificationMechanism: notificationMechanismArray, 
+      notificationTime,
+      repeatNotification,
     });
 
-    const savedEvent = await newEvent.save(); 
+    const savedEvent = await newEvent.save();
     res.status(201).json(savedEvent);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: 'Errore durante l\'aggiunta dell\'evento' });
   }
 });
 
-
-
 router.get('/eventsGET', async (req, res) => {
   try {
-    const username = req.query.username;
+    const author = req.query.author;
 
-    if (!username) {
-      return res.status(400).json({ message: 'Username è necessario' });
+    if (!author) {
+      return res.status(400).json({ message: 'Autore è necessario' });
     }
 
-    const events = await Event.find({author: username }); 
-    res.json(events); 
+    const events = await Event.find({ author });
+    res.json(events);
   } catch (error) {
     console.error('Errore nel recupero degli eventi:', error);
     res.status(500).json({ error: 'Errore nel recupero degli eventi' });
   }
 });
 
-
 router.get('/events/last', async (req, res) => {
-
   try {
-      const username = req.query.username;
+    const author = req.query.author;
 
-      if(!username) {
-        return res.status(400).json({message: 'Username è necessario' }) ;
-      }
+    if (!author) {
+      return res.status(400).json({ message: 'Autore è necessario' });
+    }
 
-      const event = await Event.findOne({author: username}) ;
-      res.json(event);
-
+    const event = await Event.findOne({ author }).sort({ createdAt: -1 }); 
+    res.json(event);
   } catch (error) {
-    console.error('errore nel recupero dell evento',error);
+    console.error('Errore nel recupero dell\'evento', error);
     res.status(500).json({ error: 'Errore nel recupero degli eventi' });
   }
 });
 
-
-
-
-
 module.exports = router;
-
-
-
-
-
