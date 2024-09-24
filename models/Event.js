@@ -1,23 +1,65 @@
 const mongoose = require('mongoose');
 
 const eventSchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  description: { type: String },
-  date: { type: Date, required: true },
-  time: { type: String, required: true },
-  duration: { type: Number, required: true }, // durata in minuti
-  repeatFrequency: { type: String }, // es.: 'daily', 'weekly', 'monthly', 'custom'
-  daysOfWeek: [String], // es.: ['monday', 'wednesday']
-  dayOfMonth: { type: Number }, // es.: 4 (per il giorno del mese)
-  repeatCount: { type: Number }, // numero di ripetizioni
-  repeatUntil: { type: Date }, // data finale per la ripetizione
-  location: { type: String }, // luogo fisico o virtuale
-  author: { type: String, required: true },
-  notificationMechanism: [String], // es.: ['OS', 'Email']
-  notificationAdvanceMinutes: { type: Number },
-  notificationAdvanceHours: { type: Number },
-  notificationAdvanceDays: { type: Number },
-  notificationRepeat: { type: String } // es.: 'everyMinute', 'everyHour', 'untilResponse'
-});
+  title: {
+    type: String,
+    required: true,
+  },
+  description: {
+    type: String,
+    default: '',
+  },
+  date: {
+    type: Date,
+    required: true,
+  },
+  startTime: {
+    type: String, // Formato: "HH:mm"
+    required: true,
+  },
+  duration: {
+    type: Number, // Durata in minuti
+    required: true,
+  },
+  location: {
+    type: String,
+    default: '',
+  },
+  isRecurring: {
+    type: Boolean,
+    default: false,
+  },
+  frequency: {
+    type: String,
+    enum: ['daily', 'weekly', 'monthly', 'custom', 'one-time'],
+    default: 'one-time',
+  },
+  recurrencePattern: {
+    type: String,
+    default: '', // Esempio: 'ogni martedì'
+  },
+  numberOfOccurrences: {
+    type: Number,
+    default: null, // null se ripeti indefinitamente
+  },
+  notificationMechanism: {
+    type: [String],
+    enum: ['system', 'email', 'whatsapp', 'alert'],
+    default: [],
+  },
+  notificationTime: {
+    type: Number, // In minuti prima dell'evento
+    default: 0,
+  },
+  repeatNotification: {
+    type: Number, // In minuti per la ripetizione della notifica
+    default: 0,
+  },
+  author: {
+    type: String,
+    required: true,
+  },
+}, { timestamps: true });
 
-module.exports = mongoose.model('Event', eventSchema);
+const Event = mongoose.model('Event', eventSchema);
+module.exports = Event;
