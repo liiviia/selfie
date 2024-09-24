@@ -1,95 +1,77 @@
 <template>
   <div class="event-form">
-    <h1>Aggiungi Evento</h1>
-    <form @submit.prevent="aggiungiEvento">
-      <div class="form-group">
+    <h2>Crea un Nuovo Evento</h2>
+    <form @submit.prevent="createEvent">
+      <div>
         <label for="title">Titolo:</label>
-        <input type="text" id="title" v-model="newEvent.title" required>
+        <input type="text" v-model="newEvent.title" required />
       </div>
-
-      <div class="form-group">
+      <div>
         <label for="description">Descrizione:</label>
-        <textarea id="description" v-model="newEvent.description"></textarea>
+        <textarea v-model="newEvent.description"></textarea>
       </div>
-
-      <div class="form-group">
+      <div>
         <label for="date">Data:</label>
-        <input type="date" id="date" v-model="newEvent.date" required>
+        <input type="date" v-model="newEvent.date" required />
       </div>
-
-      <div class="form-group">
-        <label for="time">Ora:</label>
-        <input type="time" id="time" v-model="newEvent.time" required>
+      <div>
+        <label for="startTime">Ora di Inizio:</label>
+        <input type="time" v-model="newEvent.startTime" required />
       </div>
-
-      <div class="form-group">
+      <div>
         <label for="duration">Durata (minuti):</label>
-        <input type="number" id="duration" v-model="newEvent.duration" required>
+        <input type="number" v-model="newEvent.duration" required />
       </div>
-
-      <div class="form-group">
-        <label for="repeatFrequency">Frequenza di ripetizione:</label>
-        <select id="repeatFrequency" v-model="newEvent.repeatFrequency">
-          <option value="">Nessuna</option>
-          <option value="daily">Giornaliera</option>
+      <div>
+        <label for="location">Luogo:</label>
+        <input type="text" v-model="newEvent.location" />
+      </div>
+      <div>
+        <label>È Ripetibile?</label>
+        <input type="checkbox" v-model="newEvent.isRecurring" />
+      </div>
+      <div v-if="newEvent.isRecurring">
+        <label for="frequency">Frequenza:</label>
+        <select v-model="newEvent.frequency">
+          <option value="one-time">Una tantum</option>
+          <option value="daily">Giornaliero</option>
           <option value="weekly">Settimanale</option>
           <option value="monthly">Mensile</option>
-          <option value="custom">Personalizzata</option>
+          <option value="custom">Personalizzato</option>
         </select>
+        <div v-if="newEvent.frequency === 'custom'">
+          <label for="recurrencePattern">Pattern di Ripetizione:</label>
+          <input type="text" v-model="newEvent.recurrencePattern" placeholder="Esempio: ogni martedì" />
+        </div>
+        <div>
+          <label for="numberOfOccurrences">Numero di Ripetizioni:</label>
+          <input type="number" v-model="newEvent.numberOfOccurrences" placeholder="Lascia vuoto per ripetere indefinitamente" />
+        </div>
       </div>
-
-      <div v-if="newEvent.repeatFrequency === 'custom'" class="form-group">
-        <label for="daysOfWeek">Giorni della settimana:</label>
-        <input type="text" id="daysOfWeek" v-model="newEvent.daysOfWeek" placeholder="es.: monday,wednesday">
+      <div>
+        <label>Meccanismo di Notifica:</label>
+        <div>
+          <input type="checkbox" value="system" v-model="newEvent.notificationMechanism" /> Sistema
+          <input type="checkbox" value="email" v-model="newEvent.notificationMechanism" /> Email
+          <input type="checkbox" value="whatsapp" v-model="newEvent.notificationMechanism" /> WhatsApp
+          <input type="checkbox" value="alert" v-model="newEvent.notificationMechanism" /> Alert
+        </div>
+        <div>
+          <label for="notificationTime">Tempo di Notifica (minuti prima):</label>
+          <input type="number" v-model="newEvent.notificationTime" />
+        </div>
+        <div>
+          <label for="repeatNotification">Ripeti Notifica (minuti):</label>
+          <input type="number" v-model="newEvent.repeatNotification" />
+        </div>
       </div>
-
-      <div class="form-group">
-        <label for="dayOfMonth">Giorno del mese:</label>
-        <input type="number" id="dayOfMonth" v-model="newEvent.dayOfMonth">
+      <div>
+        <label for="author">Autore:</label>
+        <input type="text" v-model="newEvent.author" required />
       </div>
-
-      <div class="form-group">
-        <label for="repeatCount">Numero di ripetizioni:</label>
-        <input type="number" id="repeatCount" v-model="newEvent.repeatCount">
-      </div>
-
-      <div class="form-group">
-        <label for="repeatUntil">Ripeti fino al:</label>
-        <input type="date" id="repeatUntil" v-model="newEvent.repeatUntil">
-      </div>
-
-      <div class="form-group">
-        <label for="location">Luogo:</label>
-        <input type="text" id="location" v-model="newEvent.location">
-      </div>
-
-      <div class="form-group">
-        <label for="notificationMechanism">Meccanismo di notifica:</label>
-        <input type="text" id="notificationMechanism" v-model="newEvent.notificationMechanism" placeholder="es.: OS, Email">
-      </div>
-
-      <div class="form-group">
-        <label for="notificationAdvanceMinutes">Notifica minuti prima:</label>
-        <input type="number" id="notificationAdvanceMinutes" v-model="newEvent.notificationAdvanceMinutes">
-      </div>
-
-      <div class="form-group">
-        <label for="notificationAdvanceHours">Notifica ore prima:</label>
-        <input type="number" id="notificationAdvanceHours" v-model="newEvent.notificationAdvanceHours">
-      </div>
-
-      <div class="form-group">
-        <label for="notificationAdvanceDays">Notifica giorni prima:</label>
-        <input type="number" id="notificationAdvanceDays" v-model="newEvent.notificationAdvanceDays">
-      </div>
-
-      <div class="form-group">
-        <label for="notificationRepeat">Ripeti notifica:</label>
-        <input type="text" id="notificationRepeat" v-model="newEvent.notificationRepeat" placeholder="es.: everyMinute, everyHour, untilResponse">
-      </div>
-
-      <button type="submit" class="submit-button">Aggiungi Evento</button>
+      <button type="submit">Crea Evento</button>
     </form>
+    <p v-if="message">{{ message }}</p>
   </div>
 </template>
 
@@ -103,50 +85,49 @@ export default {
         title: '',
         description: '',
         date: '',
-        time: '',
+        startTime: '',
         duration: '',
-        repeatFrequency: '',
-        daysOfWeek: '',
-        dayOfMonth: '',
-        repeatCount: '',
-        repeatUntil: '',
         location: '',
-        author: localStorage.getItem('username') || 'Guest',
-        notificationMechanism: '',
-        notificationAdvanceMinutes: '',
-        notificationAdvanceHours: '',
-        notificationAdvanceDays: '',
-        notificationRepeat: ''
-      }
+        isRecurring: false,
+        frequency: 'one-time',
+        recurrencePattern: '',
+        numberOfOccurrences: null,
+        notificationMechanism: [],
+        notificationTime: 0,
+        repeatNotification: 0,
+        author: localStorage.getItem('username') || 'Guest'
+      },
+      message: ''
     };
   },
   methods: {
-    async aggiungiEvento() {
+    async createEvent() {
       try {
         const response = await axios.post('/api/events', this.newEvent);
-        console.log('Evento aggiunto:', response.data);
+        console.log('Evento creato con successo:', response.data);
+
         this.newEvent = {
           title: '',
           description: '',
           date: '',
-          time: '',
+          startTime: '',
           duration: '',
-          repeatFrequency: '',
-          daysOfWeek: '',
-          dayOfMonth: '',
-          repeatCount: '',
-          repeatUntil: '',
           location: '',
-          author: this.newEvent.username,
-          notificationMechanism: '',
-          notificationAdvanceMinutes: '',
-          notificationAdvanceHours: '',
-          notificationAdvanceDays: '',
-          notificationRepeat: ''
+          isRecurring: false,
+          frequency: 'one-time',
+          recurrencePattern: '',
+          numberOfOccurrences: null,
+          notificationMechanism: [],
+          notificationTime: 0,
+          repeatNotification: 0,
+          author: localStorage.getItem('username') || 'Guest'
         };
+
+        this.message = 'Evento creato con successo!';
         this.$router.push('/homePrincipale'); 
       } catch (error) {
-        console.error('Errore durante l\'aggiunta dell\'evento:', error);
+        this.message = 'Errore durante la creazione dell\'evento: ' + error;
+        console.error('Errore:', error);
       }
     }
   }
@@ -155,55 +136,81 @@ export default {
 
 <style scoped>
 .event-form {
-  max-width: 800px;
-  margin: 20px auto;
+  max-width: 600px;
+  margin: auto;
+  background-color: #f9f9f9;
   padding: 20px;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-h1 {
+.event-form h2 {
   text-align: center;
+  color: #333;
   margin-bottom: 20px;
-  color: #343a40;
 }
 
-.form-group {
+.event-form div {
   margin-bottom: 15px;
 }
 
-label {
-  font-weight: bold;
+.event-form label {
   display: block;
+  font-weight: bold;
+  color: #555;
   margin-bottom: 5px;
 }
 
-input, textarea, select {
+.event-form input[type="text"],
+.event-form input[type="date"],
+.event-form input[type="time"],
+.event-form input[type="number"],
+.event-form textarea,
+.event-form select {
   width: 100%;
   padding: 10px;
-  border: 1px solid #ced4da;
-  border-radius: 4px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
   box-sizing: border-box;
 }
 
-input:focus, textarea:focus, select:focus {
-  border-color: #80bdff;
-  outline: none;
+.event-form textarea {
+  resize: vertical;
 }
 
-.submit-button {
+.event-form input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+.event-form button {
   width: 100%;
   padding: 10px;
-  background-color: #007bff;
+  background-color: #4caf50;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 5px;
+  font-size: 16px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: background-color 0.3s ease;
 }
 
-.submit-button:hover {
-  background-color: #0056b3;
+.event-form button:hover {
+  background-color: #45a049;
 }
+
+.event-form p {
+  text-align: center;
+  color: #4caf50;
+  font-weight: bold;
+}
+
+.event-form input:focus,
+.event-form textarea:focus,
+.event-form select:focus {
+  border-color: #4caf50;
+  outline: none;
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+}
+
 </style>
