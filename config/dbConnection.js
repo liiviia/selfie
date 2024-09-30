@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const mongoDBUri = "mongodb+srv://gg:cccciiiaaaaoooo@cluster0.oepbskc.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
 const connectDB = () => {
-    mongoose.connect(mongoDBUri, { useNewUrlParser: true, useUnifiedTopology: true });
+    mongoose.connect(mongoDBUri);
     mongoose.connection.on("connected", () => console.log("Connected to MongoDB"));
     mongoose.connection.on("reconnected", () => console.log("Reconnected to MongoDB"));
     mongoose.connection.on("disconnected", () => console.log("Disconnected from MongoDB"));
