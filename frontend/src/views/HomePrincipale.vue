@@ -2,6 +2,29 @@
   <div class="home-principale">
     <h1 class="mt-4">Benvenuto, {{ username }}!</h1>
 
+    <nav class="navbar navbar-expand-lg bg-body-tertiary mt-3">
+      <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+          <ul class="navbar-nav d-flex justify-content-center">
+            <li class="nav-item"><a class="nav-link" href="/pomodoroTempo">Pomodoro</a></li>
+            
+            <li class="nav-item"><a class="nav-link" href="/todo">Lista Note</a></li>
+            <li class="nav-item"><a class="nav-link" href="/calendarEvent">Calendario</a></li>
+            <li class="nav-item"><a class="nav-link" href="/addEvent">Aggiungi evento</a></li>
+            <li class="nav-item"><a class="nav-link" href="/eventsE">Lista eventi</a></li>
+            <li class="nav-item"><a class="nav-link" href="/addActivities">Aggiungi attività</a></li>
+            <li class="nav-item"><a class="nav-link" href="/activities">Lista attività</a></li>
+            <li class="nav-item"><a class="nav-link" href="/pomSession">Sessioni Pomodoro</a></li>
+            <li class="nav-item"><a class="nav-link" href="/accountUtente">Gestisci il tuo Account</a></li>
+            <li class="nav-item"> <button class="nav-link" @click="logout">Logout</button></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
     <div class="container mt-3">
       <div class="row">
         <div class="col-md-6 d-flex justify-content-center align-items-center">
@@ -55,6 +78,8 @@
 </template>
 
 <script>
+
+
 import axios from 'axios';
 
 export default {
@@ -79,7 +104,12 @@ export default {
   methods: {
      async getLastEvent() {
       try {
+        const token = sessionStorage.getItem('token');
+        console.log("token home " ,token) ;
       const response = await axios.get('/api/events/last', {
+        headers: {
+          Authorization: `Bearer ${token}` 
+        },
         params: { author: this.username }
       });
       if (response.data) {
@@ -103,8 +133,12 @@ export default {
   
   async getLastActivity() {
     try {
+      const token = sessionStorage.getItem('token');
       const username = localStorage.getItem('username'); 
       const response = await axios.get('/api/activities/last', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
         params: { username: username }
       });
 
