@@ -9,7 +9,6 @@ exports.getAllNotes = async (req, res) => {
       return res.status(400).json({ message: 'Username è necessario' });
     }
 
-    console.log('Richiesta note per l\'utente:', username); 
 
     const notes = await Note.find({ author: username });
 
