@@ -10,11 +10,15 @@ const accountRoutes = require('./routes/accountRoutes');
 const activityRoutes = require('./routes/activityRoutes');
 const registerRoutes = require('./routes/registerRoutes');
 const { scheduleEmailReminders } = require('./cronTask'); 
+require('dotenv').config({ path: __dirname + '/.env' });
 
 const app = express();
 const port = 3000;
 
 connectDB();
+
+
+
 
 app.use(cors());
 app.use(express.json());
