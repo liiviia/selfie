@@ -27,6 +27,7 @@
 </template>
 
 <script>
+  
 import axios from 'axios';
 
 export default {
@@ -45,13 +46,17 @@ export default {
   methods: {
     async fetchNotes() {
       try {
+        const token = sessionStorage.getItem('token');
         const username = localStorage.getItem('username'); 
         if (!username) {
           console.error('Username non trovato');
           return;
         }
         const response = await axios.get('/api/notesGET', {
-          params: { username: username }
+          params: { username: username } ,
+          headers: {
+            Authorization: `Bearer ${token}` 
+          }
         });
         this.notes = response.data;
       } catch (error) {
@@ -60,6 +65,7 @@ export default {
     },
     async addNote() {
       try {
+        const token = sessionStorage.getItem('token');
         const username = localStorage.getItem('username');
         if (!username) {
           console.error('Username non trovato, impossibile creare la nota');
@@ -68,7 +74,11 @@ export default {
 
         this.newNote.author = username;
 
-        const response = await axios.post('/api/notes', this.newNote);
+        const response = await axios.post('/api/notes', this.newNote, {
+          headers: {
+            Authorization: `Bearer ${token}` 
+          }
+        });
         console.log('Nota aggiunta:', response.data);
 
         this.newNote = {
@@ -87,7 +97,12 @@ export default {
     },
     async deleteNote(id) {
       try {
-        await axios.delete(`/api/notesRIM/${id}`);
+        const token = sessionStorage.getItem('token');
+        await axios.delete(`/api/notesRIM/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}` 
+          }
+        });
         console.log('Nota eliminata');
         this.fetchNotes();
       } catch (error) {
