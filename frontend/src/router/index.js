@@ -10,7 +10,6 @@ import calendarEvent from '../views/calendarEvent.vue'
 import eventsE from '../views/eventsE.vue'
 import pomodoroTempo from '../views/pomodoroTempo.vue'
 import pomSession from '../views/pomSession.vue'
-import registratiAccedi from '../views/registratiAccedi.vue'
 import editNote from '../views/editNote.vue';
 import accountUtente from '@/views/accountUtente.vue';
 
@@ -26,7 +25,7 @@ const routes = [
     path: '/accountUtente',
     name: 'accountUtente',
     component: accountUtente,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true } 
   },
 
   {
@@ -46,14 +45,15 @@ const routes = [
     path: '/todo',
     name: 'ToDoApp',
     component: ToDoApp,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true } 
+
   },
 
   {
     path: '/edit-note/:id',
     name: 'editNote',
     component: editNote,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true } 
   },
 
 
@@ -61,28 +61,28 @@ const routes = [
     path: '/activities',
     name: 'activities',
     component: activities,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true } 
   },
 
   {
     path: '/addActivities',
     name: 'addActivities',
     component: addActivities,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true } 
   },
 
   {
     path: '/addEvent',
     name: 'addEvent',
     component: addEvent,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true } 
   },
 
   {
     path: '/calendarEvent',
     name: 'calendarEvent',
     component: calendarEvent,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true } 
   },
 
 
@@ -90,7 +90,7 @@ const routes = [
     path: '/eventsE',
     name: 'eventsE',
     component: eventsE,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true } 
   },
 
 
@@ -98,21 +98,17 @@ const routes = [
     path: '/pomodoroTempo',
     name: 'pomodoroTempo',
     component: pomodoroTempo,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true } 
   },
 
   {
     path: '/pomSession',
     name: 'pomSession',
     component: pomSession,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true } 
   },
 
-  {
-    path: '/registratiAccedi',
-    name: 'registratiAccedi',
-    component: registratiAccedi,
-  },
+
 ];
 
 const router = createRouter({
@@ -120,16 +116,28 @@ const router = createRouter({
   routes,
 });
 
-/*// Verifica se l'utente è autenticato controllando il token di accesso nel localStorage
-router.beforeEach((to, from, next) => {
-  const isAuthenticated = localStorage.getItem('userToken'); 
 
-  // Se la rotta richiede autenticazione e l'utente non è autenticato
-  if (to.matched.some(record => record.meta.requiresAuth) && !isAuthenticated) {
-    next('/'); // Reindirizza alla pagina di login
+// Guard globale per controllare il token
+router.beforeEach((to, from, next) => {
+  const token = sessionStorage.getItem('token'); // Recupera il token dal sessionStorage
+
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    // Se la rotta richiede autenticazione e il token non è presente, reindirizza al login
+    if (!token) {
+      next({
+        path: '/',
+        query: { redirect: to.fullPath } // Dopo il login, reindirizza alla pagina richiesta
+      });
+    } else {
+      next(); // Se il token è presente, consenti l'accesso alla rotta
+    }
   } else {
-    next(); // Altrimenti consenti l'accesso
+    next(); // Se la rotta non richiede autenticazione, consenti l'accesso
   }
-});*/
+});
+
+
+
+
 
 export default router;
