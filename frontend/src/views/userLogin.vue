@@ -32,31 +32,33 @@ export default {
       errorMessage: ''
     };
   },
-  /* created() {
-    const token = localStorage.getItem('token'); 
-    if (token) {
-      // Puoi eventualmente fare una richiesta per verificare se il token è valido
-      this.$router.push('/homePrincipale');
-    }
-  }, */
   methods: {
     async login() {
-      try {
-        const response = await axios.post('/api/auth/login', {
-          username: this.username,
-          password: this.password
-        });
-        // Salva il token nel localStorage
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('username', this.username);
+  try {
+    const response = await axios.post('/api/auth/login', {
+      username: this.username,
+      password: this.password
+    });
+             
+      //TOKEN
+      const token = response.data.token;
+      sessionStorage.setItem('token', token);
+      console.log("token login:" , response.data.token) ;
 
-        // Reindirizza l'utente alla home page
-        this.$router.push('/homePrincipale'); 
-      } catch (error) {
-        // Mostra il messaggio di errore in caso di problemi con il login
-        this.errorMessage = error.response?.data?.message || 'Errore durante il login';
-      }
-    }
+
+        localStorage.setItem('username', this.username);
+    const userEmail = response.data.email; 
+      localStorage.setItem('email', userEmail);
+      const numeroTel = response.data.phone;
+      localStorage.setItem('phone',numeroTel);
+
+      console.log("email:",userEmail);
+      console.log("tel:",numeroTel);
+    this.$router.push('/homePrincipale'); 
+  } catch (error) {
+    this.errorMessage = error.response.data.message;
+  }
+}
   }
 };
 </script>
@@ -64,7 +66,6 @@ export default {
 
 <style scoped>
 
-/* Aggiungi uno sfondo sfumato */
 .login {
   background: linear-gradient(90deg, #C7C5F4, #776BCC);
   display: flex;
