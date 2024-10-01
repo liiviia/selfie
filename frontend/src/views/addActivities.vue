@@ -44,7 +44,12 @@ export default {
   methods: {
     async submitActivity() {
       try {
-        const response = await axios.post('/api/activities', this.newActivity);
+        const token = sessionStorage.getItem('token');
+        const response = await axios.post('/api/activities', this.newActivity, {
+          headers: {
+            Authorization: `Bearer ${token}` 
+          }
+        });
         console.log('Attività aggiunta:', response.data);
         
         this.newActivity = { 
