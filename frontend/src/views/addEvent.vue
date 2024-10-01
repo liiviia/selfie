@@ -103,7 +103,12 @@ export default {
   methods: {
     async createEvent() {
       try {
-        const response = await axios.post('/api/events', this.newEvent);
+        const token = sessionStorage.getItem('token');
+        const response = await axios.post('/api/events', this.newEvent, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
         console.log('Evento creato con successo:', response.data);
 
         this.newEvent = {
