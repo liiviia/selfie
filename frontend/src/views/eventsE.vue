@@ -28,9 +28,13 @@ export default {
   methods: {
     async fetchEvents() {
       try {
+        const token = sessionStorage.getItem('token');
         const username = localStorage.getItem('username'); 
         const response = await axios.get('/api/eventsGET', {
-          params: { username: username }
+          headers: {
+            Authorization: `Bearer ${token}` 
+          },
+          params: { author: username }
         });
         this.events = response.data;
       } catch (error) {
