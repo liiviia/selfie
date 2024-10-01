@@ -28,8 +28,12 @@ export default {
   methods: {
     async fetchActivities() {
       try {
+        const token = sessionStorage.getItem('token');
         const username = localStorage.getItem('username'); 
         const response = await axios.get('/api/activitiesGET', {
+          headers: {
+            Authorization: `Bearer ${token}` 
+          },
           params: { username: username }
         });
         this.activities = response.data;
