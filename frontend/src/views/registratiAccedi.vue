@@ -59,7 +59,7 @@ export default {
         };
       } catch (error) {
         this.message = 'Errore durante la registrazione.';
-        console.error('Errore:', error);
+        console.log('Errore:', error);
       }
     }
   }
