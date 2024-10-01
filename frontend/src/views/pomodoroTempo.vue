@@ -46,9 +46,14 @@ export default {
   methods: {
     async aggiungiPomodoro() {
       try {
+        const token = sessionStorage.getItem('token');
         console.log('Dati inviati:', this.newPom);
 
-        const response = await axios.post('/api/pomsPOST', this.newPom);
+        const response = await axios.post('/api/pomsPOST', this.newPom, {
+          headers: {
+            Authorization: `Bearer ${token}` 
+          }
+        });
         console.log('Sessione pomodoro aggiunta:', response.data);
         this.startStudyTimer(this.newPom.tempoStudio, this.newPom.ripetizioni, this.newPom.tempoPausa);
         this.newPom = {
