@@ -50,7 +50,11 @@ export default {
   methods: {
     async updatePassword() {
       try {
+        const token = sessionStorage.getItem('token');
         const response = await axios.put('/api/updatePassword', {
+          headers: {
+           Authorization: `Bearer ${token}` 
+      },
           username: this.username,
           currentPassword: this.currentPassword,
           newPassword: this.newPassword
@@ -62,6 +66,7 @@ export default {
 
         this.currentPassword = '';
         this.newPassword = '';
+        this.$router.push('/'); 
       } catch (error) {
         this.errorMessage = error.response?.data?.message || 'Errore durante l\'aggiornamento della password.';
         console.log("errore", error);
@@ -71,7 +76,11 @@ export default {
     
     async deleteAccount() {
       try {
+        const token = sessionStorage.getItem('token');
         const response = await axios.delete('/api/deleteAccount', {
+          headers: {
+           Authorization: `Bearer ${token}` 
+      },
           data: { username: this.username }
         });
         
