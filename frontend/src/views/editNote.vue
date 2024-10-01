@@ -33,19 +33,28 @@
     methods: {
       async fetchNote() {
         try {
+          const token = sessionStorage.getItem('token');
           const noteId = this.$route.params.id;
-          const response = await axios.get(`/api/nota/${noteId}`);
+          const response = await axios.get(`/api/nota/${noteId}`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          });
           this.note = response.data;
           console.log('Nota recuperata:', this.note); 
-         // this.$router.push('/todo');
         } catch (error) {
           console.error('Errore nel recupero della nota:', error);
         }
       },
       async updateNote() {
         try {
+          const token = sessionStorage.getItem('token');
           const noteId = this.$route.params.id;
-          const response = await axios.put(`/api/notes/${noteId}`, this.note);
+          const response = await axios.put(`/api/notes/${noteId}`, this.note, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          });
           console.log('Nota aggiornata:', response.data);
           this.$router.push('/todo');
         } catch (error) {
