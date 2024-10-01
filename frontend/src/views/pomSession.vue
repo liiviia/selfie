@@ -33,7 +33,14 @@ export default {
   methods: {
     async getPoms() {
       try {
-        const response = await axios.get('/api/poms');
+        const token = sessionStorage.getItem('token');
+        const username = localStorage.getItem('username'); 
+        const response = await axios.get('/api/poms', {
+          headers: {
+            Authorization: `Bearer ${token}` 
+          },
+          params: { username: username }
+        });
         this.poms = response.data; 
       } catch (error) {
         console.error('Errore durante il recupero delle sessioni Pomodoro:', error);
