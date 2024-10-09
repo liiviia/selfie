@@ -1,4 +1,8 @@
 <template>
+  <router-link to="/homePrincipale" class="back-home-link">
+    <button class="btn btn-dark">Torna alla Home</button>
+  </router-link>
+
   <div class="event-form">
     <h2>Crea un Nuovo Evento</h2>
     <form @submit.prevent="createEvent">
@@ -142,28 +146,37 @@ export default {
 <style scoped>
 .event-form {
   max-width: 600px;
-  margin: auto;
-  background-color: #f9f9f9;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin: 50px auto;
+  padding: 30px;
+  background-color: #15172b;
+  border-radius: 12px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); /* ombreggiatura */
+  transition: transform 0.3s ease; /* transizione */
+  box-sizing: border-box;
+}
+
+.event-form:hover {
+  transform: translateY(-5px); /* animazione al passaggio */
 }
 
 .event-form h2 {
   text-align: center;
-  color: #333;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
+  color: #acb0b4;
+  font-family: 'Poppins', sans-serif;
+  font-size: 28px;
 }
 
 .event-form div {
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
 .event-form label {
-  display: block;
   font-weight: bold;
-  color: #555;
-  margin-bottom: 5px;
+  margin-bottom: 8px;
+  color: #acb0b4;
+  font-family: 'Poppins', sans-serif;
+  display: block;
 }
 
 .event-form input[type="text"],
@@ -172,50 +185,80 @@ export default {
 .event-form input[type="number"],
 .event-form textarea,
 .event-form select {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  padding: 12px;
+  border: 2px solid #ced4da;
+  border-radius: 8px;
   font-size: 16px;
-  box-sizing: border-box;
-}
-
-.event-form textarea {
-  resize: vertical;
-}
-
-.event-form input[type="checkbox"] {
-  margin-right: 10px;
-}
-
-.event-form button {
   width: 100%;
-  padding: 10px;
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.event-form button:hover {
-  background-color: #45a049;
-}
-
-.event-form p {
-  text-align: center;
-  color: #4caf50;
-  font-weight: bold;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .event-form input:focus,
 .event-form textarea:focus,
 .event-form select:focus {
-  border-color: #4caf50;
+  border-color: #007bff;
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.25); /* effetto focus */
   outline: none;
-  box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+}
+
+.event-form textarea {
+  height: 120px;
+  resize: none;
+}
+
+.event-form button {
+  padding: 12px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 18px;
+  font-family: 'Poppins', sans-serif;
+  transition: background-color 0.3s ease, transform 0.2s;
+}
+
+.event-form button:hover {
+  background-color: #0056b3;
+  transform: translateY(-2px);
+}
+
+.event-form p {
+  text-align: center;
+  margin-top: 20px;
+  color: #28a745;
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+}
+
+.event-form input,
+.event-form textarea,
+.event-form button {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /*  effetto ombra per gli input e il pulsante */
+}
+
+.event-form div {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.back-home-link {
+  color: #0016db;
+  font-family: 'Poppins', sans-serif;
+  text-decoration: none;
+  margin-bottom: 20px;
+  transition: color 0.3s ease;
+  text-align: left;
 }
 
 </style>

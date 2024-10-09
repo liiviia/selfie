@@ -42,34 +42,12 @@
     </div>
 
     <!-- Navbar -->
-    <nav class="navbar navbar-light bg-white">
-      <div class="container-fluid d-flex justify-content-between align-items-center">
-        <!-- Pulsante hamburger e titolo della pagina a sinistra -->
-        <div class="d-flex align-items-center">
-          <button class="navbar-toggler" type="button" @click="toggleNavbar" data-bs-toggle="collapse" data-bs-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div v-if="currentPage" class="navbar-page-title ms-3">
-            {{ currentPage }}
-          </div>
-        </div>
-
-        <!-- Time Machine Controls - Mostra solo nelle pagine specificate -->
-        <div v-if="showTimeMachine" class="time-machine-control">
-          <div>
-            <label for="date">Data:</label>
-            <input type="date" v-model="timeMachineDate">
-            <label for="time">Ora:</label>
-            <input type="time" v-model="timeMachineTime">
-            <button @click="setTimeMachine">Imposta</button>
-            <button @click="resetTimeMachine">Reset</button>
-          </div>
-          <div>
-            <p>Orologio: {{ simulatedTime }}</p>
-          </div>
-        </div>
+    <!-- <nav class="navbar navbar-light bg-white">
+      <div class="container-fluid d-flex justify-content-center align-items-center">
+        <h5 class="welcome-message">Benvenuto {{ username ? ', ' + username : ', loggati o registrati !' }}!</h5>
       </div>
-    </nav>
+    </nav> -->
+    
   </div>
 </template>
 
@@ -134,6 +112,8 @@ export default {
     },
     logout() {
       localStorage.clear();
+      this.isAut=false;
+      console.log("autenticato:", this.isAut);
       this.$router.push('/'); // Ritorna alla pagina di login
     },
     setTimeMachine() {
@@ -216,4 +196,12 @@ export default {
 .time-machine-control button:hover {
   background-color: #0056b3;
 }
+
+.welcome-message {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  text-align: center;
+}
+
 </style>

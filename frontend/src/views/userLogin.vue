@@ -1,4 +1,7 @@
 <template>
+  <div class="mess">
+    <h2>accedi o registrati</h2>
+  </div>
   <div class="login">
     <div class="login__container">
       <h1 class="login__title">Login</h1>

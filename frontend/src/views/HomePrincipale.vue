@@ -1,6 +1,6 @@
 <template>
   <div class="home-principale">
-    <h1 class="mt-4">Benvenuto, {{ username }}!</h1>
+    <h2 class="mt-4">Benvenuto, {{ username }}!</h2>
 
     <nav class="navbar navbar-expand-lg bg-body-tertiary mt-3">
       <div class="container-fluid">
@@ -8,9 +8,8 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNavDropdown">
-          <ul class="navbar-nav d-flex justify-content-center">
+          <ul class="navbar-nav me-auto">
             <li class="nav-item"><a class="nav-link" href="/pomodoroTempo">Pomodoro</a></li>
-            
             <li class="nav-item"><a class="nav-link" href="/todo">Lista Note</a></li>
             <li class="nav-item"><a class="nav-link" href="/calendarEvent">Calendario</a></li>
             <li class="nav-item"><a class="nav-link" href="/addEvent">Aggiungi evento</a></li>
@@ -19,8 +18,8 @@
             <li class="nav-item"><a class="nav-link" href="/activities">Lista attività</a></li>
             <li class="nav-item"><a class="nav-link" href="/pomSession">Sessioni Pomodoro</a></li>
             <li class="nav-item"><a class="nav-link" href="/accountUtente">Gestisci il tuo Account</a></li>
-            <li class="nav-item"> <button class="nav-link" @click="logout">Logout</button></li>
           </ul>
+          <button type="button" class="btn btn-dark" @click="logout">Logout</button>
         </div>
       </div>
     </nav>
@@ -160,7 +159,6 @@ export default {
 };
 </script>
 
-
 <style scoped>
 body {
   background: linear-gradient(to bottom, #0000ff, #ffffff);
@@ -185,9 +183,26 @@ body {
 }
 
 .navbar {
-  display: flex; 
-  justify-content: center; 
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* ombreggiatura navbar */
 }
 
+.nav-link {
+  padding: 10px 15px;
+  transition: background-color 0.3s; /* transizione passaggio del mouse */
+}
 
+.nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.1); /* cambia colore al passaggio del mouse */
+  border-radius: 5px; /* angoli arrotondati */
+}
+
+.btn-danger {
+  margin-left: 10px; /* margine pulsante Logout */
+}
+
+/* effetto di hover per il pulsante */
+.btn-danger:hover {
+  background-color: #c82333; /* colore scuro al passaggio del mouse */
+  transition: background-color 0.3s;
+}
 </style>
