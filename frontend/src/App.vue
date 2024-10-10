@@ -1,21 +1,28 @@
 <template>
   <div id="App">
-    <AppNavbar />
+    <!-- Navbar, visibile solo se non siamo nella schermata di login -->
+    <Nav v-if="!isLoginPage" />
     <router-view/>
-    <AppFooter />
+    <AppFooter v-if="!isLoginPage"/>
   </div>
 </template>
 
 <script>
-import AppNavbar from './components/AppNavbar.vue';
 import AppFooter from './components/AppFooter.vue';
+import Nav from './components/NavigationBar.vue';
 
 
 export default {
   name: 'App', 
    components: {
-    AppNavbar,
+    Nav,
     AppFooter,
+  },
+  computed:{
+    //verifico se sono nella pagina di login
+    isLoginPage(){
+      return this.$route.path==='/';
+    }
   },
 }; 
 </script>

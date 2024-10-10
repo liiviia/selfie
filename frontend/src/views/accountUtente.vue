@@ -1,6 +1,8 @@
 <template>
   <div class="account-utente">
-    <h1>Pagina Account Utente</h1>
+    <div class="teext">
+      <h1>Pagina Account Utente</h1>
+    </div>
     
     <div class="personal-data">
       <h2>Dati Personali</h2>
@@ -118,7 +120,6 @@ export default {
   margin: 20px 0;
   padding: 15px;
   border: 1px solid #ccc;
-  border-radius: 5px;
   background-color: #f9f9f9;
 }
 
@@ -128,5 +129,9 @@ export default {
 
 .success {
   color: green;
+}
+
+.teext {
+  margin: 10px 0;
 }
 </style>

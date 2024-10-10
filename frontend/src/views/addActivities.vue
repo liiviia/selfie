@@ -1,9 +1,4 @@
 <template>
-
-  <router-link to="/homePrincipale" class="back-home-link">
-    <button class="btn btn-dark">Torna alla Home</button>
-  </router-link>
-  
   <div class="activity-form">
     <h1>Aggiungi una nuova attività</h1>
     

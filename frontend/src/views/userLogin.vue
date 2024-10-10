@@ -1,6 +1,6 @@
 <template>
   <div class="mess">
-    <h2>accedi o registrati</h2>
+    <h3>accedi o registrati</h3>
   </div>
   <div class="login">
     <div class="login__container">

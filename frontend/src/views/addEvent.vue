@@ -1,7 +1,4 @@
 <template>
-  <router-link to="/homePrincipale" class="back-home-link">
-    <button class="btn btn-dark">Torna alla Home</button>
-  </router-link>
 
   <div class="event-form">
     <h2>Crea un Nuovo Evento</h2>

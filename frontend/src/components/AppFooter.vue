@@ -24,38 +24,21 @@
     background-color: #343a40;
     color: white;
     padding: 20px 0;
+    width: 100%;    
+    position: fixed;
+    bottom: 0;
+    left: 0;
   }
   
-  .footer h5 {
-    font-size: 18px;
-    color: #ffffff;
-  }
-  
-  .footer p,
-  .footer ul,
-  .footer li,
-  .footer a {
+  .footer p {
+    margin: 0;
+    text-align: center;      
     font-size: 14px;
     color: #dcdcdc;
-    text-decoration: none;
   }
   
   .footer a:hover {
     color: #ffffff;
-  }
-  
-  .social-links {
-    list-style: none;
-    padding: 0;
-  }
-  
-  .social-links li {
-    display: inline;
-    margin-right: 10px;
-  }
-  
-  .social-links a {
-    color: #dcdcdc;
   }
   </style>
   
