@@ -35,3 +35,20 @@ exports.getPoms = async (req, res) => {
     res.status(500).json({ error: 'Errore durante il recupero delle sessioni Pomodoro' });
   }
 };
+
+
+exports.getLastPom = async (req, res) => {
+  try {
+    const username = req.query.username;
+
+    if (!username) {
+      return res.status(400).json({ message: 'Username è necessario' });
+    }
+
+    const pom = await Pom.findOne({ username }).sort({ createdAt: -1 });
+    res.status(200).json(pom);
+  } catch (error) {
+    console.error('Errore durante il recupero dell\'ultima sessione Pomodoro:', error);
+    res.status(500).json({ error: 'Errore durante il recupero dell\'ultima sessione Pomodoro' });
+  }
+};

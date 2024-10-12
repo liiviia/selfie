@@ -86,3 +86,63 @@ exports.getLastEvent = async (req, res) => {
     res.status(500).json({ error: 'Errore nel recupero dell\'evento' });
   }
 };
+
+
+exports.getCurrentDayEvents = async (req, res) => {
+  try {
+    const username = req.query.username;
+
+    if (!username) {
+      return res.status(400).json({ message: 'Username è necessario' });
+    } 
+
+    const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0); // Imposta l'ora a mezzanotte
+
+    const endOfDay = new Date(currentDate);
+    endOfDay.setDate(currentDate.getDate() + 1);
+    endOfDay.setMilliseconds(endOfDay.getMilliseconds() - 1); // Fine della giornata
+
+
+    const events = await Event.find({
+      author: username,
+      date: { $gte: currentDate, $lte: endOfDay }
+    });
+
+
+  
+
+    res.json(events);
+  } catch (error) {
+    console.error('Errore nel recupero degli eventi del giorno corrente:', error);
+    res.status(500).json({ error: 'Errore nel recupero degli eventi del giorno corrente' });
+  }
+};
+
+
+
+exports.getEventByDate = async (req, res) => {
+  try {
+    const { author, date } = req.query;
+    if (!author || !date) {
+      return res.status(400).json({ message: 'Autore e data sono necessari' });
+    }
+
+    const startDate = new Date(date);
+    startDate.setHours(0, 0, 0, 0);
+    const endDate = new Date(date);
+    endDate.setHours(23, 59, 59, 999);
+
+    const events = await Event.find({
+      author,
+      date: { $gte: startDate, $lte: endDate }
+    });
+
+
+
+    res.json(events);
+  } catch (error) {
+    console.error('Errore nel recupero degli eventi:', error);
+    res.status(500).json({ error: 'Errore nel recupero degli eventi' });
+  }
+};

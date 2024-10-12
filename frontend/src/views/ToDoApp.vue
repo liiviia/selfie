@@ -7,35 +7,37 @@
         <input type="text" v-model="newNote.heading" id="heading" required />
       </div>
       <div>
-        <label for="completed">Completata:</label>
-        <input type="checkbox" v-model="newNote.completed" id="completed" />
+        <label for="content">Contenuto:</label>
+        <textarea v-model="newNote.content" id="content" rows="4"></textarea>
       </div>
       <button type="submit">Aggiungi Nota</button>
     </form>
 
     <h1>Notes</h1>
-    <ul>
-      <li v-for="note in notes" :key="note._id">
+    <ul class="notes-list">
+      <li v-for="note in notes" :key="note._id" class="note-item">
         <h2>{{ note.heading }}</h2>
+        <div class="note-content" v-html="renderMarkdown(note.content)"></div>
         <p>Author: {{ note.author }}</p>
-        <p>Status: {{ note.completed ? 'Completed' : 'Not Completed' }}</p>
-        <button @click="editNote(note._id)">Modifica</button>
-        <button @click="deleteNote(note._id)">Elimina</button>
+        <div class="note-actions">
+          <button @click="editNote(note._id)">Modifica</button>
+          <button @click="deleteNote(note._id)">Elimina</button>
+        </div>
       </li>
     </ul>
   </div>
 </template>
-
 <script>
   
-import axios from 'axios';
+  import axios from 'axios';
+import {marked} from 'marked';
 
 export default {
   data() {
     return {
       newNote: {
         heading: '',
-        completed: false
+        content: ''
       },
       notes: []
     };
@@ -53,7 +55,7 @@ export default {
           return;
         }
         const response = await axios.get('/api/notesGET', {
-          params: { username: username } ,
+          params: { username: username },
           headers: {
             Authorization: `Bearer ${token}` 
           }
@@ -83,6 +85,7 @@ export default {
 
         this.newNote = {
           heading: '',
+          content: '',
           author: username,
           completed: false
         };
@@ -108,6 +111,11 @@ export default {
       } catch (error) {
         console.error('Errore nell\'eliminazione della nota:', error);
       }
+    },
+    
+    renderMarkdown(content) {
+      if (!content) return '';
+      return marked(content);
     }
   }
 };
@@ -147,7 +155,8 @@ form label {
 }
 
 form input[type="text"],
-form input[type="checkbox"] {
+form input[type="checkbox"],
+form textarea {
   width: 100%;
   padding: 10px;
   border-radius: 6px;
@@ -157,6 +166,10 @@ form input[type="checkbox"] {
 
 form input[type="checkbox"] {
   width: auto;
+}
+
+form textarea {
+  resize: vertical;
 }
 
 button[type="submit"] {
@@ -226,5 +239,69 @@ button:nth-of-type(2):hover {
   background-color: #c82333;
 }
 
+
+.notes-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  max-width: 800px;
+}
+
+.note-item {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.note-content {
+  margin-bottom: 15px;
+  line-height: 1.6;
+}
+
+.note-content h1 {
+  font-size: 24px;
+  margin-top: 0;
+}
+
+.note-content h2 {
+  font-size: 20px;
+}
+
+.note-content h3 {
+  font-size: 18px;
+}
+
+.note-content ul, .note-content ol {
+  padding-left: 20px;
+}
+
+.note-content pre {
+  background-color: #f4f4f4;
+  padding: 10px;
+  border-radius: 4px;
+  overflow-x: auto;
+}
+
+.note-content code {
+  font-family: monospace;
+  background-color: #f4f4f4;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+.note-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.note-actions button {
+  margin-left: 10px;
+}
 
 </style>

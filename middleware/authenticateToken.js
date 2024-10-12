@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
-  console.log("token backend: ", token, "ora: ", new Date().toLocaleString(), "\n");
+  //console.log("token backend: ", token, "ora: ", new Date().toLocaleString(), "\n");
 
   if (!token) {
     return res.status(403).json({ message: 'Token mancante, accesso negato' });

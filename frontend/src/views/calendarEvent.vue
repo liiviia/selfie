@@ -1,159 +1,299 @@
 <template>
   <div class="calendar">
     <div class="calendar-header">
-      <button @click="prevMonth">←</button>
-      <div class="year-month-display">
-        <div class="year">{{ currentYear }}</div>
-        <div class="month">{{ monthNames[currentMonth] }}</div>
+      <button @click="prevMonth">&lt;</button>
+      <h2>{{ currentMonthYear }}</h2>
+      <button @click="nextMonth">&gt;</button>
+    </div>
+    <div class="calendar-body">
+      <div class="weekdays">
+        <div v-for="day in weekdays" :key="day">{{ day }}</div>
       </div>
-      <button @click="nextMonth">→</button>
-    </div>
-
-    <div class="calendar-weekdays">
-      <div v-for="day in weekdays" :key="day">{{ day }}</div>
-    </div>
-
-    <div class="calendar-grid">
-      <div v-for="emptyDay in emptyDays" :key="emptyDay" class="empty-day"></div>
-      <div v-for="day in daysInMonth" :key="day" class="calendar-day" 
-           :class="{ 'current-day': isToday(day), 'sunday': isSunday(day) }" 
-           @click="handleDayClick(day)">
-        {{ day }}
+      <div class="days">
+        <div 
+          v-for="day in calendarDays" 
+          :key="day.date" 
+          :class="{ 'current-month': day.currentMonth, 'other-month': !day.currentMonth, 'today': day.isToday, 'has-events': day.hasEvents, 'has-activities': day.hasActivities }"
+          @click="selectDate(day)"
+        >
+          {{ day.dayOfMonth }}
+          <div v-if="day.hasEvents" class="event-indicator"></div>
+          <div v-if="day.hasActivities" class="activity-indicator"></div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { ref, computed, onMounted, watch } from 'vue';
+import axios from 'axios';
+import { useRouter } from 'vue-router';
+
 export default {
-  data() {
-    return {
-      currentYear: new Date().getFullYear(),
-      currentMonth: new Date().getMonth(),
-      monthNames: [
-        'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno',
-        'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'
-      ],
-      weekdays: ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom']
-    };
-  },
-  computed: {
-    daysInMonth() {
-      return new Array(new Date(this.currentYear, this.currentMonth + 1, 0).getDate()).fill(null).map((_, i) => i + 1);
-    },
-    emptyDays() {
-      const firstDay = new Date(this.currentYear, this.currentMonth, 1).getDay();
-      return new Array(firstDay === 0 ? 6 : firstDay - 1).fill(null);
+  setup() {
+    const router = useRouter();
+
+    const currentDate = ref(new Date());
+    const weekdays = ['Dom', 'Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab'];
+    const eventsMap = ref({});
+    const activityMap = ref({});
+    const calendarDays = ref([]);
+
+    const currentMonthYear = computed(() => {
+      return currentDate.value.toLocaleString('it-IT', { month: 'long', year: 'numeric' });
+    });
+
+    // Funzione per formattare la data in formato "YYYY-MM-DD" locale
+    function formatDateToLocal(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0'); // I mesi sono indicizzati da 0, quindi aggiungi 1
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
     }
-  },
-  methods: {
-    isToday(day) {
+
+    function createDayObject(date, currentMonth, today) {
+      const localDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      const dateString = formatDateToLocal(localDate); // Usa la funzione per formattare la data localmente
+      return {
+        date: localDate,
+        dayOfMonth: localDate.getDate(),
+        currentMonth: currentMonth,
+        isToday: localDate.toDateString() === today.toDateString(),
+        hasEvents: eventsMap.value[dateString] || false,
+        hasActivities: activityMap.value[dateString] || false
+      };
+    }
+
+    function updateCalendarDays() {
+      const year = currentDate.value.getFullYear();
+      const month = currentDate.value.getMonth();
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+      const daysInMonth = lastDay.getDate();
+      const startingDayOfWeek = firstDay.getDay();
+
+      const calendarArray = [];
       const today = new Date();
-      return (
-        day === today.getDate() &&
-        this.currentMonth === today.getMonth() &&
-        this.currentYear === today.getFullYear()
-      );
-    },
-    isSunday(day) {
-      const date = new Date(this.currentYear, this.currentMonth, day);
-      return date.getDay() === 0;
-    },
-    prevMonth() {
-      this.currentMonth--;
-      if (this.currentMonth < 0) {
-        this.currentMonth = 11;
-        this.currentYear--;
+
+      // Giorni del mese precedente
+      for (let i = startingDayOfWeek - 1; i >= 0; i--) {
+        const day = new Date(year, month, -i);
+        calendarArray.push(createDayObject(day, false, today));
       }
-    },
-    nextMonth() {
-      this.currentMonth++;
-      if (this.currentMonth > 11) {
-        this.currentMonth = 0;
-        this.currentYear++;
+
+      // Giorni del mese corrente
+      for (let i = 1; i <= daysInMonth; i++) {
+        const day = new Date(year, month, i);
+        calendarArray.push(createDayObject(day, true, today));
       }
-    },
-    handleDayClick(day) {
-      const date = new Date(this.currentYear, this.currentMonth, day);
-      console.log('Hai cliccato sulla data:', date);
+
+      // Giorni del mese successivo
+      const remainingDays = 42 - calendarArray.length;
+      for (let i = 1; i <= remainingDays; i++) {
+        const day = new Date(year, month + 1, i);
+        calendarArray.push(createDayObject(day, false, today));
+      }
+
+      calendarDays.value = calendarArray;
     }
+
+    async function fetchEvents() {
+      try {
+        const username = localStorage.getItem('username');
+        const token = sessionStorage.getItem('token');
+        if (!username || !token) {
+          console.error('Username o token mancante. L\'utente potrebbe non essere autenticato.');
+          return;
+        }
+
+        const response = await axios.get(`/api/eventsGET`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+          params: { author: username }
+        });
+        const events = response.data;
+
+
+        const activityResponse = await axios.get(`/api/activitiesGET`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+          params: { username: username }
+        });
+        const activities = activityResponse.data;
+        // Resetta eventsMap
+        eventsMap.value = {};
+        activityMap.value = {};
+
+        // Popola eventsMap
+        events.forEach(event => {
+          const eventDate = new Date(event.date);
+          const dateString = formatDateToLocal(eventDate); // Formatta la data in formato locale
+          eventsMap.value[dateString] = true;
+        });
+
+        activities.forEach(activity => {
+          const activityDate = new Date(activity.deadline);
+          const dateString = formatDateToLocal(activityDate); // Formatta la data in formato locale
+          activityMap.value[dateString] = true;
+        });
+
+        updateCalendarDays();
+      } catch (error) {
+        if (error.response) {
+          console.error('Errore nella risposta del server:', error.response.status, error.response.data);
+        } else if (error.request) {
+          console.error('Nessuna risposta ricevuta dal server:', error.request);
+        } else {
+          console.error('Errore durante l\'impostazione della richiesta:', error.message);
+        }
+      }
+    }
+
+    function prevMonth() {
+      const newDate = new Date(currentDate.value);
+      newDate.setMonth(newDate.getMonth() - 1);
+      currentDate.value = newDate;
+      updateCalendarDays();
+    }
+
+    function nextMonth() {
+      const newDate = new Date(currentDate.value);
+      newDate.setMonth(newDate.getMonth() + 1);
+      currentDate.value = newDate;
+      updateCalendarDays();
+    }
+
+    function selectDate(day) {
+      const username = localStorage.getItem('username');
+      const dateString = formatDateToLocal(day.date); 
+      console.log("dateString", dateString);
+      router.push({
+        name: 'eventDayCalendar',
+        query: { author: username,
+           date: dateString }
+      });
+    }
+
+    onMounted(async () => {
+      await fetchEvents();
+      updateCalendarDays();
+    });
+
+    watch(currentDate, async () => {
+      await fetchEvents();
+      updateCalendarDays();
+    });
+
+    return {
+      currentDate,
+      weekdays,
+      currentMonthYear,
+      calendarDays,
+      prevMonth,
+      nextMonth,
+      selectDate
+    };
   }
 };
 </script>
 
 <style scoped>
+.has-events {
+  position: relative;
+}
 
-.custom-btn {
+.event-indicator {
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
   background-color: #007bff;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  font-size: 1em;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
 }
 
 .calendar {
-  width: 500px;
+  max-width: 800px;
   margin: 0 auto;
-  text-align: center;
+  font-family: Arial, sans-serif;
 }
 
 .calendar-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
 }
 
-.year-month-display {
-  text-align: center;
+.calendar-header button {
+  background-color: #f0f0f0;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-size: 16px;
 }
 
-.year {
-  font-size: 2em;
-}
-
-.month {
-  font-size: 1.5em;
-}
-
-.calendar-weekdays,
-.calendar-grid {
+.weekdays, .days {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 5px;
-  margin-bottom: 10px;
 }
 
-.calendar-weekdays div {
-  font-weight: bold;
-  padding: 10px 0;
-}
-
-.calendar-day {
+.weekdays div {
+  background-color: #f0f0f0;
   padding: 10px;
-  border: 1px solid #ccc;
+  text-align: center;
+  font-weight: bold;
+}
+
+.days div {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
   cursor: pointer;
 }
 
-.calendar-day:hover {
-  background-color: #d4edda;
+.days div:hover {
+  background-color: #f0f0f0;
 }
 
-.current-day {
-  border-color: red;
-  border-width: 3px;
-  border-radius: 10px;
+.other-month {
+  color: #ccc;
 }
 
-.empty-day {
-  visibility: hidden;
-}
-
-.sunday {
+.today {
+  background-color: #e6f2ff;
   font-weight: bold;
 }
+
+.selected-date {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.has-activities {
+  position: relative;
+}
+
+.activity-indicator {
+  position: absolute;
+  bottom: 2px;
+  right: 2px; /* Posizionato a destra dell'event-indicator */
+  width: 6px;
+  height: 6px;
+  background-color: #ffa500; /* Colore arancione per le attività */
+  border-radius: 50%;
+}
+
+/* Aggiusta la posizione dell'event-indicator */
+.event-indicator {
+  left: 2px;
+  transform: none;
+}
+
+
 </style>

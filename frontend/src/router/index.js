@@ -12,6 +12,8 @@ import pomodoroTempo from '../views/pomodoroTempo.vue'
 import pomSession from '../views/pomSession.vue'
 import editNote from '../views/editNote.vue';
 import accountUtente from '@/views/accountUtente.vue';
+import eventDayCalendar from '@/views/eventDayCalendar.vue';
+
 
 
 const routes = [
@@ -25,6 +27,13 @@ const routes = [
     path: '/accountUtente',
     name: 'accountUtente',
     component: accountUtente,
+    meta: { requiresAuth: true } 
+  },
+
+  {
+    path: '/eventDayCalendar',
+    name: 'eventDayCalendar',
+    component: eventDayCalendar,
     meta: { requiresAuth: true } 
   },
 

@@ -13,5 +13,9 @@ router.get('/activities/2days', authenticateToken, activityController.getLastAct
 
 router.post('/activities/sendEmail', authenticateToken, activityController.sendEmailWithActivities);
 
+router.get('/activities/current-day', authenticateToken, activityController.getCurrentDayActivities);
+
+router.get('/activities/by-date', authenticateToken, activityController.getActivitiesByDate);
+
 
 module.exports = router;

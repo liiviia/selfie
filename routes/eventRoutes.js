@@ -9,4 +9,8 @@ router.get('/eventsGET', authenticateToken, eventController.getEvents);
 
 router.get('/events/last', authenticateToken, eventController.getLastEvent);
 
+router.get('/events/current-day', authenticateToken, eventController.getCurrentDayEvents);
+
+router.get('/events/by-date', authenticateToken, eventController.getEventByDate);
+
 module.exports = router;
