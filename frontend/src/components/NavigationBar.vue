@@ -32,10 +32,31 @@
         <a class="navbar-brand me-4" href="/homePrincipale">
             <i class="fas fa-home"></i>
         </a>
+
         <!-- Pulsante Gestione Profilo -->
         <a class="me-4" href="/accountUtente">
-            <i class="fa-solid fa-user" style="color: black;"></i>
+            <i class="fas fa-user" style="color: black;"></i>
+            <span class="username-initials">{{ username }}</span>
         </a>
+
+        <!-- Notifiche -->
+        <a class="me-4" href="#" @click="toggleNotifications">
+          <i class="fas fa-bell" style="color: black;"></i> 
+          <span v-if="notifications.length" class="badge">{{ notifications.length }}</span> 
+        </a>
+
+        <div v-if="showNotifications" class="notifications-dropdown">
+          <ul>
+            <li v-for="notification in notifications" :key="notification._id">
+              titolo: {{ notification.title }} - Scadenza: {{ notification.deadline }}
+            </li>
+            <li v-if="notifications.length === 0">
+              Nessuna notifica
+            </li>
+          </ul>
+          <button @click="sendEmail" class="btn btn-primary">Invia Email</button> <!-- Pulsante per inviare l'email -->
+        </div>        
+
       </div>
 
       <!-- Offcanvas Sidebar -->
@@ -89,6 +110,9 @@
   </template>
   
 <script>
+
+import axios from 'axios';
+
   export default {
     data() {
       return {
@@ -97,7 +121,9 @@
         timeMachineTime: '',  
         simulatedTime: '--:--:--', 
         intervalId: null, 
-        currentSimulatedTime: null
+        currentSimulatedTime: null,
+        showNotifications: false, // Controlla se il menu delle notifiche è visibile
+        notifications: [] //contiene notifiche
       };
     }, 
     computed:{
@@ -151,8 +177,57 @@
             this.simulatedTime = this.currentSimulatedTime.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
           }
         }, 1000); 
-      }
-    },
+      },
+
+
+      async toggleNotifications(){
+        // Mostra o nasconde il menu delle notifiche
+        this.showNotifications = !this.showNotifications;
+        if (this.showNotifications) {
+          await this.checkDeadlines();
+        }
+      },
+  
+
+      async checkDeadlines() {
+        try {
+          const token = sessionStorage.getItem('token');
+          const username = localStorage.getItem('username');
+          const response = await axios.get('/api/activities/2days', {
+            headers: {Authorization: `Bearer ${token}`},
+            params:{username: username}
+          });
+          this.notifications = response.data; // Salva le notifiche nella variabile
+          console.log(this.notifications);
+          console.log(response.data);
+          //alert('Email inviata con successo!');
+        } catch (error) {
+          console.error('Errore nel recupero delle notifiche:', error);
+        } 
+      },
+
+      
+      async sendEmail() {
+        try {
+          const token = sessionStorage.getItem('token');
+          const username = localStorage.getItem('username');
+          const response = await axios.post('/api/activities/sendEmail', 
+            { username: username },  // Dati nel body della richiesta
+            {headers: { Authorization: `Bearer ${token}` }  // Headers separati
+            }
+          );
+          alert(response.data.message); // Mostra il messaggio di successo o errore
+        } catch (error) {
+          console.error('Errore nell invio dell email:', error);
+          alert('Errore durante invio email');
+        }
+      }      
+      // mounted() {
+      //  this.checkDeadlines();
+      // }
+      
+    }
+    
   };
 
 </script>
@@ -234,4 +309,38 @@
 .time-machine-control button:hover {
   background-color: #0056b3;
 }
+
+.notifications-dropdown {
+  position: absolute;
+  top: 50px; /* Aggiusta in base alla tua navbar */
+  right: 10px;
+  width: 200px;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  z-index: 1000; /* Assicurati che sia sopra altri elementi */
+}
+
+.notifications-dropdown ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.notifications-dropdown li {
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.notifications-dropdown li:last-child {
+  border-bottom: none;
+}
+
+.notifications-dropdown button {
+  margin-top: 10px;
+  width: 100%; /* Rende il pulsante a larghezza piena */
+}
+
 </style>

@@ -1,37 +1,40 @@
 
 const nodemailer = require('nodemailer');
 
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'appp4905@gmail.com',
+    pass: 'usjk uqyr obst fwhx',
+  },
+});
+  
 
-  const transporter = nodemailer.createTransport({
-    host: 'smtp.office365.com',
-    port: 587,
-    secure: false, 
-    auth: {
-      user: 'selfieAPP@outlook.it',
-      pass: 'APPselfie2024',
-    },
+const sendReminderEmail = (email, activities) => {
+
+  let emailContent = 'Ciao! Ecco le attività in scadenza nei prossimi 2 giorni:\n\n';
+
+  activities.forEach(activity => {
+    emailContent += `- ${activity.title} (scadenza: ${activity.deadline.toLocaleDateString()})\n`;
   });
-  
-  
-  
 
-  const sendReminderEmail = (email, activityTitle, deadline) => {
-    const mailOptions = {
-        from: '"Servizio Sito SELFIE"<selfieAPP@outlook.it>',
-        to: email,
+  const mailOptions = {
+      from: '"Servizio Sito SELFIE"<appp4905@gmail.com>',
+      to: email,
       subject: 'Promemoria: Attività in scadenza',
-      text: `Ciao! Ricorda che l'attività "${activityTitle}" scade il ${deadline}.`,
-    };
-  
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.log('Errore nell\'invio dell\'email:', error);
-      } else {
-        console.log('Email inviata:', info.response);
-      }
-    });
+      text: emailContent,
   };
+  
+  //inivio la mail
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log('Errore nell invio email:', error);
+    } else {
+      console.log('Email inviata:', info.response);
+    }
+  });
+};
 
 
-  module.exports = { sendReminderEmail };
+module.exports = { sendReminderEmail };
 

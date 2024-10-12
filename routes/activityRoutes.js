@@ -9,4 +9,9 @@ router.get('/activitiesGET', authenticateToken, activityController.getActivities
 
 router.get('/activities/last', authenticateToken, activityController.getLastActivity);
 
+router.get('/activities/2days', authenticateToken, activityController.getLastActivity2days);
+
+router.post('/activities/sendEmail', authenticateToken, activityController.sendEmailWithActivities);
+
+
 module.exports = router;
