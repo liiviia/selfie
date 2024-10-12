@@ -9,6 +9,8 @@ const eventRoutes = require('./routes/eventRoutes');
 const accountRoutes = require('./routes/accountRoutes');
 const activityRoutes = require('./routes/activityRoutes');
 const registerRoutes = require('./routes/registerRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
+
 const { scheduleEmailReminders } = require('./cronTask'); 
 require('dotenv').config({ path: __dirname + '/.env' });
 
@@ -16,8 +18,6 @@ const app = express();
 const port = 3000;
 
 connectDB();
-
-
 
 
 app.use(cors());
@@ -29,7 +29,9 @@ app.use('/api', eventRoutes);
 app.use('/api', activityRoutes);
 app.use('/api', registerRoutes);
 app.use('/api', accountRoutes); 
-app.use(express.static(path.join(__dirname, 'frontend/frontend/dist')));
+app.use('/api/notifications', notificationRoutes); 
+
+//app.use(express.static(path.join(__dirname, 'frontend/frontend/dist')));
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'frontend/frontend/dist', 'index.html'));

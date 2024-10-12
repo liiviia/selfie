@@ -179,6 +179,13 @@ import axios from 'axios';
         }, 1000); 
       },
 
+      logout() {
+        localStorage.clear();
+        this.isAut=false;
+        console.log("autenticato:", this.isAut);
+        this.$router.push('/'); // Ritorna alla pagina di login
+    },
+
 
       async toggleNotifications(){
         // Mostra o nasconde il menu delle notifiche
@@ -206,7 +213,7 @@ import axios from 'axios';
         } 
       },
 
-      
+
       async sendEmail() {
         try {
           const token = sessionStorage.getItem('token');

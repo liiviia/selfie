@@ -1,7 +1,6 @@
 <template>
-  <!-- <NavigationBar /> -->
-  <div class="home-principale">
 
+  <div class="home-principale">
     <div class="container mt-3">
       <div class="row">
         <div class="col-md-6 d-flex justify-content-center align-items-center">
@@ -42,17 +41,69 @@
                 </div>
               </div>
             </div>
+
             <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators"
               data-bs-slide="prev">
               <span class="carousel-control-prev-icon" aria-hidden="true"></span>
               <span class="visually-hidden">Previous</span>
             </button>
+
             <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators"
               data-bs-slide="next">
               <span class="carousel-control-next-icon" aria-hidden="true"></span>
               <span class="visually-hidden">Next</span>
             </button>
+
+
+
           </div>
+
+
+          <div id="carouselNotifications" class="carousel slide mt-4" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+              <button v-for="(notification, index) in notifications" :key="index" type="button" 
+                      :data-bs-target="'#carouselNotifications'" :data-bs-slide-to="index" 
+                      :class="{ active: index === 0 }" :aria-current="index === 0 ? 'true' : 'false'"
+                      :aria-label="'Slide ' + (index + 1)">
+              </button>
+            </div>
+          
+            <div class="carousel-inner">
+              <div v-if="notifications.length === 0" class="carousel-item active">
+                <div class="d-block w-100 text-center p-4">
+                  <h2>Nessuna Notifica</h2>
+                  <p>{{ noNotificationsMessage }}</p>
+                </div>
+              </div>
+          
+              <div v-else v-for="(notification, index) in notifications" :key="index" 
+                   :class="['carousel-item', { active: index === 0 }]">
+                <div class="d-block w-100 text-center p-4">
+                  <h2>Notifica {{ index + 1 }}</h2>
+                  <p>
+                    <strong>Messaggio:</strong> {{ notification.message }}<br>
+                    <strong>Data:</strong> {{ new Date(notification.createdAt).toLocaleDateString() }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselNotifications"
+              data-bs-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Previous</span>
+            </button>
+          
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselNotifications"
+              data-bs-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Next</span>
+            </button>
+          </div>
+          
+          
+
+          
         </div>
       </div>
     </div>
@@ -80,12 +131,16 @@ export default {
       lastActivityDescription: '',
       lastActivityDeadline: '',
       noEventsMessage: '',
-      noActivitiesMessage: ''
+      noActivitiesMessage: '',
+
+      notifications: [],
+      noNotificationsMessage:''
     };
   },
   mounted() {
     this.getLastEvent();
     this.getLastActivity();
+    this.getNotifies();
   },
   methods: {
     async getLastEvent() {
@@ -139,6 +194,26 @@ export default {
 
       } catch (error) {
         console.error('Errore nel recupero delle attività:', error);
+      }
+    },
+
+    async getNotifies(){
+      try {
+        const token = sessionStorage.getItem('token');
+        const response = await axios.get('/api/notifications/getNotif', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+          params: { author: this.username }
+        });
+        console.log(response.data);
+        if (response.data) {
+          this.notifications=response.data;
+        } else {
+          this.noNotificationsMessage = 'Nessuna notifica trovata.';        }
+      } catch (error) {
+        console.error('Errore nel recupero delle notifiche :', error);
+        this.noNotificationsMessage = 'Errore caricamento delle notifiche.';
       }
     }
   }
