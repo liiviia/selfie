@@ -1,6 +1,10 @@
 <template>
     <div>
       <h2>Eventi e Attività per {{ formatDate(queryDate) }}</h2>
+      <div class="button-container">
+      <button @click="navigateToAddEvent">Aggiungi Evento</button>
+      <button @click="navigateToAddActivity">Aggiungi Attività</button>
+    </div>
       <div v-if="events.length > 0">
         <h3>Eventi:</h3>
         <div v-for="event in events" :key="event._id">
@@ -19,21 +23,32 @@
       </div>
       <div v-if="events.length === 0 && activities.length === 0">
         <p>Nessun evento o attività per questa data.</p>
+
       </div>
     </div>
   </template>
   
   <script>
   import { ref, onMounted, computed } from 'vue';
-  import { useRoute } from 'vue-router';
+  import { useRoute, useRouter } from 'vue-router';
   import axios from 'axios';
   
   export default {
     setup() {
       const route = useRoute();
+      const router = useRouter();
       const events = ref([]);
       const activities = ref([]);
       const queryDate = computed(() => route.query.date);
+
+
+      const navigateToAddEvent = () => {
+        router.push({ path: '/addEvent', query: { date: queryDate.value } });
+      };
+
+      const navigateToAddActivity = () => {
+        router.push({ path: '/addActivities', query: { date: queryDate.value } });
+      };
   
       const fetchEvents = async () => {
     try {
@@ -85,7 +100,30 @@
   
       onMounted(fetchEvents);
   
-      return { events,activities, formatDate, queryDate };
+      return { events,activities, formatDate, queryDate ,navigateToAddEvent, navigateToAddActivity};
     }
   }
   </script>
+
+
+
+<style scoped>
+.button-container {
+  margin-bottom: 20px;
+}
+
+button {
+  margin-right: 10px;
+  padding: 8px 16px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+</style>
