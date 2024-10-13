@@ -1,5 +1,4 @@
 <template>
-
   <div class="event-form">
     <h2>Crea un Nuovo Evento</h2>
     <form @submit.prevent="createEvent">
@@ -77,42 +76,49 @@
 </template>
 
 <script>
+import { ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 import axios from 'axios';
 
 export default {
-  data() {
-    return {
-      newEvent: {
-        title: '',
-        description: '',
-        date: '',
-        startTime: '',
-        duration: '',
-        location: '',
-        isRecurring: false,
-        frequency: 'one-time',
-        recurrencePattern: '',
-        numberOfOccurrences: null,
-        notificationMechanism: [],
-        notificationTime: 0,
-        repeatNotification: 0,
-        author: localStorage.getItem('username') || 'Guest'
-      },
-      message: ''
-    };
-  },
-  methods: {
-    async createEvent() {
+  setup() {
+    const route = useRoute();
+    const newEvent = ref({
+      title: '',
+      description: '',
+      date: '',
+      startTime: '',
+      duration: '',
+      location: '',
+      isRecurring: false,
+      frequency: 'one-time',
+      recurrencePattern: '',
+      numberOfOccurrences: null,
+      notificationMechanism: [],
+      notificationTime: 0,
+      repeatNotification: 0,
+      author: localStorage.getItem('username') || 'Guest'
+    });
+
+    onMounted(() => {
+      if (route.query.date) {
+        newEvent.value.date = route.query.date;
+      }
+    });
+
+    const message = ref('');
+
+    const createEvent = async () => {
       try {
         const token = sessionStorage.getItem('token');
-        const response = await axios.post('/api/events', this.newEvent, {
+        const response = await axios.post('/api/events', newEvent.value, {
           headers: {
             Authorization: `Bearer ${token}`
           }
         });
         console.log('Evento creato con successo:', response.data);
 
-        this.newEvent = {
+        newEvent.value = {
           title: '',
           description: '',
           date: '',
@@ -129,13 +135,23 @@ export default {
           author: localStorage.getItem('username') || 'Guest'
         };
 
-        this.message = 'Evento creato con successo!';
-        this.$router.push('/homePrincipale'); 
+        message.value = 'Evento creato con successo!';
+        setTimeout(() => {
+          message.value = '';
+          this.$router.push('/homePrincipale');
+        }, 2000);
+
       } catch (error) {
-        this.message = 'Errore durante la creazione dell\'evento: ' + error;
+        message.value = 'Errore durante la creazione dell\'evento: ' + error.message;
         console.error('Errore:', error);
       }
-    }
+    };
+
+    return {
+      newEvent,
+      message,
+      createEvent
+    };
   }
 };
 </script>
@@ -231,7 +247,7 @@ export default {
 .event-form input,
 .event-form textarea,
 .event-form button {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /*  effetto ombra per gli input e il pulsante */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* effetto ombra per gli input e il pulsante */
 }
 
 .event-form div {
@@ -257,5 +273,4 @@ export default {
   transition: color 0.3s ease;
   text-align: left;
 }
-
 </style>

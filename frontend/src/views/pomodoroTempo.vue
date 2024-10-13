@@ -17,6 +17,11 @@
         <input type="number" v-model="newPom.ripetizioni" min="1" required>
       </div>
 
+      <div>
+        <label for="giorno">Giorno della sessione:</label>
+        <input type="date" v-model="newPom.giorno" required>
+      </div>
+
       <button type="submit">Aggiungi Sessione</button>
     </form>
 
@@ -29,47 +34,56 @@
 </template>
 
 <script>
+import { ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 import axios from 'axios';
 
 export default {
-  data() {
-    return {
-      newPom: {
-        username: localStorage.getItem('username') || 'Guest',
-        tempoStudio: '',
-        tempoPausa: '',
-        ripetizioni: ''
-      },
-      statusMessage: ''
-    };
-  },
-  methods: {
-    async aggiungiPomodoro() {
+  setup() {
+    const route = useRoute();
+    const newPom = ref({
+      username: localStorage.getItem('username') || 'Guest',
+      tempoStudio: '',
+      tempoPausa: '',
+      ripetizioni: '',
+      giorno: ''
+    });
+    const statusMessage = ref('');
+
+    onMounted(() => {
+      if (route.query.date) {
+        newPom.value.giorno = route.query.date;
+      }
+    });
+
+    const aggiungiPomodoro = async () => {
       try {
         const token = sessionStorage.getItem('token');
-        console.log('Dati inviati:', this.newPom);
+        console.log('Dati inviati:', newPom.value);
 
-        const response = await axios.post('/api/pomsPOST', this.newPom, {
+        const response = await axios.post('/api/pomsPOST', newPom.value, {
           headers: {
-            Authorization: `Bearer ${token}` 
+            Authorization: `Bearer ${token}`
           }
         });
         console.log('Sessione pomodoro aggiunta:', response.data);
-        this.startStudyTimer(this.newPom.tempoStudio, this.newPom.ripetizioni, this.newPom.tempoPausa);
-        this.newPom = {
-          username: this.newPom.username,
+        startStudyTimer(newPom.value.tempoStudio, newPom.value.ripetizioni, newPom.value.tempoPausa);
+        newPom.value = {
+          username: newPom.value.username,
           tempoStudio: '',
           tempoPausa: '',
-          ripetizioni: ''
+          ripetizioni: '',
+          giorno: route.query.date || ''
         };
       } catch (error) {
         console.error('Errore:', error);
       }
-    },
-    startStudyTimer(studyTime, studyCycles, pause) {
-      this.statusMessage = `Studio! Numero cicli rimanenti: ${studyCycles}`;
+    };
+
+    const startStudyTimer = (studyTime, studyCycles, pause) => {
+      statusMessage.value = `Studio! Numero cicli rimanenti: ${studyCycles}`;
       const progressBar = document.querySelector('.progress-bar');
-      progressBar.style.width = '0%'; 
+      progressBar.style.width = '0%';
 
       const startTime = Date.now();
       const endTime = startTime + studyTime * 60000;
@@ -88,16 +102,17 @@ export default {
           requestAnimationFrame(updateProgressBar);
         } else {
           progressBar.style.width = '0%';
-          this.startBreakTimer(pause, studyCycles);
+          startBreakTimer(pause, studyCycles);
         }
       };
 
       updateProgressBar();
-    },
-    startBreakTimer(pause, studyCycles) {
-      this.statusMessage = `Pausa! Numero cicli rimanenti: ${studyCycles}`;
+    };
+
+    const startBreakTimer = (pause, studyCycles) => {
+      statusMessage.value = `Pausa! Numero cicli rimanenti: ${studyCycles}`;
       const progressBar = document.querySelector('.progress-bar');
-      progressBar.style.width = '0%'; 
+      progressBar.style.width = '0%';
 
       const startTime = Date.now();
       const endTime = startTime + pause * 60000;
@@ -118,16 +133,22 @@ export default {
           progressBar.style.width = '0%';
           studyCycles--;
           if (studyCycles > 0) {
-            this.startStudyTimer(this.newPom.tempoStudio, studyCycles, pause);
+            startStudyTimer(newPom.value.tempoStudio, studyCycles, pause);
           } else {
-            this.statusMessage = `Finito! Cicli rimanenti: ${studyCycles}`;
+            statusMessage.value = `Finito! Cicli rimanenti: ${studyCycles}`;
             document.getElementById('timerDisplay').textContent = "";
           }
         }
       };
 
       updateProgressBar();
-    }
+    };
+
+    return {
+      newPom,
+      statusMessage,
+      aggiungiPomodoro
+    };
   }
 };
 </script>
@@ -152,15 +173,18 @@ form {
   max-width: 400px;
   margin: auto;
 }
+
 label {
   display: block;
   margin-bottom: 5px;
 }
+
 input {
   width: 100%;
   padding: 8px;
   margin-bottom: 10px;
 }
+
 button {
   padding: 10px 20px;
   background-color: #4CAF50;
@@ -168,6 +192,7 @@ button {
   border: none;
   cursor: pointer;
 }
+
 button:hover {
   background-color: #45a049;
 }
