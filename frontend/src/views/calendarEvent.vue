@@ -16,9 +16,21 @@
           :class="{ 'current-month': day.currentMonth, 'other-month': !day.currentMonth, 'today': day.isToday, 'has-events': day.hasEvents, 'has-activities': day.hasActivities }"
           @click="selectDate(day)"
         >
-          {{ day.dayOfMonth }}
-          <div v-if="day.hasEvents" class="event-indicator"></div>
-          <div v-if="day.hasActivities" class="activity-indicator"></div>
+          <div class="day-content">
+            <span class="day-number">{{ day.dayOfMonth }}</span>
+            <div class="indicators">
+              
+              <div v-if="day.hasEvents && day.hasActivities" class="both-indicator">
+                Ci sono attività ed eventi
+              </div>
+              <div v-else-if="day.hasEvents" class="event-indicator">
+                C'è un evento
+              </div>
+              <div v-else-if="day.hasActivities" class="activity-indicator">
+                C'è un'attività
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -44,17 +56,17 @@ export default {
       return currentDate.value.toLocaleString('it-IT', { month: 'long', year: 'numeric' });
     });
 
-    // Funzione per formattare la data in formato "YYYY-MM-DD" locale
+
     function formatDateToLocal(date) {
       const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0'); // I mesi sono indicizzati da 0, quindi aggiungi 1
+      const month = String(date.getMonth() + 1).padStart(2, '0'); 
       const day = String(date.getDate()).padStart(2, '0');
       return `${year}-${month}-${day}`;
     }
 
     function createDayObject(date, currentMonth, today) {
       const localDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-      const dateString = formatDateToLocal(localDate); // Usa la funzione per formattare la data localmente
+      const dateString = formatDateToLocal(localDate); 
       return {
         date: localDate,
         dayOfMonth: localDate.getDate(),
@@ -76,19 +88,19 @@ export default {
       const calendarArray = [];
       const today = new Date();
 
-      // Giorni del mese precedente
+
       for (let i = startingDayOfWeek - 1; i >= 0; i--) {
         const day = new Date(year, month, -i);
         calendarArray.push(createDayObject(day, false, today));
       }
 
-      // Giorni del mese corrente
+
       for (let i = 1; i <= daysInMonth; i++) {
         const day = new Date(year, month, i);
         calendarArray.push(createDayObject(day, true, today));
       }
 
-      // Giorni del mese successivo
+
       const remainingDays = 42 - calendarArray.length;
       for (let i = 1; i <= remainingDays; i++) {
         const day = new Date(year, month + 1, i);
@@ -123,20 +135,20 @@ export default {
           params: { username: username }
         });
         const activities = activityResponse.data;
-        // Resetta eventsMap
+        
         eventsMap.value = {};
         activityMap.value = {};
 
-        // Popola eventsMap
+        
         events.forEach(event => {
           const eventDate = new Date(event.date);
-          const dateString = formatDateToLocal(eventDate); // Formatta la data in formato locale
+          const dateString = formatDateToLocal(eventDate);
           eventsMap.value[dateString] = true;
         });
 
         activities.forEach(activity => {
           const activityDate = new Date(activity.deadline);
-          const dateString = formatDateToLocal(activityDate); // Formatta la data in formato locale
+          const dateString = formatDateToLocal(activityDate); 
           activityMap.value[dateString] = true;
         });
 
@@ -201,25 +213,14 @@ export default {
 </script>
 
 <style scoped>
-.has-events {
-  position: relative;
-}
-
-.event-indicator {
-  position: absolute;
-  bottom: 2px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 6px;
-  height: 6px;
-  background-color: #007bff;
-  border-radius: 50%;
-}
-
 .calendar {
   max-width: 800px;
   margin: 0 auto;
   font-family: Arial, sans-serif;
+  background-color: #fff; 
+  border-radius: 10px; 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+  padding: 20px; 
 }
 
 .calendar-header {
@@ -230,17 +231,24 @@ export default {
 }
 
 .calendar-header button {
-  background-color: #f0f0f0;
+  background-color: #007bff;
+  color: white;
   border: none;
   padding: 10px 15px;
   cursor: pointer;
   font-size: 16px;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.calendar-header button:hover {
+  background-color: #0056b3; 
 }
 
 .weekdays, .days {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 5px;
+  gap: 5px; 
 }
 
 .weekdays div {
@@ -248,52 +256,100 @@ export default {
   padding: 10px;
   text-align: center;
   font-weight: bold;
+  border-radius: 5px; 
 }
 
 .days div {
   border: 1px solid #ddd;
-  padding: 10px;
+  padding: 5px;
   text-align: center;
   cursor: pointer;
+  height: 100px;
+  border-radius: 10px; 
+  transition: transform 0.2s, background-color 0.3s ease;
+  background-color: #fff;
 }
 
 .days div:hover {
   background-color: #f0f0f0;
+  transform: scale(1.05); 
+}
+
+.day-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.day-number {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.indicators {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.event-indicator, .activity-indicator {
+  font-size: 0.7em;
+  padding: 2px;
+  border-radius: 3px;
+}
+
+.event-indicator {
+  background-color: #e6f2ff;
+  color: #007bff;
+}
+
+.activity-indicator {
+  background-color: #fff5e6;
+  color: #ffa500;
 }
 
 .other-month {
-  color: #ccc;
+  opacity: 0.5;
 }
 
 .today {
   background-color: #e6f2ff;
   font-weight: bold;
+  border-radius: 10px; 
+  box-shadow: 0 0 10px rgba(0, 123, 255, 0.3); 
 }
 
-.selected-date {
-  margin-top: 20px;
+
+.both-indicator {
+  background-color: #d1f7d6;
+  color: #2f8f2f;
+  font-size: 0.8em;
+  padding: 2px;
+  border-radius: 3px;
   text-align: center;
 }
 
-.has-activities {
-  position: relative;
+.event-indicator {
+  background-color: #e6f2ff;
+  color: #007bff;
+  font-size: 0.8em;
+  padding: 2px;
+  border-radius: 3px;
+  text-align: center;
 }
 
 .activity-indicator {
-  position: absolute;
-  bottom: 2px;
-  right: 2px; /* Posizionato a destra dell'event-indicator */
-  width: 6px;
-  height: 6px;
-  background-color: #ffa500; /* Colore arancione per le attività */
-  border-radius: 50%;
+  background-color: #fff5e6;
+  color: #ffa500;
+  font-size: 0.8em;
+  padding: 2px;
+  border-radius: 3px;
+  text-align: center;
 }
 
-/* Aggiusta la posizione dell'event-indicator */
-.event-indicator {
-  left: 2px;
-  transform: none;
-}
+
 
 
 </style>
