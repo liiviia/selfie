@@ -37,11 +37,12 @@ exports.getNoteById = async (req, res) => {
 
 exports.createNote = async (req, res) => {
   try {
-    const { heading, author, completed } = req.body;
+    const { heading, author, content, completed } = req.body;
 
     const newNote = new Note({
       heading,
       author,
+      content,
       completed
     });
 
