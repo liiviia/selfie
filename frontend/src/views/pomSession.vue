@@ -1,20 +1,17 @@
 <template>
-  <div>
-    <h1>Sessioni Pomodoro Salvate</h1>
-    <div v-if="poms.length > 0">
-      <ul>
-        <li v-for="pom in poms" :key="pom._id">
-          <p><strong>Username:</strong> {{ pom.username }}</p>
-          <p><strong>Tempo di Studio:</strong> {{ pom.tempoStudio }} minuti</p>
-          <p><strong>Tempo di Pausa:</strong> {{ pom.tempoPausa }} minuti</p>
-          <p><strong>Ripetizioni:</strong> {{ pom.ripetizioni }}</p>
-          <hr>
-        </li>
-      </ul>
-    </div>
-    <div v-else>
-      <p>Non ci sono sessioni Pomodoro salvate al momento.</p>
-    </div>
+  <div class="pomodoro-list">
+    <h1>Lista delle Sessioni Pomodoro Salvate</h1>
+    <ul v-if="poms.length > 0">
+      <li v-for="pom in poms" :key="pom._id" class="pomodoro-item">
+        <h2>Sessione Pomodoro</h2>
+        <p><strong>Username:</strong> {{ pom.username }}</p>
+        <p><strong>Tempo di Studio:</strong> {{ pom.tempoStudio }} minuti</p>
+        <p><strong>Tempo di Pausa:</strong> {{ pom.tempoPausa }} minuti</p>
+        <p><strong>Ripetizioni:</strong> {{ pom.ripetizioni }}</p>
+        <p><strong>Data della Sessione:</strong> {{ formatDate(pom.giorno) }}</p>
+      </li>
+    </ul>
+    <p v-else class="no-poms">Non ci sono sessioni Pomodoro da visualizzare.</p>
   </div>
 </template>
 
@@ -24,43 +21,90 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      poms: [] 
+      poms: []
     };
   },
-  async created() {
-    await this.getPoms(); 
-  },
   methods: {
-    async getPoms() {
+    async fetchPoms() {
       try {
         const token = sessionStorage.getItem('token');
-        const username = localStorage.getItem('username'); 
+        const username = localStorage.getItem('username');
         const response = await axios.get('/api/poms', {
           headers: {
-            Authorization: `Bearer ${token}` 
+            Authorization: `Bearer ${token}`
           },
           params: { username: username }
         });
-        this.poms = response.data; 
+
+        console.log('Sessioni Pomodoro recuperate:', JSON.stringify(response.data, null, 2));
+
+        this.poms = response.data;
       } catch (error) {
         console.error('Errore durante il recupero delle sessioni Pomodoro:', error);
       }
+    },
+    formatDate(date) {
+      if (!date) {
+        return 'Data non disponibile';
+      }
+      
+      const parsedDate = new Date(date);
+      if (isNaN(parsedDate)) {
+        console.error('Data non valida:', date);
+        return 'Data non valida';
+      }
+
+      return parsedDate.toLocaleDateString('it-IT', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
     }
+  },
+  mounted() {
+    this.fetchPoms();
   }
 };
 </script>
 
 <style scoped>
+.pomodoro-list {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #343a40;
+}
+
 ul {
   list-style-type: none;
   padding: 0;
 }
 
-li {
+.pomodoro-item {
   margin-bottom: 20px;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 10px;
 }
 
-hr {
-  margin-top: 10px;
+.pomodoro-item h2 {
+  color: #007bff;
+  margin: 0;
+}
+
+.pomodoro-item p {
+  margin: 5px 0;
+}
+
+.no-poms {
+  text-align: center;
+  color: #6c757d;
 }
 </style>

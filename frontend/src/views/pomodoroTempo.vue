@@ -61,6 +61,8 @@ export default {
         const token = sessionStorage.getItem('token');
         console.log('Dati inviati:', newPom.value);
 
+        newPom.value.giorno = newPom.value.giorno ? new Date(newPom.value.giorno).toISOString().split('T')[0] : '';
+
         const response = await axios.post('/api/pomsPOST', newPom.value, {
           headers: {
             Authorization: `Bearer ${token}`

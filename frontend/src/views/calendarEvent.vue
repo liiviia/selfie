@@ -13,22 +13,18 @@
         <div 
           v-for="day in calendarDays" 
           :key="day.date" 
-          :class="{ 'current-month': day.currentMonth, 'other-month': !day.currentMonth, 'today': day.isToday, 'has-events': day.hasEvents, 'has-activities': day.hasActivities }"
+          :class="{ 'current-month': day.currentMonth, 'other-month': !day.currentMonth, 'today': day.isToday }"
           @click="selectDate(day)"
         >
           <div class="day-content">
             <span class="day-number">{{ day.dayOfMonth }}</span>
             <div class="indicators">
-              
-              <div v-if="day.hasEvents && day.hasActivities" class="both-indicator">
-                Ci sono attività ed eventi
-              </div>
-              <div v-else-if="day.hasEvents" class="event-indicator">
-                C'è un evento
-              </div>
-              <div v-else-if="day.hasActivities" class="activity-indicator">
-                C'è un'attività
-              </div>
+              <!-- Pallino blu per eventi -->
+              <span v-if="day.hasEvents" class="event-dot"></span>
+              <!-- Pallino verde per attività -->
+              <span v-if="day.hasActivities" class="activity-dot"></span>
+              <!-- Pallino rosso per pomodori -->
+              <span v-if="day.hasPomodoros" class="pomodoro-dot"></span>
             </div>
           </div>
         </div>
@@ -45,17 +41,16 @@ import { useRouter } from 'vue-router';
 export default {
   setup() {
     const router = useRouter();
-
     const currentDate = ref(new Date());
     const weekdays = ['Dom', 'Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab'];
     const eventsMap = ref({});
     const activityMap = ref({});
+    const pomodoroMap = ref({});
     const calendarDays = ref([]);
 
     const currentMonthYear = computed(() => {
       return currentDate.value.toLocaleString('it-IT', { month: 'long', year: 'numeric' });
     });
-
 
     function formatDateToLocal(date) {
       const year = date.getFullYear();
@@ -72,8 +67,9 @@ export default {
         dayOfMonth: localDate.getDate(),
         currentMonth: currentMonth,
         isToday: localDate.toDateString() === today.toDateString(),
-        hasEvents: eventsMap.value[dateString] || false,
-        hasActivities: activityMap.value[dateString] || false
+        hasEvents: !!eventsMap.value[dateString],
+        hasActivities: !!activityMap.value[dateString],
+        hasPomodoros: !!pomodoroMap.value[dateString],
       };
     }
 
@@ -88,19 +84,19 @@ export default {
       const calendarArray = [];
       const today = new Date();
 
-
+      // Giorni del mese precedente
       for (let i = startingDayOfWeek - 1; i >= 0; i--) {
         const day = new Date(year, month, -i);
         calendarArray.push(createDayObject(day, false, today));
       }
 
-
+      // Giorni del mese corrente
       for (let i = 1; i <= daysInMonth; i++) {
         const day = new Date(year, month, i);
         calendarArray.push(createDayObject(day, true, today));
       }
 
-
+      // Giorni del mese successivo
       const remainingDays = 42 - calendarArray.length;
       for (let i = 1; i <= remainingDays; i++) {
         const day = new Date(year, month + 1, i);
@@ -127,7 +123,6 @@ export default {
         });
         const events = response.data;
 
-
         const activityResponse = await axios.get(`/api/activitiesGET`, {
           headers: {
             Authorization: `Bearer ${token}`
@@ -135,11 +130,19 @@ export default {
           params: { username: username }
         });
         const activities = activityResponse.data;
-        
+
+        const pomodoroResponse = await axios.get(`/api/pomsGET`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+          params: { author: username }
+        });
+        const pomodoros = pomodoroResponse.data;
+
         eventsMap.value = {};
         activityMap.value = {};
+        pomodoroMap.value = {};
 
-        
         events.forEach(event => {
           const eventDate = new Date(event.date);
           const dateString = formatDateToLocal(eventDate);
@@ -150,6 +153,12 @@ export default {
           const activityDate = new Date(activity.deadline);
           const dateString = formatDateToLocal(activityDate); 
           activityMap.value[dateString] = true;
+        });
+
+        pomodoros.forEach(pomodoro => {
+          const pomodoroDate = new Date(pomodoro.giorno);
+          const dateString = formatDateToLocal(pomodoroDate);
+          pomodoroMap.value[dateString] = true;
         });
 
         updateCalendarDays();
@@ -184,8 +193,7 @@ export default {
       console.log("dateString", dateString);
       router.push({
         name: 'eventDayCalendar',
-        query: { author: username,
-           date: dateString }
+        query: { author: username, date: dateString }
       });
     }
 
@@ -206,7 +214,7 @@ export default {
       calendarDays,
       prevMonth,
       nextMonth,
-      selectDate
+      selectDate,
     };
   }
 };
@@ -290,24 +298,28 @@ export default {
 
 .indicators {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  gap: 4px;
+  justify-content: center;
+  margin-top: 5px;
 }
 
-.event-indicator, .activity-indicator {
-  font-size: 0.7em;
-  padding: 2px;
-  border-radius: 3px;
+.event-dot, .activity-dot, .pomodoro-dot {
+  height: 8px;  /* Pallini piccoli */
+  width: 8px;
+  border-radius: 50%;  /* Trasformare in cerchio */
+  display: inline-block;
 }
 
-.event-indicator {
-  background-color: #e6f2ff;
-  color: #007bff;
+.event-dot {
+  background-color: blue;
 }
 
-.activity-indicator {
-  background-color: #fff5e6;
-  color: #ffa500;
+.activity-dot {
+  background-color: green;
+}
+
+.pomodoro-dot {
+  background-color: red;
 }
 
 .other-month {
@@ -320,36 +332,4 @@ export default {
   border-radius: 10px; 
   box-shadow: 0 0 10px rgba(0, 123, 255, 0.3); 
 }
-
-
-.both-indicator {
-  background-color: #d1f7d6;
-  color: #2f8f2f;
-  font-size: 0.8em;
-  padding: 2px;
-  border-radius: 3px;
-  text-align: center;
-}
-
-.event-indicator {
-  background-color: #e6f2ff;
-  color: #007bff;
-  font-size: 0.8em;
-  padding: 2px;
-  border-radius: 3px;
-  text-align: center;
-}
-
-.activity-indicator {
-  background-color: #fff5e6;
-  color: #ffa500;
-  font-size: 0.8em;
-  padding: 2px;
-  border-radius: 3px;
-  text-align: center;
-}
-
-
-
-
 </style>

@@ -163,7 +163,7 @@ export default {
   padding: 30px;
   background-color: #15172b;
   border-radius: 12px;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); /* ombreggiatura */
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); 
   transition: transform 0.3s ease; /* transizione */
   box-sizing: border-box;
 }
@@ -247,7 +247,7 @@ export default {
 .event-form input,
 .event-form textarea,
 .event-form button {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* effetto ombra per gli input e il pulsante */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
 }
 
 .event-form div {
