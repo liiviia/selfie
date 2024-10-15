@@ -36,7 +36,7 @@ export default {
           params: { username: username }
         });
 
-        console.log('Sessioni Pomodoro recuperate:', JSON.stringify(response.data, null, 2));
+        console.log('Sessioni Pomodoro recuperate:', response.data);
 
         this.poms = response.data;
       } catch (error) {
@@ -44,23 +44,9 @@ export default {
       }
     },
     formatDate(date) {
-      if (!date) {
-        return 'Data non disponibile';
+         return new Date(date).toLocaleDateString();
       }
-      
-      const parsedDate = new Date(date);
-      if (isNaN(parsedDate)) {
-        console.error('Data non valida:', date);
-        return 'Data non valida';
-      }
-
-      return parsedDate.toLocaleDateString('it-IT', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      });
-    }
-  },
+    }, 
   mounted() {
     this.fetchPoms();
   }

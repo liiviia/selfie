@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Aggiungi una Sessione Pomodoro</h1>
+    <h1>Sessione Pomodoro</h1>
     <form @submit.prevent="aggiungiPomodoro">
       <div>
         <label for="tempoStudio">Tempo di studio (minuti):</label>
@@ -26,6 +26,7 @@
     </form>
 
     <p id="studio-pausa">{{ statusMessage }}</p>
+
     <div id="clock" class="blob">
       <div class="timer" id="timerDisplay">00:00</div>
       <div class="progress-bar"></div>
@@ -41,6 +42,7 @@ import axios from 'axios';
 export default {
   setup() {
     const route = useRoute();
+
     const newPom = ref({
       username: localStorage.getItem('username') || 'Guest',
       tempoStudio: '',
@@ -59,9 +61,6 @@ export default {
     const aggiungiPomodoro = async () => {
       try {
         const token = sessionStorage.getItem('token');
-        console.log('Dati inviati:', newPom.value);
-
-        newPom.value.giorno = newPom.value.giorno ? new Date(newPom.value.giorno).toISOString().split('T')[0] : '';
 
         const response = await axios.post('/api/pomsPOST', newPom.value, {
           headers: {
@@ -69,14 +68,15 @@ export default {
           }
         });
         console.log('Sessione pomodoro aggiunta:', response.data);
-        startStudyTimer(newPom.value.tempoStudio, newPom.value.ripetizioni, newPom.value.tempoPausa);
         newPom.value = {
           username: newPom.value.username,
           tempoStudio: '',
           tempoPausa: '',
           ripetizioni: '',
-          giorno: route.query.date || ''
+          giorno: ''
         };
+
+        startStudyTimer(parseInt(response.data.tempoStudio), parseInt(response.data.ripetizioni), parseInt(response.data.tempoPausa));
       } catch (error) {
         console.error('Errore:', error);
       }
@@ -87,28 +87,25 @@ export default {
       const progressBar = document.querySelector('.progress-bar');
       progressBar.style.width = '0%';
 
-      const startTime = Date.now();
-      const endTime = startTime + studyTime * 60000;
+      let remainingTime = studyTime * 60; // convert study time to seconds
 
-      const updateProgressBar = () => {
-        const now = Date.now();
-        const elapsedTime = now - startTime;
-        const progressPercentage = (elapsedTime / (studyTime * 60000)) * 100;
-        progressBar.style.width = `${progressPercentage}%`;
+      const updateTimer = () => {
+        if (remainingTime > 0) {
+          const minutes = Math.floor(remainingTime / 60);
+          const seconds = remainingTime % 60;
+          document.getElementById('timerDisplay').textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+          remainingTime--;
 
-        if (now < endTime) {
-          const studyDifference = endTime - now;
-          const studyMinutes = Math.floor((studyDifference % (1000 * 60 * 60)) / (1000 * 60));
-          const studySeconds = Math.floor((studyDifference % (1000 * 60)) / 1000);
-          document.getElementById('timerDisplay').textContent = `${String(studyMinutes).padStart(2, '0')}:${String(studySeconds).padStart(2, '0')}`;
-          requestAnimationFrame(updateProgressBar);
+          const progressPercentage = ((studyTime * 60 - remainingTime) / (studyTime * 60)) * 100;
+          progressBar.style.width = `${progressPercentage}%`;
+          setTimeout(updateTimer, 1000);
         } else {
           progressBar.style.width = '0%';
           startBreakTimer(pause, studyCycles);
         }
       };
 
-      updateProgressBar();
+      updateTimer();
     };
 
     const startBreakTimer = (pause, studyCycles) => {
@@ -116,21 +113,18 @@ export default {
       const progressBar = document.querySelector('.progress-bar');
       progressBar.style.width = '0%';
 
-      const startTime = Date.now();
-      const endTime = startTime + pause * 60000;
+      let remainingTime = pause * 60; // convert pause time to seconds
 
-      const updateProgressBar = () => {
-        const now = Date.now();
-        const elapsedTime = now - startTime;
-        const progressPercentage = (elapsedTime / (pause * 60000)) * 100;
-        progressBar.style.width = `${progressPercentage}%`;
+      const updateTimer = () => {
+        if (remainingTime > 0) {
+          const minutes = Math.floor(remainingTime / 60);
+          const seconds = remainingTime % 60;
+          document.getElementById('timerDisplay').textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+          remainingTime--;
 
-        if (now < endTime) {
-          const breakDifference = endTime - now;
-          const breakMinutes = Math.floor((breakDifference % (1000 * 60 * 60)) / (1000 * 60));
-          const breakSeconds = Math.floor((breakDifference % (1000 * 60)) / 1000);
-          document.getElementById('timerDisplay').textContent = `${String(breakMinutes).padStart(2, '0')}:${String(breakSeconds).padStart(2, '0')}`;
-          requestAnimationFrame(updateProgressBar);
+          const progressPercentage = ((pause * 60 - remainingTime) / (pause * 60)) * 100;
+          progressBar.style.width = `${progressPercentage}%`;
+          setTimeout(updateTimer, 1000);
         } else {
           progressBar.style.width = '0%';
           studyCycles--;
@@ -138,12 +132,12 @@ export default {
             startStudyTimer(newPom.value.tempoStudio, studyCycles, pause);
           } else {
             statusMessage.value = `Finito! Cicli rimanenti: ${studyCycles}`;
-            document.getElementById('timerDisplay').textContent = "";
+            document.getElementById('timerDisplay').textContent = "00:00";
           }
         }
       };
 
-      updateProgressBar();
+      updateTimer();
     };
 
     return {
@@ -164,11 +158,13 @@ export default {
   width: 0;
   height: 20px;
   background-color: green;
-  transition: width 0.5s;
+  transition: width 1s linear;
 }
 
 .timer {
   font-size: 2em;
+  text-align: center;
+  margin-bottom: 10px;
 }
 
 form {
