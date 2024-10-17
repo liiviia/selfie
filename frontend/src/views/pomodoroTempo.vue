@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="event-form">
     <h1>Sessione Pomodoro</h1>
     <form @submit.prevent="aggiungiPomodoro">
       <div>

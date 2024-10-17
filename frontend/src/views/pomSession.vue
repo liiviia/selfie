@@ -9,6 +9,7 @@
         <p><strong>Tempo di Pausa:</strong> {{ pom.tempoPausa }} minuti</p>
         <p><strong>Ripetizioni:</strong> {{ pom.ripetizioni }}</p>
         <p><strong>Data della Sessione:</strong> {{ formatDate(pom.giorno) }}</p>
+        <button @click="confirmDelete(pom._id)" class="delete-btn">🗑️</button>
       </li>
     </ul>
     <p v-else class="no-poms">Non ci sono sessioni Pomodoro da visualizzare.</p>
@@ -25,6 +26,27 @@ export default {
     };
   },
   methods: {
+    confirmDelete(id) {
+      if (confirm("Sicuro di voler eliminare questa sessione Pomodoro?")) {
+        this.deletePomodoro(id); 
+      }
+    },
+    
+    async deletePomodoro(id) {
+      try {
+        const token = sessionStorage.getItem('token');
+        await axios.delete(`/api/pomRemove/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}` 
+          }
+        });
+        console.log('Sessione Pomodoro eliminata');
+        this.fetchPoms(); // Ricarica la lista dopo l'eliminazione
+      } catch (error) {
+        console.error('Errore nell\'eliminazione della sessione:', error);
+      }
+    },
+
     async fetchPoms() {
       try {
         const token = sessionStorage.getItem('token');
@@ -37,16 +59,16 @@ export default {
         });
 
         console.log('Sessioni Pomodoro recuperate:', response.data);
-
         this.poms = response.data;
       } catch (error) {
         console.error('Errore durante il recupero delle sessioni Pomodoro:', error);
       }
     },
+    
     formatDate(date) {
-         return new Date(date).toLocaleDateString();
-      }
-    }, 
+      return new Date(date).toLocaleDateString();
+    }
+  }, 
   mounted() {
     this.fetchPoms();
   }
@@ -78,6 +100,8 @@ ul {
   margin-bottom: 20px;
   border-bottom: 1px solid #ccc;
   padding-bottom: 10px;
+  position: relative;
+  padding-right: 40px; /* Spazio per il pulsante */
 }
 
 .pomodoro-item h2 {
@@ -87,6 +111,20 @@ ul {
 
 .pomodoro-item p {
   margin: 5px 0;
+}
+
+.delete-btn {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 24px;
+}
+
+.delete-btn:hover {
+  color: red;
 }
 
 .no-poms {

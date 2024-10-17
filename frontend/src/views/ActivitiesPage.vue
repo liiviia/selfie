@@ -9,6 +9,7 @@
         <p><strong>Scadenza:</strong> {{ formatDate(activity.deadline) }}</p>
         <p><strong>Autore:</strong> {{ activity.author }}</p>
         <p><strong>Completata:</strong> {{ activity.completed ? 'Sì' : 'No' }}</p>
+          <button @click="confirmDelete(activity._id)" class="delete-btn">🗑️</button>
       </li>
     </ul>
     
@@ -26,6 +27,27 @@ export default {
     };
   },
   methods: {
+      confirmDelete(id) {
+      if (confirm("Sicuro di voler eliminare questa Attività?")) {
+        this.deleteActivities(id); 
+      }
+    },
+    
+    async deleteActivities(id) {
+      try {
+        const token = sessionStorage.getItem('token');
+        await axios.delete(`/api/activitiesRemove/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}` 
+          }
+        });
+        console.log('Attività eliminata');
+        this.fetchActivities(); 
+      } catch (error) {
+        console.error('Errore nell\'eliminazione della attivita:', error);
+      }
+    },
+    
     async fetchActivities() {
       try {
         const token = sessionStorage.getItem('token');
@@ -79,10 +101,25 @@ h1 {
   border: 1px solid #ced4da;
   border-radius: 4px;
   transition: box-shadow 0.3s;
+  position: relative;
 }
 
 .activity-item:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.delete-btn {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 24px;
+}
+
+.delete-btn:hover {
+  color: red;
 }
 
 .no-activities {

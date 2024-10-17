@@ -146,3 +146,20 @@ exports.getEventByDate = async (req, res) => {
     res.status(500).json({ error: 'Errore nel recupero degli eventi' });
   }
 };
+
+exports.deleteEvents = async (req, res) => {
+
+  try {
+    const EventID = req.params.id;
+    const result = await Event.findByIdAndDelete(EventID);
+
+    if (!result) {
+      return res.status(404).json({ message: 'Evento non trovato' });
+    }
+
+    res.json({ message: 'Evento eliminato con successo' });
+  } catch (error) {
+    console.error('Errore nella cancellazione di evento:', error);
+    res.status(500).send('Errore nella cancellazione di evento');
+  }
+}

@@ -216,3 +216,21 @@ exports.getActivitiesByDate = async (req, res) => {
     res.status(500).json({ error: 'Errore nel recupero delle attività' });
   }
 };
+
+
+exports.deleteActivities = async (req, res) => {
+
+  try {
+    const ActivityID = req.params.id;
+    const result = await Activity.findByIdAndDelete(ActivityID);
+
+    if (!result) {
+      return res.status(404).json({ message: 'Attività non trovata' });
+    }
+
+    res.json({ message: 'pom eliminata con successo' });
+  } catch (error) {
+    console.error('Errore nella cancellazione della attità:', error);
+    res.status(500).send('Errore nella cancellazione della attività');
+  }
+}
