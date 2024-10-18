@@ -181,7 +181,6 @@ export default {
       lastActivityTitle: '',
       lastActivityDescription: '',
       lastActivityDeadline: '',
-      noEventsMessage: '',
       noActivitiesMessage: '',
 
       notifications: [],
@@ -193,7 +192,6 @@ export default {
       lastNoteHeading: '',
       lastNoteAuthor: '',
       noEventsMessage: '' ,
-      noActivitiesMessage: '',
       noNotesMessage: '',
       noPomodorosMessage: '',
       lastPomodoroTempoStudio: '',
