@@ -38,7 +38,7 @@ const routes = [
   },
 
   {
-    path: '/registra',
+    path: '/registratiAccedi',
     name: 'nuovoUtente',
     component: nuovoUtente,
   },
