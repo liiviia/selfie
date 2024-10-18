@@ -32,45 +32,78 @@
         <div class="col-md-6">
           <div id="carouselExampleIndicators" class="carousel slide mt-4" data-bs-ride="carousel">
             <div class="carousel-indicators">
-              <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active"
-                aria-current="true" aria-label="Slide 1"></button>
-              <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1"
-                aria-label="Slide 2"></button>
+              <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+              <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+              <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+              <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="3" aria-label="Slide 4"></button>
             </div>
+
+
+
             <div class="carousel-inner">
-              <div class="carousel-item active">
-                <div class="d-block w-100 text-center p-4">
-                  <h2>Ultimo Evento</h2>
-                  <p v-if="noEventsMessage">{{ noEventsMessage }}</p>
-                  <p v-else>
-                    <strong>Titolo:</strong> {{ lastEventTitle }}<br>
-                    <strong>Descrizione:</strong> {{ lastEventDescription }}<br>
-                    <strong>Data:</strong> {{ lastEventDate }}
-                  </p>
-                </div>
-              </div>
 
-              <div class="carousel-item">
-                <div class="d-block w-100 text-center p-4">
-                  <h2>Ultima Attività</h2>
-                  <p v-if="noActivitiesMessage">{{ noActivitiesMessage }}</p>
-                  <p v-else>
-                    <strong>Titolo:</strong> {{ lastActivityTitle }}<br>
-                    <strong>Descrizione:</strong> {{ lastActivityDescription }}<br>
-                    <strong>Scadenza:</strong> {{ lastActivityDeadline }}
-                  </p>
-                </div>
+
+              <div class="carousel-item active">
+    <div class="d-block w-100 text-center p-4">
+      <h2>{{ isCurrentDay ? 'Evento di Oggi' : 'Ultimo Evento' }}</h2>
+      <p v-if="noEventsMessage">{{ noEventsMessage }}</p>
+      <p v-else>
+        <strong>Titolo:</strong> {{ lastEventTitle }}<br>
+        <strong>Descrizione:</strong> {{ lastEventDescription }}<br>
+        <strong>Data:</strong> {{ lastEventDate }}
+      </p>
+      <button v-if="!isCurrentDay" class="btn btn-primary mt-3" @click="getCurrentDayEvents">Vedi eventi del giorno corrente</button>
+      <button v-else class="btn btn-secondary mt-3" @click="getLastEvent">Torna all'ultimo evento</button>
+    </div>
+  </div>
+
+
+
+  <div class="carousel-item">
+    <div class="d-block w-100 text-center p-4">
+      <h2>{{ isCurrentDayActivity ? 'Attività di Oggi' : 'Ultima Attività' }}</h2>
+      <p v-if="noActivitiesMessage">{{ noActivitiesMessage }}</p>
+      <p v-else>
+        <strong>Titolo:</strong> {{ lastActivityTitle }}<br>
+        <strong>Descrizione:</strong> {{ lastActivityDescription }}<br>
+        <strong>Scadenza:</strong> {{ lastActivityDeadline }}
+      </p>
+      <button v-if="!isCurrentDayActivity" class="btn btn-primary mt-3" @click="getCurrentDayActivities">Vedi attività del giorno corrente</button>
+      <button v-else class="btn btn-secondary mt-3" @click="getLastActivity">Torna all'ultima attività</button>
+    </div>
+  </div>
+
+            <div class="carousel-item">
+              <div class="d-block w-100 text-center p-4">
+                <h2>Ultima Nota</h2>
+                <p v-if="noNotesMessage">{{ noNotesMessage }}</p>
+                <p v-else>
+                  <strong>Titolo:</strong> {{ lastNoteHeading }}<br>
+                  <strong>Autore:</strong> {{ lastNoteAuthor }}
+                </p>
               </div>
             </div>
 
-            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators"
-              data-bs-slide="prev">
+
+            <div class="carousel-item">
+              <div class="d-block w-100 text-center p-4">
+                <h2>Ultimo Pomodoro</h2>
+                <p v-if="noPomodorosMessage">{{ noPomodorosMessage }}</p>
+                <p v-else>
+                   <strong>tempo studio prefissato:</strong> {{ lastPomodoroTempoStudio }}<br>
+                   <strong>tempo pausa prefissato:</strong> {{ lastPomodoroTempoPausa }}<br>
+                   <strong>ripetizioni prefissate:</strong> {{ lastPomodoroRipetizioni }}
+                </p>
+              </div>
+            </div>
+
+
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
               <span class="carousel-control-prev-icon" aria-hidden="true"></span>
               <span class="visually-hidden">Previous</span>
             </button>
-
-            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators"
-              data-bs-slide="next">
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
               <span class="carousel-control-next-icon" aria-hidden="true"></span>
               <span class="visually-hidden">Next</span>
             </button>
@@ -156,7 +189,24 @@ export default {
 
       users: [], // Array che contiene tutti gli utenti
       selectedUsers: [], // Array che contiene gli ID degli utenti selezionati
-      notificationMessage: '' // Il messaggio personalizzato inserito dall'utente
+      notificationMessage: '' ,// Il messaggio personalizzato inserito dall'utente
+      lastNoteHeading: '',
+      lastNoteAuthor: '',
+      noEventsMessage: '' ,
+      noActivitiesMessage: '',
+      noNotesMessage: '',
+      noPomodorosMessage: '',
+      lastPomodoroTempoStudio: '',
+      lastPomodoroTempoPausa: '',
+      lastPomodoroRipetizioni: '',
+      currentEventTitle: '',
+      currentEventDescription: '',
+      currentEventDate: '',
+      currentActivityTitle: '',
+      currentActivityDescription: '',
+      currentActivityDeadline: '',
+      isCurrentDay: false,
+      isCurrentDayActivity: false
     };
   },
   mounted() {
@@ -164,6 +214,8 @@ export default {
     this.getLastActivity();
     this.getNotifies();
     this.getUsers();
+    this.getLastNote();
+    this.getLastPomodoro();
   },
   methods: {
     async getLastEvent() {
@@ -299,8 +351,129 @@ export default {
         console.error('errore durante eliminazione notifica:', error);
         alert('errore durante leliminazione della notifica.');
       }
-    }
+    },
 
+    async getLastNote() {
+      try {
+        const token = sessionStorage.getItem('token');
+        const username = localStorage.getItem('username');
+        const response = await axios.get('/api/notes/last', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+          params: { author: username }
+        });
+
+        if (response.data) {
+          this.lastNoteHeading = response.data.heading;
+          this.lastNoteAuthor = response.data.author;
+          this.noNotesMessage = '';
+        } else {
+          this.noNotesMessage = 'Non ci sono note trovate';
+        }
+      } catch (error) {
+        console.error('Errore nel recupero dell\'ultima nota:', error);
+        this.noNotesMessage = 'Errore nel caricamento dell\'ultima nota.';
+      }
+    },
+    async getLastPomodoro() {
+      try {
+        const token = sessionStorage.getItem('token');
+        const username = localStorage.getItem('username');
+        const response = await axios.get('/api/poms/last', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+          params: { username: username }
+        });
+
+        if (response.data) {
+          this.lastPomodoroTempoStudio = response.data.tempoStudio;
+          this.lastPomodoroTempoPausa = response.data.tempoPausa;
+          this.lastPomodoroRipetizioni = response.data.ripetizioni;
+          this.noPomodorosMessage = '';
+        } else {
+          this.noPomodorosMessage = 'Nessun pomodoro trovato';
+        }
+      } catch (error) {
+        console.error('Errore nel recupero dell\'ultimo pomodoro:', error);
+        this.noPomodorosMessage = 'Errore nel caricamento dell\'ultimo pomodoro.';
+      }
+    },
+    async getCurrentDayEvents() {
+  try { 
+    const token = sessionStorage.getItem('token');
+    const username = localStorage.getItem('username');
+    const response = await axios.get('/api/events/current-day', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      params: { username: username }
+    });     
+
+    if (response.data && response.data.length > 0) {
+      // Assumiamo che la risposta sia un array di eventi
+      const event = response.data[0]; // Prendiamo il primo evento
+      this.lastEventTitle = event.title;
+      this.lastEventDescription = event.description;
+      this.lastEventDate = new Date(event.date).toLocaleDateString();
+      this.noEventsMessage = '';
+      this.isCurrentDay = true;
+      // Puliamo il messaggio di errore
+    } else {
+      this.noEventsMessage = 'Non ci sono eventi imminenti';
+      this.lastEventTitle = '';
+      this.lastEventDescription = '';
+      this.lastEventDate = '';
+    }
+    console.log("eventi del giorno corrente", response.data);
+  } catch (error) { 
+    console.error('Errore nel recupero degli eventi del giorno corrente:', error);
+    this.noEventsMessage = 'Errore nel caricamento degli eventi del giorno corrente.';
+    this.lastEventTitle = '';
+    this.lastEventDescription = '';
+    this.lastEventDate = '';
+  }
+},
+async getCurrentDayActivities() {
+  try {
+    const token = sessionStorage.getItem('token');
+    const username = localStorage.getItem('username');
+    const response = await axios.get('/api/activities/current-day', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      params: { username: username }
+    });
+
+    if (response.data && response.data.length > 0) {
+      const activity = response.data[0];
+      this.lastActivityTitle = activity.title;
+      this.lastActivityDescription = activity.description;
+      this.lastActivityDeadline = new Date(activity.deadline).toLocaleDateString();
+      this.noActivitiesMessage = '';
+      this.isCurrentDayActivity = true;
+    } else {
+      this.noActivitiesMessage = 'Non ci sono attività imminenti';
+      this.lastActivityTitle = '';
+      this.lastActivityDescription = '';
+      this.lastActivityDeadline = '';
+      this.isCurrentDayActivity = true;
+    }
+  } catch (error) {
+    if (error.response && error.response.status === 404) {
+      this.noActivitiesMessage = 'Non ci sono attività imminenti123';
+      console.log("no",error) ;
+      this.lastActivityTitle = '';
+      this.lastActivityDescription = '';
+      this.lastActivityDeadline = '';
+      this.isCurrentDayActivity = true;
+    } else {
+      console.error('Errore nel recupero delle attività del giorno corrente:', error);
+      this.noActivitiesMessage = 'Errore nel caricamento delle attività del giorno corrente.';
+    }
+  }
+},
   }
 
 };

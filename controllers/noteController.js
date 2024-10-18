@@ -37,11 +37,12 @@ exports.getNoteById = async (req, res) => {
 
 exports.createNote = async (req, res) => {
   try {
-    const { heading, author, completed } = req.body;
+    const { heading, author, content, completed } = req.body;
 
     const newNote = new Note({
       heading,
       author,
+      content,
       completed
     });
 
@@ -83,5 +84,17 @@ exports.deleteNote = async (req, res) => {
   } catch (error) {
     console.error('Errore nella cancellazione della nota:', error);
     res.status(500).send('Errore nella cancellazione della nota');
+  }
+};
+
+
+exports.getLastNote = async (req, res) => {
+  try {
+    const username = req.query.author;
+    const lastNote = await Note.findOne({ author: username }).sort({ createdAt: -1 });
+    res.json(lastNote);
+  } catch (error) {
+    console.error('Errore nel recupero dell\'ultima nota:', error);
+    res.status(500).send('Errore nel recupero dell\'ultima nota');
   }
 };

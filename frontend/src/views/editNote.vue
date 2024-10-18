@@ -1,19 +1,23 @@
 <template>
-    <div>
-      <h1>Modifica Nota</h1>
-      <form @submit.prevent="updateNote">
-        <div>
-          <label for="heading">Titolo:</label>
-          <input type="text" v-model="note.heading" id="heading" required />
-        </div>
-        <div>
-          <label for="completed">Completata:</label>
-          <input type="checkbox" v-model="note.completed" id="completed" />
-        </div>
-        <button type="submit">Aggiorna Nota</button>
-      </form>
-    </div>
-  </template>
+  <div>
+    <h1>Modifica Nota</h1>
+    <form @submit.prevent="updateNote">
+      <div>
+        <label for="heading">Titolo:</label>
+        <input type="text" v-model="note.heading" id="heading" required />
+      </div>
+      <div>
+        <label for="content">Contenuto:</label>
+        <textarea v-model="note.content" id="content" rows="4" required></textarea>
+      </div>
+      <div>
+        <label for="completed">Completata:</label>
+        <input type="checkbox" v-model="note.completed" id="completed" />
+      </div>
+      <button type="submit">Aggiorna Nota</button>
+    </form>
+  </div>
+</template>
   
   <script>
   import axios from 'axios';
@@ -23,6 +27,7 @@
       return {
         note: {
           heading: '',
+          content: '',
           completed: false
         }
       };

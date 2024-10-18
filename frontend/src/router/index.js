@@ -12,6 +12,8 @@ import pomodoroTempo from '../views/pomodoroTempo.vue'
 import pomSession from '../views/pomSession.vue'
 import editNote from '../views/editNote.vue';
 import accountUtente from '@/views/accountUtente.vue';
+import eventDayCalendar from '@/views/eventDayCalendar.vue';
+
 
 
 const routes = [
@@ -29,7 +31,14 @@ const routes = [
   },
 
   {
-    path: '/registra',
+    path: '/eventDayCalendar',
+    name: 'eventDayCalendar',
+    component: eventDayCalendar,
+    meta: { requiresAuth: true } 
+  },
+
+  {
+    path: '/registratiAccedi',
     name: 'nuovoUtente',
     component: nuovoUtente,
   },
@@ -40,6 +49,7 @@ const routes = [
     component: HomePrincipale ,
     meta: { requiresAuth: true } 
   },
+
 
   {
     path: '/todo',

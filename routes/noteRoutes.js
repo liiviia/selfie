@@ -14,6 +14,9 @@ router.put('/notes/:id',authenticateToken, noteController.updateNote);
 
 router.delete('/notesRIM/:id',authenticateToken, noteController.deleteNote);
 
+router.get('/notes/last', authenticateToken, noteController.getLastNote);
+
+
 
 
 module.exports = router;
