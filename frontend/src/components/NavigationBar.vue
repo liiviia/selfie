@@ -107,7 +107,7 @@
       </div>
     </div>
   </nav>
-  </template>
+</template>
   
 <script>
 
@@ -179,12 +179,14 @@ import axios from 'axios';
         }, 1000); 
       },
 
+
       logout() {
+        localStorage.removeItem('token');
+        localStorage.removeItem('username');
         localStorage.clear();
-        this.isAut=false;
-        console.log("autenticato:", this.isAut);
-        this.$router.push('/'); // Ritorna alla pagina di login
-    },
+        sessionStorage.clear();
+        this.$router.push('/');
+      },
 
 
       async toggleNotifications(){
@@ -196,7 +198,7 @@ import axios from 'axios';
       },
   
 
-      async checkDeadlines() {
+      async checkDeadlines() {    //notifiche con scadenza <= 2gg
         try {
           const token = sessionStorage.getItem('token');
           const username = localStorage.getItem('username');

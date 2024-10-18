@@ -7,6 +7,7 @@ router.post('/send',authenticateToken, notificationController.sendNotification);
 
 router.get('/getNotif',authenticateToken, notificationController.getNotificationsForUser);
 
+router.delete('/:id', authenticateToken, notificationController.deleteNotification);
 
 // router.get('/events/last', authenticateToken, eventController.getLastEvent);
 

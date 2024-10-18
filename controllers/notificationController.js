@@ -5,22 +5,36 @@ const User = require('../models/User');
 
 //manda notifica ad un utente
 exports.sendNotification = async (req, res) => {
-    const { recipientId, message } = req.body;
-    if (!recipientId || !message) return res.status(400).json({ message: 'userId e message sono necessari' });
+   const { recipients, message } = req.body;
 
-    try {
-        // Crea una nuova notifica
-        const notification = new Notification({
-            recipient: recipientId, // Usa l'ID dell'utente qui
-            message: message
-        });
+  if (!recipients || recipients.length === 0 || !message) {
+    return res.status(400).json({ message: 'I destinatari e il messaggio sono necessari' });
+  }
 
-        await notification.save();
-        res.status(200).json({ message: 'Notifica inviata con successo' });
-    } catch (error) {
-        console.error('Errore durante l\'invio della notifica:', error);
-        res.status(500).json({ message: 'Errore durante l\'invio della notifica' });
+  try {
+    // Invia la notifica a ciascun destinatario selezionato
+    for (const recipientId of recipients) {
+      const user = await User.findById(recipientId);
+
+      if (!user) {
+        return res.status(404).json({ message: `Utente con ID ${recipientId} non trovato` });
+      }
+
+      const notification = new Notification({
+        recipient: user._id,
+        message: message,
+        isRead: false,
+        createdAt: new Date()
+      });
+
+      await notification.save();
     }
+
+    res.status(200).json({ message: 'Notifiche inviate con successo' });
+  } catch (error) {
+    console.error('Errore durante l\'invio delle notifiche:', error);
+    res.status(500).json({ message: 'Errore durante l\'invio delle notifiche' });
+  }
 };
 
 //notifiche dell utente
@@ -37,3 +51,20 @@ exports.getNotificationsForUser = async (req, res) => {
     }
 };
   
+//elimina una notifica con id
+exports.deleteNotification = async (req, res) => {
+    const { id } = req.params; // id della notifica dai parametri della richiesta
+  
+    try {
+      const notification = await Notification.findByIdAndDelete(id);
+  
+      if (!notification) {
+        return res.status(404).json({ message: 'notifica non trovata.' });
+      }
+  
+      res.status(200).json({ message: 'notifica eliminata con successo' });
+    } catch (error) {
+      console.error('errore durante eliminazione della notifica: ', error);
+      res.status(500).json({ message: 'errore del server' });
+    }
+  };

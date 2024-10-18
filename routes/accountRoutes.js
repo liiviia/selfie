@@ -7,4 +7,6 @@ router.put('/updatePassword', authenticateToken, accountController.updatePasswor
 
 router.delete('/deleteAccount', authenticateToken, accountController.deleteAccount);
 
+router.get('/users', authenticateToken, accountController.getAllUsers);
+
 module.exports = router;

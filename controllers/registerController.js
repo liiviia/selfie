@@ -54,7 +54,7 @@ exports.register = async (req, res) => {
 
     const savedUser = await newUser.save();
 
-    await sendConfirmationEmail(email, username);
+    //await sendConfirmationEmail(email, username);
 
     res.status(201).json(savedUser);
   } catch (error) {

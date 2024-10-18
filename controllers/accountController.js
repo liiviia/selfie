@@ -69,3 +69,14 @@ exports.deleteAccount = async (req, res) => {
     res.status(500).json({ message: 'Errore interno del server' });
   }
 };
+
+
+// Controller per ottenere tutti gli utenti
+exports.getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find({}, 'username'); // Ritorna solo il campo username
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ message: 'Errore nel recupero degli utenti' });
+  }
+};

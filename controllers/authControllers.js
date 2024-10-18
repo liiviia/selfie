@@ -8,14 +8,17 @@ exports.login = async (req, res) => {
 
     const { username, password } = req.body;
 
-    const user = await User.findOne({ username });
+    if(!username || !password){
+      return res.status(400).json({message:'inserisci username e passwordd!'});
+    }
 
+    //cerco user a db
+    const user = await User.findOne({ username });
     if (!user) {
       return res.status(401).json({ message: 'Username o password errati' });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
-
     if (!isMatch) {
       return res.status(401).json({ message: 'Username o password errati' });
     }
@@ -25,8 +28,6 @@ exports.login = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: '1h' }
     );
-
-    
 
     res.json({ token, email: user.email, phone: user.phoneNumber });
   } catch (error) {

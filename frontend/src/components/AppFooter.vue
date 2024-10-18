@@ -25,9 +25,6 @@
     color: white;
     padding: 10px 0;
     width: 100%;    
-    position: fixed;
-    bottom: 0;
-    left: 0;
   }
   
   .footer p {
@@ -40,5 +37,10 @@
   .footer a:hover {
     color: #ffffff;
   }
+
+  /* Aggiungi margine al contenuto della pagina */
+.container {
+  padding-bottom: 20px; /* Regola questo valore in base all'altezza del footer */
+}
   </style>
   
