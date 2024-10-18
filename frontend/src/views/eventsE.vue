@@ -11,6 +11,7 @@
         <p><strong>Luogo:</strong> {{ event.location }}</p>
         <p><strong>Ripetizione:</strong> {{ formatRepeat(event) }}</p>
         <p><strong>Autore:</strong> {{ event.author }}</p>
+          <button @click="confirmDelete(event._id)" class="delete-btn">🗑️</button>
       </li>
     </ul>
   </div>
@@ -26,6 +27,27 @@ export default {
     };
   },
   methods: {
+     confirmDelete(id) {
+      if (confirm("Sicuro di voler eliminare questo Evento?")) {
+        this.deleteEvents(id); 
+      }
+    },
+    
+    async deleteEvents(id) {
+      try {
+        const token = sessionStorage.getItem('token');
+        await axios.delete(`/api/eventsRemove/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}` 
+          }
+        });
+        console.log('Evento eliminato');
+        this.fetchEvents(); // Ricarica la lista dopo l'eliminazione
+      } catch (error) {
+        console.error('Errore nell\'eliminazione di evento:', error);
+      }
+    },
+
     async fetchEvents() {
       try {
         const token = sessionStorage.getItem('token');
@@ -93,6 +115,8 @@ ul {
   margin-bottom: 20px;
   border-bottom: 1px solid #ccc;
   padding-bottom: 10px;
+  padding-right: 40px; 
+  position: relative; 
 }
 
 .event-item h2 {
@@ -102,5 +126,19 @@ ul {
 
 .event-item p {
   margin: 5px 0;
+}
+
+.delete-btn {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 24px;
+}
+
+.delete-btn:hover {
+  color: red;
 }
 </style>

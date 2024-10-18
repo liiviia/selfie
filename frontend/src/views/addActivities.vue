@@ -1,23 +1,23 @@
 <template>
   <div class="activity-form">
     <h1>Aggiungi una nuova attività</h1>
-    
+
     <form @submit.prevent="submitActivity" class="form-container">
       <div class="form-group">
         <label for="title">Titolo:</label>
         <input v-model="newActivity.title" id="title" required class="form-input">
       </div>
-      
+
       <div class="form-group">
         <label for="description">Descrizione:</label>
         <textarea v-model="newActivity.description" id="description" class="form-textarea"></textarea>
       </div>
-      
+
       <div class="form-group">
         <label for="deadline">Scadenza:</label>
         <input v-model="newActivity.deadline" type="date" id="deadline" required class="form-input">
       </div>
-      
+
       <button type="submit" class="submit-button">Aggiungi Attività</button>
     </form>
 
@@ -26,68 +26,85 @@
 </template>
 
 <script>
+import { ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 import axios from 'axios';
 
 export default {
-  data() {
-    return {
-      newActivity: {
-        title: '',
-        description: '',
-        deadline: '',
-        author: localStorage.getItem('username') || 'Guest',
-        email: localStorage.getItem('email') || '',
-        completed: false
-      },
-      message: ''
-    };
-  },
-  methods: {
-    async submitActivity() {
+  setup() {
+    const route = useRoute();
+
+    const newActivity = ref({
+      title: '',
+      description: '',
+      deadline: '',
+      author: localStorage.getItem('username') || 'Guest',
+      email: localStorage.getItem('email') || '',
+      completed: false
+    });
+
+    onMounted(() => {
+      if (route.query.date) {
+        newActivity.value.deadline = route.query.date;
+      }
+    });
+
+    const submitActivity = async () => {
       try {
         const token = sessionStorage.getItem('token');
-        const response = await axios.post('/api/activities', this.newActivity, {
+        const response = await axios.post('/api/activities', newActivity.value, {
           headers: {
-            Authorization: `Bearer ${token}` 
+            Authorization: `Bearer ${token}`
           }
         });
         console.log('Attività aggiunta:', response.data);
-        
-        this.newActivity = { 
+
+        newActivity.value = {
           title: '',
           description: '',
           deadline: '',
-          author: this.newActivity.author,
-          email: this.newActivity.email,
+          author: localStorage.getItem('username') || 'Guest',
+          email: localStorage.getItem('email') || '',
           completed: false
         };
-        
-        this.message = 'Attività aggiunta con successo!';
-        this.$router.push('/homePrincipale'); 
+
+        message.value = 'Attività aggiunta con successo!';
+        setTimeout(() => {
+          message.value = '';
+          this.$router.push('/homePrincipale');
+        }, 2000);
+
       } catch (error) {
-        this.message = 'Errore: ' + error;
+        message.value = 'Errore: ' + error.message;
         console.error('Errore:', error);
       }
-    }
+    };
+
+    const message = ref('');
+
+    return {
+      newActivity,
+      message,
+      submitActivity
+    };
   }
 };
 </script>
 
 <style scoped>
-
 .activity-form {
   max-width: 600px;
   margin: 50px auto;
   padding: 30px;
   background-color: #15172b;
   border-radius: 12px;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); /* ombreggiatura morbida */
-  transition: transform 0.3s ease; /* transizione */
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
   box-sizing: border-box;
 }
 
 .activity-form:hover {
-  transform: translateY(-5px); /* animazione al passaggio */
+  transform: translateY(-5px);
 }
 
 h1 {
@@ -126,7 +143,7 @@ label {
 
 .form-input:focus, .form-textarea:focus {
   border-color: #007bff;
-  box-shadow: 0 0 8px rgba(0, 123, 255, 0.25); /* effetto focus */
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.25);
   outline: none;
 }
 
@@ -161,10 +178,9 @@ label {
 }
 
 .form-input, .form-textarea, .submit-button {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* piccolo effetto ombra per gli input e il pulsante */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Aggiungere un effetto leggero ai contenitori */
 .form-group {
   animation: fadeIn 0.5s ease-in-out;
 }
@@ -178,14 +194,5 @@ label {
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-.back-home-link {
-  color: #007bff;
-  font-family: 'Poppins', sans-serif;
-  text-decoration: none;
-  margin-bottom: 20px;
-  transition: color 0.3s ease;
-  text-align: left;
 }
 </style>

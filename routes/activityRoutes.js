@@ -17,5 +17,7 @@ router.get('/activities/current-day', authenticateToken, activityController.getC
 
 router.get('/activities/by-date', authenticateToken, activityController.getActivitiesByDate);
 
+router.delete('/activitiesRemove/:id', authenticateToken, activityController.deleteActivities) ;
+
 
 module.exports = router;

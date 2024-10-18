@@ -13,4 +13,6 @@ router.get('/events/current-day', authenticateToken, eventController.getCurrentD
 
 router.get('/events/by-date', authenticateToken, eventController.getEventByDate);
 
+router.delete('/eventsRemove/:id', authenticateToken, eventController.deleteEvents) ;
+
 module.exports = router;
