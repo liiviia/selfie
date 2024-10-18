@@ -38,7 +38,7 @@ const routes = [
   },
 
   {
-    path: '/registra',
+    path: '/registratiAccedi',
     name: 'nuovoUtente',
     component: nuovoUtente,
   },
@@ -49,6 +49,7 @@ const routes = [
     component: HomePrincipale ,
     meta: { requiresAuth: true } 
   },
+
 
   {
     path: '/todo',
