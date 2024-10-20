@@ -1,6 +1,7 @@
 <template>
   <div class="activity-list">
-    <h1>Lista delle Attività</h1>
+    <h1>Lista delle Attività : </h1>
+    <h2>Numero Attività : {{activities.length}} </h2>
     
     <ul v-if="activities.length > 0" class="activity-items">
       <li v-for="(activity, index) in activities" :key="index" class="activity-item">

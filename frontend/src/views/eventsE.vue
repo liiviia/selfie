@@ -1,6 +1,7 @@
 <template>
   <div class="event-list">
     <h1>Lista Eventi</h1>
+    <h2>Numero Eventi : {{events.length}}</h2>
     <ul>
       <li v-for="event in events" :key="event._id" class="event-item">
         <h2>{{ event.title }}</h2>
