@@ -1,4 +1,7 @@
 const Event = require('../models/Event');
+const { sendNotifEmail } = require('../emailService');
+const User = require('../models/User');
+
 
 // Crea un nuovo evento
 exports.createEvent = async (req, res) => {
@@ -19,6 +22,11 @@ exports.createEvent = async (req, res) => {
       notificationTime,
       repeatNotification,
     } = req.body;
+
+    // Validazione di base
+    if (!title || !date || !startTime || !author) {
+      return res.status(400).json({ error: 'I campi titolo, data, ora di inizio e autore sono obbligatori.' });
+    }
 
     let notificationMechanismArray = [];
 
@@ -47,9 +55,20 @@ exports.createEvent = async (req, res) => {
 
     const savedEvent = await newEvent.save();
     res.status(201).json(savedEvent);
+
+    const use=await User.findOne({username:author});
+
+    //console.log(use);
+    //console.log(notificationMechanismArray.length);
+
+    if(notificationMechanismArray.length > 0){
+      // sendNotifications(savedEvent,notificationMechanismArray);
+      sendNotifEmail(use.email, newEvent);
+    }
+
   } catch (error) {
-    console.error('Errore durante l\'aggiunta dell\'evento:', error);
-    res.status(500).json({ error: 'Errore durante l\'aggiunta dell\'evento' });
+    console.error('Errore durante aggiunta evento:', error);
+    res.status(500).json({ error: 'Errore durante aggiunta dell evento' });
   }
 };
 
@@ -109,9 +128,6 @@ exports.getCurrentDayEvents = async (req, res) => {
       date: { $gte: currentDate, $lte: endOfDay }
     });
 
-
-  
-
     res.json(events);
   } catch (error) {
     console.error('Errore nel recupero degli eventi del giorno corrente:', error);
@@ -138,8 +154,6 @@ exports.getEventByDate = async (req, res) => {
       date: { $gte: startDate, $lte: endDate }
     });
 
-
-
     res.json(events);
   } catch (error) {
     console.error('Errore nel recupero degli eventi:', error);
@@ -163,3 +177,24 @@ exports.deleteEvents = async (req, res) => {
     res.status(500).send('Errore nella cancellazione di evento');
   }
 }
+
+
+// // Funzione per inviare le notifiche immediatamente
+// const sendNotifications = (event, notificationMechanismArray) => {
+//   // Itera sui vari meccanismi di notifica
+//   notificationMechanismArray.forEach(mechanism => {
+//     if (mechanism === 'email') {
+//       // Chiama la funzione per inviare email
+//       sendNotifEmail();
+//     // } else if (mechanism === 'whatsapp') {
+//     //   // Chiama la funzione per inviare la notifica WhatsApp
+//     //   sendWhatsAppNotification(event);
+//     // } else if (mechanism === 'system') {
+//     //   // Invia una notifica tramite il sistema (ad esempio, notifiche push)
+//     //   sendSystemNotification(event);
+//     // } else if (mechanism === 'alert') {
+//     //   // Invia un alert (ad esempio un popup o un banner)
+//     //   sendAlertNotification(event);
+//     }
+//   });
+// };

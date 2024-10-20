@@ -77,12 +77,13 @@
 
 <script>
 import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
 
 export default {
   setup() {
     const route = useRoute();
+    const router=useRouter();
     const newEvent = ref({
       title: '',
       description: '',
@@ -138,7 +139,7 @@ export default {
         message.value = 'Evento creato con successo!';
         setTimeout(() => {
           message.value = '';
-          this.$router.push('/homePrincipale');
+          router.push('/homePrincipale'); ////
         }, 2000);
 
       } catch (error) {
