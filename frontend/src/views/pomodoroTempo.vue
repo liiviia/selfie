@@ -31,6 +31,15 @@
       <div class="timer" id="timerDisplay">00:00</div>
       <div class="progress-bar"></div>
     </div>
+
+    <!-- Bottoni aggiuntivi per la gestione del ciclo -->
+    <div class="controls">
+      <button @click="skipPhase">Salta alla fase successiva</button>
+      <button @click="restartCycle">Ricomincia ciclo</button>
+      <button @click="endCycle">Termina ciclo</button>
+      <button @click="pauseTimer">Stoppa timer</button>
+      <button v-if="isPaused" @click="resumeTimer">Riprendi timer</button> <!-- Pulsante per riprendere -->
+    </div>
   </div>
 </template>
 
@@ -45,12 +54,17 @@ export default {
 
     const newPom = ref({
       username: localStorage.getItem('username') || 'Guest',
-      tempoStudio: '',
-      tempoPausa: '',
-      ripetizioni: '',
+      tempoStudio: 30,  // Default di 30 minuti
+      tempoPausa: 5,    // Default di 5 minuti
+      ripetizioni: 5,   // Default di 5 cicli
       giorno: ''
     });
     const statusMessage = ref('');
+    let studyCycles = ref(0); // Numero di cicli rimanenti
+    let timerInterval = null; // Per gestire il timeout
+    let isStudyPhase = ref(true); // Per sapere se siamo nella fase di studio o di pausa
+    let remainingTime = ref(0); // Per tenere traccia del tempo rimanente nel ciclo corrente
+    let isPaused = ref(false); // Stato di pausa del timer
 
     onMounted(() => {
       if (route.query.date) {
@@ -67,83 +81,126 @@ export default {
             Authorization: `Bearer ${token}`
           }
         });
-        console.log('Sessione pomodoro aggiunta:', response.data);
-        newPom.value = {
-          username: newPom.value.username,
-          tempoStudio: '',
-          tempoPausa: '',
-          ripetizioni: '',
-          giorno: ''
-        };
 
-        startStudyTimer(parseInt(response.data.tempoStudio), parseInt(response.data.ripetizioni), parseInt(response.data.tempoPausa));
+        console.log('Sessione pomodoro aggiunta:', response.data);
+
+        // Avvio il timer di studio, con i parametri inseriti
+        studyCycles.value = newPom.value.ripetizioni;
+        startStudyTimer(newPom.value.tempoStudio, studyCycles.value, newPom.value.tempoPausa);
       } catch (error) {
         console.error('Errore:', error);
       }
     };
 
-    const startStudyTimer = (studyTime, studyCycles, pause) => {
-      statusMessage.value = `Studio! Numero cicli rimanenti: ${studyCycles}`;
-      const progressBar = document.querySelector('.progress-bar');
-      progressBar.style.width = '0%';
+    // Funzione per avviare il ciclo di studio
+    const startStudyTimer = (studyTime, cycles, pause) => {
+      if (cycles <= 0) {
+        alert('Ciclo completato!');
+        return;
+      }
 
-      let remainingTime = studyTime * 60; // convert study time to seconds
+      statusMessage.value = `Studio! Numero cicli rimanenti: ${cycles}`;
+      remainingTime.value = studyTime * 60;
+      isStudyPhase.value = true;
+      isPaused.value = false;
 
-      const updateTimer = () => {
-        if (remainingTime > 0) {
-          const minutes = Math.floor(remainingTime / 60);
-          const seconds = remainingTime % 60;
-          document.getElementById('timerDisplay').textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-          remainingTime--;
-
-          const progressPercentage = ((studyTime * 60 - remainingTime) / (studyTime * 60)) * 100;
-          progressBar.style.width = `${progressPercentage}%`;
-          setTimeout(updateTimer, 1000);
-        } else {
-          progressBar.style.width = '0%';
-          startBreakTimer(pause, studyCycles);
-        }
-      };
-
-      updateTimer();
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        updateTimer(remainingTime.value, studyTime, pause, cycles, startBreakTimer);
+        remainingTime.value--;
+      }, 1000);
     };
 
-    const startBreakTimer = (pause, studyCycles) => {
-      statusMessage.value = `Pausa! Numero cicli rimanenti: ${studyCycles}`;
-      const progressBar = document.querySelector('.progress-bar');
-      progressBar.style.width = '0%';
+    const startBreakTimer = (pauseTime, cycles) => {
+      if (cycles <= 0) {
+        alert('Ciclo completato!');
+        return;
+      }
 
-      let remainingTime = pause * 60; // convert pause time to seconds
+      statusMessage.value = `Pausa! Numero cicli rimanenti: ${cycles}`;
+      remainingTime.value = pauseTime * 60;
+      isStudyPhase.value = false;
+      isPaused.value = false;
 
-      const updateTimer = () => {
-        if (remainingTime > 0) {
-          const minutes = Math.floor(remainingTime / 60);
-          const seconds = remainingTime % 60;
-          document.getElementById('timerDisplay').textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-          remainingTime--;
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        updateTimer(remainingTime.value, pauseTime, pauseTime, cycles, startStudyTimer);
+        remainingTime.value--;
+      }, 1000);
+    };
 
-          const progressPercentage = ((pause * 60 - remainingTime) / (pause * 60)) * 100;
-          progressBar.style.width = `${progressPercentage}%`;
-          setTimeout(updateTimer, 1000);
-        } else {
-          progressBar.style.width = '0%';
-          studyCycles--;
-          if (studyCycles > 0) {
-            startStudyTimer(newPom.value.tempoStudio, studyCycles, pause);
-          } else {
-            statusMessage.value = `Finito! Cicli rimanenti: ${studyCycles}`;
-            document.getElementById('timerDisplay').textContent = "00:00";
-          }
-        }
-      };
+    const updateTimer = (remaining, phaseTime, pauseTime, cycles, nextPhase) => {
+      if (remaining > 0) {
+        const minutes = Math.floor(remaining / 60);
+        const seconds = remaining % 60;
+        document.getElementById('timerDisplay').textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      } else {
+        clearInterval(timerInterval);
+        studyCycles.value--;
+        nextPhase(phaseTime, studyCycles.value);
+      }
+    };
 
-      updateTimer();
+    // Forza il passaggio alla fase successiva
+    const skipPhase = () => {
+      clearInterval(timerInterval);
+
+      // Decrementa il numero di cicli solo se siamo nella fase di studio
+      if (isStudyPhase.value) {
+        studyCycles.value--;
+        startBreakTimer(newPom.value.tempoPausa, studyCycles.value);
+      } else {
+        startStudyTimer(newPom.value.tempoStudio, studyCycles.value, newPom.value.tempoPausa);
+      }
+
+      // Verifica se i cicli sono terminati
+      if (studyCycles.value <= 0) {
+        statusMessage.value = "Ciclo completato!";
+        document.getElementById('timerDisplay').textContent = "00:00";
+      }
+    };
+
+    // Ricomincia il ciclo
+    const restartCycle = () => {
+      clearInterval(timerInterval);
+      studyCycles.value = newPom.value.ripetizioni;
+      startStudyTimer(newPom.value.tempoStudio, studyCycles.value, newPom.value.tempoPausa);
+    };
+
+    // Termina il ciclo
+    const endCycle = () => {
+      clearInterval(timerInterval);
+      studyCycles.value = 0;
+      statusMessage.value = 'Ciclo terminato manualmente.';
+      document.getElementById('timerDisplay').textContent = "00:00";
+    };
+
+    // Ferma il timer
+    const pauseTimer = () => {
+      clearInterval(timerInterval);
+      isPaused.value = true;
+    };
+
+    // Riprende il timer
+    const resumeTimer = () => {
+      isPaused.value = false;
+      clearInterval(timerInterval); // Ferma eventuali timer precedenti
+      timerInterval = setInterval(() => {
+        updateTimer(remainingTime.value, newPom.value.tempoStudio, newPom.value.tempoPausa, studyCycles.value, isStudyPhase.value ? startBreakTimer : startStudyTimer);
+        remainingTime.value--;
+      }, 1000); // Riprende il timer da dove è stato fermato
     };
 
     return {
       newPom,
       statusMessage,
-      aggiungiPomodoro
+      aggiungiPomodoro,
+      skipPhase,
+      restartCycle,
+      endCycle,
+      pauseTimer,
+      resumeTimer,
+      isPaused
     };
   }
 };
@@ -193,5 +250,23 @@ button {
 
 button:hover {
   background-color: #45a049;
+}
+
+.controls {
+  margin-top: 20px;
+}
+
+.controls button {
+  padding: 10px;
+  margin-right: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.controls button:hover {
+  background-color: #0056b3;
 }
 </style>

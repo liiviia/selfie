@@ -131,13 +131,15 @@ export default {
         });
         const activities = activityResponse.data;
 
-        const pomodoroResponse = await axios.get(`/api/pomsGET`, {
+        const pomodoroResponse = await axios.get(`/api/poms`, {
           headers: {
             Authorization: `Bearer ${token}`
           },
-          params: { author: username }
+          params: { username: username }
         });
         const pomodoros = pomodoroResponse.data;
+
+            console.log("Risposta API Pomodori:", pomodoroResponse.data);
 
         eventsMap.value = {};
         activityMap.value = {};
