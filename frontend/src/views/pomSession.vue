@@ -1,6 +1,9 @@
 <template>
   <div class="pomodoro-list">
     <h1>Lista delle Sessioni Pomodoro Salvate</h1>
+
+    <h2>Numero Pomodori : {{poms.length}}</h2>
+
     <ul v-if="poms.length > 0">
       <li v-for="pom in poms" :key="pom._id" class="pomodoro-item">
         <h2>Sessione Pomodoro</h2>
