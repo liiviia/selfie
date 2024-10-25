@@ -91,6 +91,9 @@ export default {
           headers: { Authorization: `Bearer ${token}` },
           params: { author, date }
         });
+
+        console.log('Pomodori recuperati:', pomodoroResponse.data);
+
         pomodoros.value = Array.isArray(pomodoroResponse.data) ? pomodoroResponse.data : [pomodoroResponse.data];
         console.log('Fetched pomodoros:', pomodoros.value);
 

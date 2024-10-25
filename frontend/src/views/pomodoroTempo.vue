@@ -22,7 +22,7 @@
         <input type="date" v-model="newPom.giorno" required>
       </div>
 
-      <button type="submit">Aggiungi Sessione</button>
+      <button type="submit" class="rounded-btn">Aggiungi Sessione</button>
     </form>
 
     <p id="studio-pausa">{{ statusMessage }}</p>
@@ -32,7 +32,6 @@
       <div class="progress-bar"></div>
     </div>
 
-    <!-- Bottoni aggiuntivi per la gestione del ciclo -->
     <div class="controls">
       <button @click="skipPhase">Salta alla fase successiva</button>
       <button @click="restartCycle">Ricomincia ciclo</button>
@@ -76,6 +75,10 @@ export default {
       try {
         const token = sessionStorage.getItem('token');
 
+        // Controlla se la data selezionata è nel futuro
+        const currentDate = new Date();
+        const selectedDate = new Date(newPom.value.giorno);
+
         const response = await axios.post('/api/pomsPOST', newPom.value, {
           headers: {
             Authorization: `Bearer ${token}`
@@ -84,15 +87,17 @@ export default {
 
         console.log('Sessione pomodoro aggiunta:', response.data);
 
-        // Avvio il timer di studio, con i parametri inseriti
-        studyCycles.value = newPom.value.ripetizioni;
-        startStudyTimer(newPom.value.tempoStudio, studyCycles.value, newPom.value.tempoPausa);
+        if (selectedDate.getTime() > currentDate.getTime()) {
+          statusMessage.value = 'Sessione pomodoro aggiunta per una data futura.';
+        } else {
+          studyCycles.value = newPom.value.ripetizioni;
+          startStudyTimer(newPom.value.tempoStudio, studyCycles.value, newPom.value.tempoPausa);
+        }
       } catch (error) {
         console.error('Errore:', error);
       }
     };
 
-    // Funzione per avviare il ciclo di studio
     const startStudyTimer = (studyTime, cycles, pause) => {
       if (cycles <= 0) {
         alert('Ciclo completato!');
@@ -141,11 +146,9 @@ export default {
       }
     };
 
-    // Forza il passaggio alla fase successiva
     const skipPhase = () => {
       clearInterval(timerInterval);
 
-      // Decrementa il numero di cicli solo se siamo nella fase di studio
       if (isStudyPhase.value) {
         studyCycles.value--;
         startBreakTimer(newPom.value.tempoPausa, studyCycles.value);
@@ -153,21 +156,18 @@ export default {
         startStudyTimer(newPom.value.tempoStudio, studyCycles.value, newPom.value.tempoPausa);
       }
 
-      // Verifica se i cicli sono terminati
       if (studyCycles.value <= 0) {
         statusMessage.value = "Ciclo completato!";
         document.getElementById('timerDisplay').textContent = "00:00";
       }
     };
 
-    // Ricomincia il ciclo
     const restartCycle = () => {
       clearInterval(timerInterval);
       studyCycles.value = newPom.value.ripetizioni;
       startStudyTimer(newPom.value.tempoStudio, studyCycles.value, newPom.value.tempoPausa);
     };
 
-    // Termina il ciclo
     const endCycle = () => {
       clearInterval(timerInterval);
       studyCycles.value = 0;
@@ -175,20 +175,18 @@ export default {
       document.getElementById('timerDisplay').textContent = "00:00";
     };
 
-    // Ferma il timer
     const pauseTimer = () => {
       clearInterval(timerInterval);
       isPaused.value = true;
     };
 
-    // Riprende il timer
     const resumeTimer = () => {
       isPaused.value = false;
-      clearInterval(timerInterval); // Ferma eventuali timer precedenti
+      clearInterval(timerInterval);
       timerInterval = setInterval(() => {
         updateTimer(remainingTime.value, newPom.value.tempoStudio, newPom.value.tempoPausa, studyCycles.value, isStudyPhase.value ? startBreakTimer : startStudyTimer);
         remainingTime.value--;
-      }, 1000); // Riprende il timer da dove è stato fermato
+      }, 1000); 
     };
 
     return {
@@ -252,6 +250,10 @@ button:hover {
   background-color: #45a049;
 }
 
+button.rounded-btn {
+  border-radius: 20px; /* Arrotonda il pulsante */
+}
+
 .controls {
   margin-top: 20px;
 }
@@ -268,5 +270,14 @@ button:hover {
 
 .controls button:hover {
   background-color: #0056b3;
+}
+
+.controls {
+  margin-top: 20px;
+  margin-bottom: 40px;
+}
+
+#clock {
+  margin-top: 40px;
 }
 </style>

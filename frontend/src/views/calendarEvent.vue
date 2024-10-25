@@ -5,6 +5,19 @@
       <h2>{{ currentMonthYear }}</h2>
       <button @click="nextMonth">&gt;</button>
     </div>
+
+     <div class="legend">
+      <div class="legend-item">
+        <span class="event-dot"></span> Eventi
+      </div>
+      <div class="legend-item">
+        <span class="activity-dot"></span> Attività
+      </div>
+      <div class="legend-item">
+        <span class="pomodoro-dot"></span> Pomodori
+      </div>
+    </div>
+
     <div class="calendar-body">
       <div class="weekdays">
         <div v-for="day in weekdays" :key="day">{{ day }}</div>
@@ -107,73 +120,95 @@ export default {
     }
 
     async function fetchEvents() {
-      try {
-        const username = localStorage.getItem('username');
-        const token = sessionStorage.getItem('token');
-        if (!username || !token) {
-          console.error('Username o token mancante. L\'utente potrebbe non essere autenticato.');
-          return;
-        }
-
-        const response = await axios.get(`/api/eventsGET`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          },
-          params: { author: username }
-        });
-        const events = response.data;
-
-        const activityResponse = await axios.get(`/api/activitiesGET`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          },
-          params: { username: username }
-        });
-        const activities = activityResponse.data;
-
-        const pomodoroResponse = await axios.get(`/api/poms`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          },
-          params: { username: username }
-        });
-        const pomodoros = pomodoroResponse.data;
-
-            console.log("Risposta API Pomodori:", pomodoroResponse.data);
-
-        eventsMap.value = {};
-        activityMap.value = {};
-        pomodoroMap.value = {};
-
-        events.forEach(event => {
-          const eventDate = new Date(event.date);
-          const dateString = formatDateToLocal(eventDate);
-          eventsMap.value[dateString] = true;
-        });
-
-        activities.forEach(activity => {
-          const activityDate = new Date(activity.deadline);
-          const dateString = formatDateToLocal(activityDate); 
-          activityMap.value[dateString] = true;
-        });
-
-        pomodoros.forEach(pomodoro => {
-          const pomodoroDate = new Date(pomodoro.giorno);
-          const dateString = formatDateToLocal(pomodoroDate);
-          pomodoroMap.value[dateString] = true;
-        });
-
-        updateCalendarDays();
-      } catch (error) {
-        if (error.response) {
-          console.error('Errore nella risposta del server:', error.response.status, error.response.data);
-        } else if (error.request) {
-          console.error('Nessuna risposta ricevuta dal server:', error.request);
-        } else {
-          console.error('Errore durante l\'impostazione della richiesta:', error.message);
-        }
-      }
+  try {
+    const username = localStorage.getItem('username');
+    const token = sessionStorage.getItem('token');
+    if (!username || !token) {
+      console.error('Username o token mancante. L\'utente potrebbe non essere autenticato.');
+      return;
     }
+
+    const response = await axios.get(`/api/eventsGET`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      params: { author: username }
+    });
+    const events = response.data;
+
+    const activityResponse = await axios.get(`/api/activitiesGET`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      params: { username: username }
+    });
+    const activities = activityResponse.data;
+
+    const pomodoroResponse = await axios.get(`/api/poms`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      params: { username: username }
+    });
+    const pomodoros = pomodoroResponse.data;
+
+    console.log("Risposta API Pomodori:", pomodoroResponse.data);
+
+    eventsMap.value = {};
+    activityMap.value = {};
+    pomodoroMap.value = {};
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    events
+      .filter(event => {
+        const eventDate = new Date(event.date);
+        eventDate.setHours(0, 0, 0, 0);
+        return eventDate >= today; // Mantiene solo gli eventi non scaduti
+      })
+      .forEach(event => {
+        const eventDate = new Date(event.date);
+        const dateString = formatDateToLocal(eventDate);
+        eventsMap.value[dateString] = true;
+      });
+
+    activities
+      .filter(activity => {
+        const activityDate = new Date(activity.deadline);
+        activityDate.setHours(0, 0, 0, 0);
+        return activityDate >= today; // Mantiene solo le attività non scadute
+      })
+      .forEach(activity => {
+        const activityDate = new Date(activity.deadline);
+        const dateString = formatDateToLocal(activityDate); 
+        activityMap.value[dateString] = true;
+      });
+
+    pomodoros
+      .filter(pomodoro => {
+        const pomodoroDate = new Date(pomodoro.giorno);
+        pomodoroDate.setHours(0, 0, 0, 0);
+        return pomodoroDate >= today; // Mantiene solo i pomodori non scaduti
+      })
+      .forEach(pomodoro => {
+        const pomodoroDate = new Date(pomodoro.giorno);
+        const dateString = formatDateToLocal(pomodoroDate);
+        pomodoroMap.value[dateString] = true;
+      });
+
+    updateCalendarDays();
+  } catch (error) {
+    if (error.response) {
+      console.error('Errore nella risposta del server:', error.response.status, error.response.data);
+    } else if (error.request) {
+      console.error('Nessuna risposta ricevuta dal server:', error.request);
+    } else {
+      console.error('Errore durante l\'impostazione della richiesta:', error.message);
+    }
+  }
+}
+
 
     function prevMonth() {
       const newDate = new Date(currentDate.value);
@@ -305,10 +340,24 @@ export default {
   margin-top: 5px;
 }
 
+.legend {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 15px;
+  gap: 15px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+}
+
 .event-dot, .activity-dot, .pomodoro-dot {
   height: 8px;  /* Pallini piccoli */
   width: 8px;
-  border-radius: 50%;  /* Trasformare in cerchio */
+  border-radius: 50%; 
   display: inline-block;
 }
 
