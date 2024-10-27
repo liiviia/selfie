@@ -1,6 +1,6 @@
 const cron = require('node-cron');
 const Activity = require('./models/Activity');
-const { sendReminderEmail } = require('./emailService');
+const { sendReminderEmail } = require('./services/emailService');
 
 const scheduleEmailReminders = () => {
   cron.schedule('0 0 * * *', async () => {

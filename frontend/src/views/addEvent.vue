@@ -71,17 +71,24 @@
       </div>
       <button type="submit">Crea Evento</button>
     </form>
+    <NotificationManager ref="notificationManager" />
     <p v-if="message">{{ message }}</p>
   </div>
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, getCurrentInstance } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
+import NotificationManager from '../components/NotificationManager.vue';
 
 export default {
+  components:{
+    NotificationManager
+  },
+  
   setup() {
+    const { proxy } = getCurrentInstance(); // Ottieni il contesto corrente (proxy)
     const route = useRoute();
     const router=useRouter();
     const newEvent = ref({
@@ -102,16 +109,27 @@ export default {
     });
 
     onMounted(() => {
+
+      //PERMESSO NOTIFICHE
+      // const notificationManager=proxy.$refs.notificationManager;
+      //   notificationManager.requestNotificationPermission();
       if (route.query.date) {
         newEvent.value.date = route.query.date;
       }
     });
 
+    
     const message = ref('');
 
+    //crea evento
     const createEvent = async () => {
       try {
         const token = sessionStorage.getItem('token');
+        ///////////
+        const notificationManager = proxy.$refs.notificationManager;
+        const emaill = localStorage.getItem('email');
+        notificationManager.scheduleNotification(newEvent.value, emaill);
+
         const response = await axios.post('/api/events', newEvent.value, {
           headers: {
             Authorization: `Bearer ${token}`
@@ -140,7 +158,7 @@ export default {
         setTimeout(() => {
           message.value = '';
           router.push('/homePrincipale'); ////
-        }, 2000);
+        }, 3000);
 
       } catch (error) {
         message.value = 'Errore durante la creazione dell\'evento: ' + error.message;

@@ -1,5 +1,5 @@
 const Event = require('../models/Event');
-const { sendNotifEmail } = require('../emailService');
+const { sendNotifEmail } = require('../services/emailService');
 const User = require('../models/User');
 
 
@@ -55,16 +55,6 @@ exports.createEvent = async (req, res) => {
 
     const savedEvent = await newEvent.save();
     res.status(201).json(savedEvent);
-
-    const use=await User.findOne({username:author});
-
-    //console.log(use);
-    //console.log(notificationMechanismArray.length);
-
-    if(notificationMechanismArray.length > 0){
-      // sendNotifications(savedEvent,notificationMechanismArray);
-      sendNotifEmail(use.email, newEvent);
-    }
 
   } catch (error) {
     console.error('Errore durante aggiunta evento:', error);
@@ -178,23 +168,19 @@ exports.deleteEvents = async (req, res) => {
   }
 }
 
+exports.sendEmailNotificationCreate=async(req,res) => {
+  const { emailRicevente, eventDetails } = req.body;
+  
+  try {  
+    await sendNotifEmail(emailRicevente, eventDetails);
+    res.status(200).json({ message: 'Email inviata con successo' });
 
-// // Funzione per inviare le notifiche immediatamente
-// const sendNotifications = (event, notificationMechanismArray) => {
-//   // Itera sui vari meccanismi di notifica
-//   notificationMechanismArray.forEach(mechanism => {
-//     if (mechanism === 'email') {
-//       // Chiama la funzione per inviare email
-//       sendNotifEmail();
-//     // } else if (mechanism === 'whatsapp') {
-//     //   // Chiama la funzione per inviare la notifica WhatsApp
-//     //   sendWhatsAppNotification(event);
-//     // } else if (mechanism === 'system') {
-//     //   // Invia una notifica tramite il sistema (ad esempio, notifiche push)
-//     //   sendSystemNotification(event);
-//     // } else if (mechanism === 'alert') {
-//     //   // Invia un alert (ad esempio un popup o un banner)
-//     //   sendAlertNotification(event);
-//     }
-//   });
-// };
+  } catch (error) {
+    console.error('Errore durante invio della notifica email:', error);
+    res.status(500).json({ error: 'Errore durante invio dell email' });
+  }
+
+}
+
+
+
