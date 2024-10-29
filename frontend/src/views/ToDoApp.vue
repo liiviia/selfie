@@ -1,36 +1,36 @@
 <template>
-  <div>
+  <div class="note-container">
     <h1>Aggiungi una Nota</h1>
-    <form @submit.prevent="addNote">
-      <div>
+    <form @submit.prevent="addNote" class="note-form">
+      <div class="form-group">
         <label for="heading">Titolo:</label>
-        <input type="text" v-model="newNote.heading" id="heading" required />
+        <input type="text" v-model="newNote.heading" id="heading" required class="form-input" />
       </div>
-      <div>
+      <div class="form-group">
         <label for="content">Contenuto:</label>
-        <textarea v-model="newNote.content" id="content" rows="4"></textarea>
+        <textarea v-model="newNote.content" id="content" rows="4" class="form-textarea"></textarea>
       </div>
-      <button type="submit">Aggiungi Nota</button>
+      <button type="submit" class="submit-button">Aggiungi Nota</button>
     </form>
 
-    <h1>Notes</h1>
+    <h1>Note</h1>
     <ul class="notes-list">
       <li v-for="note in notes" :key="note._id" class="note-item">
         <h2>{{ note.heading }}</h2>
         <div class="note-content" v-html="renderMarkdown(note.content)"></div>
-        <p>Author: {{ note.author }}</p>
+        <p>Autore: {{ note.author }}</p>
         <div class="note-actions">
-          <button @click="editNote(note._id)">Modifica</button>
-          <button @click="deleteNote(note._id)">Elimina</button>
+          <button @click="editNote(note._id)" class="edit-btn">Modifica</button>
+          <button @click="deleteNote(note._id)" class="delete-btn">Elimina</button>
         </div>
       </li>
     </ul>
   </div>
 </template>
+
 <script>
-  
-  import axios from 'axios';
-import {marked} from 'marked';
+import axios from 'axios';
+import { marked } from 'marked';
 
 export default {
   data() {
@@ -49,7 +49,7 @@ export default {
     async fetchNotes() {
       try {
         const token = sessionStorage.getItem('token');
-        const username = localStorage.getItem('username'); 
+        const username = localStorage.getItem('username');
         if (!username) {
           console.error('Username non trovato');
           return;
@@ -57,12 +57,12 @@ export default {
         const response = await axios.get('/api/notesGET', {
           params: { username: username },
           headers: {
-            Authorization: `Bearer ${token}` 
+            Authorization: `Bearer ${token}`
           }
         });
         this.notes = response.data;
       } catch (error) {
-        console.error('Error fetching notes:', error);
+        console.error('Errore nel recupero delle note:', error);
       }
     },
     async addNote() {
@@ -73,12 +73,11 @@ export default {
           console.error('Username non trovato, impossibile creare la nota');
           return;
         }
-
         this.newNote.author = username;
 
         const response = await axios.post('/api/notes', this.newNote, {
           headers: {
-            Authorization: `Bearer ${token}` 
+            Authorization: `Bearer ${token}`
           }
         });
         console.log('Nota aggiunta:', response.data);
@@ -92,7 +91,7 @@ export default {
 
         this.fetchNotes();
       } catch (error) {
-        console.error('Errore nell\'aggiunta della nota:', error);
+        console.error("Errore nell'aggiunta della nota:", error);
       }
     },
     editNote(id) {
@@ -103,16 +102,15 @@ export default {
         const token = sessionStorage.getItem('token');
         await axios.delete(`/api/notesRIM/${id}`, {
           headers: {
-            Authorization: `Bearer ${token}` 
+            Authorization: `Bearer ${token}`
           }
         });
         console.log('Nota eliminata');
         this.fetchNotes();
       } catch (error) {
-        console.error('Errore nell\'eliminazione della nota:', error);
+        console.error("Errore nell'eliminazione della nota:", error);
       }
     },
-    
     renderMarkdown(content) {
       if (!content) return '';
       return marked(content);
@@ -122,130 +120,85 @@ export default {
 </script>
 
 <style scoped>
-
-
-div {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px;
-  background: linear-gradient(135deg, #f3f4f6, #e2e6ea);
-  border-radius: 10px; 
-  padding: 20px;
-}
-
-form {
-  background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  width: 100%;
+.note-container {
   max-width: 600px;
-  margin-bottom: 20px;
-}
-
-form div {
-  margin-bottom: 15px;
-}
-
-form label {
-  display: block;
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-
-form input[type="text"],
-form input[type="checkbox"],
-form textarea {
-  width: 100%;
-  padding: 10px;
-  border-radius: 6px;
-  border: 1px solid #ddd;
+  margin: 50px auto;
+  padding: 30px;
+  background-color: #15172b;
+  border-radius: 12px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
   box-sizing: border-box;
 }
 
-form input[type="checkbox"] {
-  width: auto;
+.note-container:hover {
+  transform: translateY(-5px);
 }
 
-form textarea {
-  resize: vertical;
+h1 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #acb0b4;
+  font-family: 'Poppins', sans-serif;
+  font-size: 28px;
 }
 
-button[type="submit"] {
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  padding: 15px 20px;
-  border-radius: 6px;
-  cursor: pointer;
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #acb0b4;
+  font-family: 'Poppins', sans-serif;
+  display: block;
+}
+
+.form-input, .form-textarea {
+  padding: 12px;
+  border: 2px solid #ced4da;
+  border-radius: 8px;
   font-size: 16px;
-}
-
-button[type="submit"]:hover {
-  background-color: #45a049;
-}
-
-ul {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
   width: 100%;
-  max-width: 600px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  background-color: #f3f4f6;
 }
 
-li {
-  background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  margin-bottom: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.form-input:focus, .form-textarea:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.25);
+  outline: none;
 }
 
-h2 {
-  margin: 0;
-  font-size: 18px;
+.form-textarea {
+  height: 120px;
+  resize: none;
 }
 
-p {
-  margin: 5px 0;
-  font-size: 14px;
-  color: #666;
-}
-
-button {
+.submit-button {
+  padding: 12px;
   background-color: #007bff;
   color: white;
   border: none;
-  padding: 10px 15px;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 14px;
-  margin-left: 10px;
+  font-size: 18px;
+  font-family: 'Poppins', sans-serif;
+  transition: background-color 0.3s ease, transform 0.2s;
 }
 
-button:hover {
+.submit-button:hover {
   background-color: #0056b3;
+  transform: translateY(-2px);
 }
-
-button:nth-of-type(2) {
-  background-color: #dc3545;
-}
-
-button:nth-of-type(2):hover {
-  background-color: #c82333;
-}
-
 
 .notes-list {
   list-style-type: none;
   padding: 0;
-  margin: 0;
   width: 100%;
-  max-width: 800px;
+  max-width: 600px;
+  margin-top: 20px;
 }
 
 .note-item {
@@ -256,52 +209,53 @@ button:nth-of-type(2):hover {
   margin-bottom: 20px;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  width: 100%;
 }
 
 .note-content {
   margin-bottom: 15px;
   line-height: 1.6;
-}
-
-.note-content h1 {
-  font-size: 24px;
-  margin-top: 0;
-}
-
-.note-content h2 {
-  font-size: 20px;
-}
-
-.note-content h3 {
-  font-size: 18px;
-}
-
-.note-content ul, .note-content ol {
-  padding-left: 20px;
-}
-
-.note-content pre {
-  background-color: #f4f4f4;
-  padding: 10px;
-  border-radius: 4px;
-  overflow-x: auto;
-}
-
-.note-content code {
-  font-family: monospace;
-  background-color: #f4f4f4;
-  padding: 2px 4px;
-  border-radius: 4px;
+  color: #333;
+  width: 100%;
+  text-align: left;
 }
 
 .note-actions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   margin-top: 10px;
 }
 
 .note-actions button {
-  margin-left: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  margin: 0 5px;
+  transition: background-color 0.3s;
 }
 
+.note-actions .edit-btn:hover {
+  background-color: #0056b3;
+}
+
+.note-actions .delete-btn {
+  background-color: #dc3545;
+}
+
+.note-actions .delete-btn:hover {
+  background-color: #c82333;
+}
+
+.status-message {
+  text-align: center;
+  margin-top: 20px;
+  color: #28a745;
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+}
 </style>
