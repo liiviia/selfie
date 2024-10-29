@@ -1,7 +1,7 @@
 <template>
   <div class="event-list">
     <h1>Lista Eventi</h1>
-    <h2>Numero Eventi : {{events.length}}</h2>
+    <h2>Numero Eventi: {{ events.length }}</h2>
     <ul>
       <li v-for="event in events" :key="event._id" class="event-item">
         <h2>{{ event.title }}</h2>
@@ -12,7 +12,7 @@
         <p><strong>Luogo:</strong> {{ event.location }}</p>
         <p><strong>Ripetizione:</strong> {{ formatRepeat(event) }}</p>
         <p><strong>Autore:</strong> {{ event.author }}</p>
-          <button @click="confirmDelete(event._id)" class="delete-btn">🗑️</button>
+        <button @click="confirmDelete(event._id)" class="delete-btn">🗑️</button>
       </li>
     </ul>
   </div>
@@ -28,7 +28,7 @@ export default {
     };
   },
   methods: {
-     confirmDelete(id) {
+    confirmDelete(id) {
       if (confirm("Sicuro di voler eliminare questo Evento?")) {
         this.deleteEvents(id); 
       }
@@ -43,7 +43,7 @@ export default {
           }
         });
         console.log('Evento eliminato');
-        this.fetchEvents(); // Ricarica la lista dopo l'eliminazione
+        this.fetchEvents(); 
       } catch (error) {
         console.error('Errore nell\'eliminazione di evento:', error);
       }
@@ -59,15 +59,21 @@ export default {
           },
           params: { author: username }
         });
-        this.events = response.data;
+        // Filtraggio degli eventi scaduti
+        const currentDate = new Date();
+        this.events = response.data.filter(event => 
+          new Date(event.date) >= currentDate
+        );
       } catch (error) {
         console.error('Errore nel recupero degli eventi:', error);
       }
     },
+    
     formatDate(date) {
       const d = new Date(date);
       return d.toLocaleDateString();
     },
+
     formatRepeat(event) {
       if (event.repeatFrequency) {
         let frequencyDetails = `${event.repeatFrequency}`;
