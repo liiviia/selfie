@@ -69,7 +69,11 @@ export default {
 
     const fetchEvents = async () => {
       try {
-        const { author, date } = route.query;
+        const author = route.query.author;
+        const date = route.query.date;
+        // mi serve per il pomodoro
+        const username = route.query.username || author;
+
         const token = sessionStorage.getItem('token');
         console.log('Fetching events for:', author, date);
 
@@ -89,7 +93,7 @@ export default {
 
         const pomodoroResponse = await axios.get('/api/poms/by-date', {
           headers: { Authorization: `Bearer ${token}` },
-          params: { author, date }
+          params: { username, date }
         });
 
         console.log('Pomodori recuperati:', pomodoroResponse.data);
