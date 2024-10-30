@@ -5,10 +5,7 @@
       <div class="row">
 
         <div class="col-md-6">
-          <!-- <div class="d-flex justify-content-center align-items-center">
-            
-          </div>          
- -->
+       
           <div class="notification-form mt-4">
             <div class="form-group">
               <label for="userSelect">Seleziona utenti per notifica:</label>
@@ -29,6 +26,10 @@
         </div>
 
 
+
+
+        <!--   INIZIO CAROSELLO PREVIEW-->         <!--   INIZIO CAROSELLO PREVIEW-->         <!--   INIZIO CAROSELLO PREVIEW-->         <!--   INIZIO CAROSELLO PREVIEW-->
+
         <div class="col-md-6">
           <div id="carouselExampleIndicators" class="carousel slide mt-4" data-bs-ride="carousel">
             <div class="carousel-indicators">
@@ -44,45 +45,136 @@
 
 
               <div class="carousel-item active">
-    <div class="d-block w-100 text-center p-4">
-      <h2>{{ isCurrentDay ? 'Evento di Oggi' : 'Ultimo Evento' }}</h2>
-      <p v-if="noEventsMessage">{{ noEventsMessage }}</p>
-      <p v-else>
+  <div class="d-block w-100 text-center p-4">
+    <div class="form-group mt-3">
+      <label for="eventSelect">Scegli preview:</label>
+      <select id="eventSelect" v-model="isCurrentDay" @change="toggleEvent" class="custom-select">
+        <option :value="false">Ultimo Evento</option>
+        <option :value="true">Evento del giorno corrente</option>
+        <option :value="null">Tutti gli Eventi</option>
+      </select>
+    </div>
+
+    <h2>
+      {{ isCurrentDay === null ? 'Tutti gli Eventi' : (isCurrentDay ? 'Evento di Oggi' : 'Ultimo Evento') }}
+    </h2>
+    <p v-if="noEventsMessage">{{ noEventsMessage }}</p>
+
+    <div v-if="isCurrentDay === null && allEvents.length > 0">
+      <h3>Eventi Trovati:</h3>
+      <ul>
+        <li v-for="event in allEvents" :key="event.id">
+          <strong>Titolo:</strong> {{ event.title || 'N/A' }}<br>
+          <strong>Descrizione:</strong> {{ event.description || 'N/A' }}<br>
+          <strong>Data:</strong> {{ formatDate(event.date) }}
+        </li>
+      </ul>
+    </div>
+
+    <div v-else-if="isCurrentDay">
+      <ul>
+        <li v-for="event in allEventCurrent" :key="event.id">
+          <strong>Titolo:</strong> {{ event.title || 'N/A' }}<br>
+          <strong>Descrizione:</strong> {{ event.description || 'N/A' }}<br>
+          <strong>Data:</strong> {{ formatDate(event.date) }}
+        </li>
+      </ul>
+    </div>
+
+    <div v-else>
+      <p>
         <strong>Titolo:</strong> {{ lastEventTitle }}<br>
         <strong>Descrizione:</strong> {{ lastEventDescription }}<br>
         <strong>Data:</strong> {{ lastEventDate }}
       </p>
-      <button v-if="!isCurrentDay" class="btn btn-primary mt-3" @click="getCurrentDayEvents">Vedi eventi del giorno corrente</button>
-      <button v-else class="btn btn-secondary mt-3" @click="getLastEvent">Torna all'ultimo evento</button>
     </div>
   </div>
+</div>
 
 
 
+
+
+<div class="carousel-item">
+  <div class="d-block w-100 text-center p-4">
+
+    <div class="form-group mt-3">
+      <label for="activitySelect">Scegli preview:</label>
+      <select id="activitySelect" v-model="isCurrentDayActivity" @change="toogleActivity" class="custom-select">
+        <option :value="false">Ultima attività</option>
+        <option :value="true">Attività del giorno corrente</option>
+        <option :value="null">Tutte le attività</option>
+      </select>
+    </div>
+
+    <h2>
+      {{ isCurrentDayActivity === null ? 'Tutte le Attività' : (isCurrentDayActivity ? 'Attività di Oggi' : 'Ultima Attività') }}
+    </h2>
+    <p v-if="noActivitiesMessage">{{ noActivitiesMessage }}</p>
+
+    <div v-if="isCurrentDayActivity === null && allActivities.length > 0">
+      <h3>Attività Trovate:</h3>
+      <ul>
+        <li v-for="activity in allActivities" :key="activity.id">
+          <strong>Titolo:</strong> {{ activity.title || 'N/A' }}<br>
+          <strong>Descrizione:</strong> {{ activity.description || 'N/A' }}<br>
+          <strong>Scadenza:</strong> {{ formatDate(activity.deadline) }}
+        </li>
+      </ul>
+    </div>
+
+    <div v-else-if="isCurrentDayActivity">
+      <p v-if="currentDayActivities.length === 0">Non ci sono attività per oggi.</p>
+      <ul>
+        <li v-for="activity in currentDayActivities" :key="activity.id">
+          <strong>Titolo:</strong> {{ activity.title || 'N/A' }}<br>
+          <strong>Descrizione:</strong> {{ activity.description || 'N/A' }}<br>
+          <strong>Scadenza:</strong> {{ formatDate(activity.deadline) }}
+        </li>
+      </ul>
+    </div>
+
+    <div v-else>
+      <strong>Titolo:</strong> {{ lastActivityTitle }}<br>
+      <strong>Descrizione:</strong> {{ lastActivityDescription }}<br>
+      <strong>Scadenza:</strong> {{ lastActivityDeadline }}
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
   <div class="carousel-item">
-    <div class="d-block w-100 text-center p-4">
-      <h2>{{ isCurrentDayActivity ? 'Attività di Oggi' : 'Ultima Attività' }}</h2>
-      <p v-if="noActivitiesMessage">{{ noActivitiesMessage }}</p>
+  <div class="d-block w-100 text-center p-4">
+    <h2>Ultima Nota</h2>
+    <p><strong>Titolo:</strong> {{ lastNoteHeading }}</p>
+
+    <div v-if="!showNoteText">
+      <p v-if="noNotesMessage">{{ noNotesMessage }}</p>
+
       <p v-else>
-        <strong>Titolo:</strong> {{ lastActivityTitle }}<br>
-        <strong>Descrizione:</strong> {{ lastActivityDescription }}<br>
-        <strong>Scadenza:</strong> {{ lastActivityDeadline }}
+        <strong>Autore:</strong> {{ lastNoteAuthor }}
       </p>
-      <button v-if="!isCurrentDayActivity" class="btn btn-primary mt-3" @click="getCurrentDayActivities">Vedi attività del giorno corrente</button>
-      <button v-else class="btn btn-secondary mt-3" @click="getLastActivity">Torna all'ultima attività</button>
+      <button v-if="lastNoteHeading" class="btn btn-primary mt-3" @click="getNoteText">Vedi testo completo della nota</button>
+    </div>
+
+    <div v-if="showNoteText" class="note-text">
+      <p><strong>Testo completo:</strong></p>
+      <div v-html="convertMarkdown(lastNoteText)"></div>
+      <!-- Bottone per tornare alla visualizzazione normale -->
+      <button class="btn btn-secondary mt-3" @click="showNoteText = false">Torna indietro</button>
     </div>
   </div>
+</div>
 
-            <div class="carousel-item">
-              <div class="d-block w-100 text-center p-4">
-                <h2>Ultima Nota</h2>
-                <p v-if="noNotesMessage">{{ noNotesMessage }}</p>
-                <p v-else>
-                  <strong>Titolo:</strong> {{ lastNoteHeading }}<br>
-                  <strong>Autore:</strong> {{ lastNoteAuthor }}
-                </p>
-              </div>
-            </div>
+
+
+
+
+
 
 
             <div class="carousel-item">
@@ -96,6 +188,10 @@
                 </p>
               </div>
             </div>
+
+
+
+            <!-- FINE CAROSELLO PREVIEW     --> <!-- FINE CAROSELLO PREVIEW     --> <!-- FINE CAROSELLO PREVIEW     --> <!-- FINE CAROSELLO PREVIEW     -->
 
 
             </div>
@@ -163,15 +259,13 @@
 
 <script>
 
-/* import NavigationBar from '../components/NavigationBar.vue';
- */
+
 import axios from 'axios';
+import { marked } from 'marked';
 
 export default {
   name: 'HomePrincipale',
-  /* components: {
-    NavigationBar,
-  }, */
+  
   data() {
     return {
       username: localStorage.getItem('username'),
@@ -182,15 +276,19 @@ export default {
       lastActivityDescription: '',
       lastActivityDeadline: '',
       noActivitiesMessage: '',
+      currentDayActivities: [], 
+      allActivities: [],
 
       notifications: [],
       noNotificationsMessage:'',
 
-      users: [], // Array che contiene tutti gli utenti
-      selectedUsers: [], // Array che contiene gli ID degli utenti selezionati
-      notificationMessage: '' ,// Il messaggio personalizzato inserito dall'utente
+      users: [], 
+      selectedUsers: [], 
+      notificationMessage: '' ,
       lastNoteHeading: '',
       lastNoteAuthor: '',
+      allEvents: [],
+      allEventCurrent: [],
       noEventsMessage: '' ,
       noNotesMessage: '',
       noPomodorosMessage: '',
@@ -204,6 +302,8 @@ export default {
       currentActivityDescription: '',
       currentActivityDeadline: '',
       isCurrentDay: false,
+      lastNoteText: '', 
+      showNoteText: false,
       isCurrentDayActivity: false
     };
   },
@@ -216,35 +316,352 @@ export default {
     this.getLastPomodoro();
   },
   methods: {
-    async getLastEvent() {
+
+                async getCurrentDayActivities() {
+  console.log("Chiamata a getCurrentDayActivities");
+  try {
+    const token = sessionStorage.getItem('token');
+    const username = localStorage.getItem('username');
+
+    this.lastActivityTitle = '';
+    this.lastActivityDescription = '';
+    this.lastActivityDeadline = '';
+    this.noActivitiesMessage = '';
+    this.isCurrentDayActivity = false; 
+
+    const response = await axios.get('/api/activities/current-day', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      params: { username: username }
+    });
+
+    this.isCurrentDayActivity = true ;
+
+    if (response.data && response.data.length > 0) {
+      this.currentDayActivities = response.data;
+      this.noActivitiesMessage = '';
+    } else {
+      this.noActivitiesMessage = 'Non ci sono attività imminenti';
+      this.isCurrentDayActivity = false; 
+    }
+  } catch (error) {
+    if (error.response && error.response.status === 404) {
+      this.noActivitiesMessage = 'Non ci sono attività imminenti';
+      this.currentDayActivities = [] ;
+    } else {
+      console.error('Errore nel recupero delle attività del giorno corrente:', error);
+      this.noActivitiesMessage = 'Errore nel caricamento delle attività del giorno corrente.';
+      this.currentDayActivities = [] ;
+    }
+  }
+},
+
+async getLastActivity() {
+  console.log("Chiamata a getLastActivity");
+  try {
+    const token = sessionStorage.getItem('token');
+    const username = localStorage.getItem('username');
+
+    this.lastActivityTitle = '';
+    this.lastActivityDescription = '';
+    this.lastActivityDeadline = '';
+    this.noActivitiesMessage = '';
+
+    const response = await axios.get('/api/activities/last', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      params: { username: username }
+    });
+
+    this.isCurrentDayActivity = false  ;
+
+
+    if (response.data) {
+      this.lastActivityTitle = response.data.title;
+      this.lastActivityDescription = response.data.description;
+      this.lastActivityDeadline = new Date(response.data.deadline).toLocaleDateString();
+      this.noActivitiesMessage = '';
+      this.isCurrentDayActivity = false; 
+    } else {
+      this.noActivitiesMessage = 'Non ci sono attività imminenti';
+    }
+  } catch (error) {
+    console.error('Errore nel recupero delle attività:', error);
+  }
+},
+
+
+async getAllActivity () {
+  const token = sessionStorage.getItem('token');
+  const username = localStorage.getItem('username');
+
+  try{
+
+  const response = await axios.get('/api/activitiesGET' , {
+    headers: {
+        Authorization: `Bearer ${token}`
+      },
+     params:{username:username} 
+  });
+
+  if(response.data) {
+    this.allActivities  = response.data;
+    this.noActivitiesMessage = '' ;
+  }  else {
+    this.allActivities  = [];
+    this.noActivitiesMessage = '' ;
+  }
+}catch (error) {
+  console.error("error", error) ;
+  this.noActivitiesMessage = 'errore nel recupero delle attivita' ;
+
+}
+
+
+},
+
+
+
+formatDate(date) {
+    if (!date) return 'N/A';
+    const d = new Date(date);
+    return isNaN(d.getTime()) ? 'Data non valida' : d.toLocaleDateString();
+  },
+
+
+    
+
+
+
+
+    toggleEvent() {
+  if (this.isCurrentDay === null) {
+    this.getAllEvents();
+  } else if (this.isCurrentDay) {
+    this.getCurrentDayEvents();
+  } else {
+    this.getLastEvent();
+  }
+},
+
+
+
+  toogleActivity() {
+
+    if (this.isCurrentDayActivity === null) {
+      this.getAllActivity();
+    }
+
+    else if(this.isCurrentDayActivity) {
+      this.getCurrentDayActivities() ;
+    }
+    else {
+      this.getLastActivity() ;
+    }
+  },
+  
+
+
+
+
+  async getAllEvents() {
+  try {
+    const token = sessionStorage.getItem('token');
+    const username = localStorage.getItem('username');
+
+    const response = await axios.get('/api/eventsGET', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      params: { author: username }
+    });
+
+    if (response.data && response.data.length > 0) {
+      this.allEvents = response.data; 
+      this.noEventsMessage = '';
+      console.log("tutti gli eventi:" , response.data) ;
+    } else {
+      this.noEventsMessage = 'Non ci sono eventi disponibili';
+      this.allEvents = []; 
+    }
+  } catch (error) {
+    console.error('Errore nel recupero di tutti gli eventi:', error);
+    this.noEventsMessage = 'Errore nel caricamento di tutti gli eventi.';
+    this.allEvents = []; 
+  }
+},
+
+
+
+
+
+
+
+
+            async getCurrentDayEvents() {
+  try { 
+    const token = sessionStorage.getItem('token');
+    const username = localStorage.getItem('username');
+
+    this.lastEventTitle = '';
+    this.lastEventDescription = '';
+    this.lastEventDate = '';
+
+
+    const response = await axios.get('/api/events/current-day', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      params: { username: username }
+    });     
+
+
+    this.isCurrentDay = true;
+
+    if (response.data && response.data.length > 0) {
+      this.allEventCurrent = response.data;
+      this.noEventsMessage = '';
+    } else {
+      this.noEventsMessage = 'Non ci sono eventi imminenti';
+      this.allEventCurrent = [] ;
+    }
+    console.log("eventi del giorno corrente", response.data);
+  } catch (error) { 
+    console.error('Errore nel recupero degli eventi del giorno corrente:', error);
+    this.noEventsMessage = 'Errore nel caricamento degli eventi del giorno corrente.';
+   
+ this.allEventCurrent = [] ;
+
+  }
+
+},
+
+
+
+
+
+
+            async getLastEvent() {
+  try {
+    const token = sessionStorage.getItem('token');
+    console.log("token home ", token);
+    const response = await axios.get('/api/events/last', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      params: { author: this.username }
+    });
+
+    this.isCurrentDay = false; 
+
+    if (response.data) {
+      this.lastEventTitle = response.data.title || 'Nessun evento';
+      this.lastEventDescription = response.data.description || 'Nessuna descrizione';
+      this.lastEventDate = response.data.date || 'Nessuna data';
+      this.noEventsMessage = ''; 
+    } else {
+      this.noEventsMessage = 'Nessun evento trovato.';
+      this.lastEventTitle = '';
+      this.lastEventDescription = '';
+      this.lastEventDate = '';
+    }
+  } catch (error) {
+    console.error('Errore nel recupero dell\'ultimo evento:', error);
+    this.noEventsMessage = 'Errore nel caricamento dell\'ultimo evento.';
+    this.lastEventTitle = '';
+    this.lastEventDescription = '';
+    this.lastEventDate = '';
+  }
+},
+
+
+
+
+
+   
+
+
+
+
+
+
+    async getLastNote() {
       try {
         const token = sessionStorage.getItem('token');
-        console.log("token home ", token);
-        const response = await axios.get('/api/events/last', {
+        const username = localStorage.getItem('username');
+        const response = await axios.get('/api/notes/last', {
           headers: {
             Authorization: `Bearer ${token}`
           },
-          params: { author: this.username }
+          params: { author: username }
         });
+
         if (response.data) {
-          this.lastEventTitle = response.data.title || 'Nessun evento';
-          this.lastEventDescription = response.data.description || 'Nessuna descrizione';
-          this.lastEventDate = response.data.date || 'Nessuna data';
+          this.lastNoteHeading = response.data.heading;
+          this.lastNoteAuthor = response.data.author;
+          this.noNotesMessage = '';
         } else {
-          this.noEventsMessage = 'Nessun evento trovato.';
+          this.noNotesMessage = 'Non ci sono note trovate';
         }
       } catch (error) {
-        console.error('Errore nel recupero dell\'ultimo evento:', error);
-        this.noEventsMessage = 'Errore nel caricamento dell\'ultimo evento.';
+        console.error('Errore nel recupero dell\'ultima nota:', error);
+        this.noNotesMessage = 'Errore nel caricamento dell\'ultima nota.';
       }
     },
 
 
-    async getLastActivity() {
+
+
+
+
+    async getNoteText() {
       try {
         const token = sessionStorage.getItem('token');
         const username = localStorage.getItem('username');
-        const response = await axios.get('/api/activities/last', {
+        const response = await axios.get('/api/notes/last', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+          params: { author: username }
+        });
+
+        if (response.data && response.data.content) {
+          this.lastNoteText = response.data.content;  
+          this.showNoteText = true;
+        } else {
+          this.lastNoteText = 'Testo non disponibile';
+        }
+      } catch (error) {
+        console.error('Errore nel recupero del testo della nota:', error);
+        this.lastNoteText = 'Errore nel caricamento del testo della nota.';
+      }
+    },
+
+
+
+
+    convertMarkdown(content) {
+      return marked(content);
+    },
+
+         etNoteText() {
+      this.showNoteText = true; 
+    },
+
+
+  
+
+
+
+
+
+    async getLastPomodoro() {
+      try {
+        const token = sessionStorage.getItem('token');
+        const username = localStorage.getItem('username');
+        const response = await axios.get('/api/poms/last', {
           headers: {
             Authorization: `Bearer ${token}`
           },
@@ -252,18 +669,25 @@ export default {
         });
 
         if (response.data) {
-          this.lastActivityTitle = response.data.title;
-          this.lastActivityDescription = response.data.description;
-          this.lastActivityDeadline = new Date(response.data.deadline).toLocaleDateString();
-          this.noActivitiesMessage = '';
+          this.lastPomodoroTempoStudio = response.data.tempoStudio;
+          this.lastPomodoroTempoPausa = response.data.tempoPausa;
+          this.lastPomodoroRipetizioni = response.data.ripetizioni;
+          this.noPomodorosMessage = '';
         } else {
-          this.noActivitiesMessage = 'Non ci sono attività imminenti';
+          this.noPomodorosMessage = 'Nessun pomodoro trovato';
         }
-
       } catch (error) {
-        console.error('Errore nel recupero delle attività:', error);
+        console.error('Errore nel recupero dell\'ultimo pomodoro:', error);
+        this.noPomodorosMessage = 'Errore nel caricamento dell\'ultimo pomodoro.';
       }
     },
+
+
+
+
+
+
+
 
     async getNotifies(){
       try {
@@ -301,7 +725,6 @@ export default {
       }
     },
 
-    // Invia le notifiche agli utenti selezionati
     async sendNotifications() {
       if (this.selectedUsers.length === 0) {
         alert('Seleziona almeno un utente per inviare una notifica.');
@@ -342,7 +765,6 @@ export default {
           }
         });
 
-        // tolgo la notifica dalla lista
         this.notifications = this.notifications.filter(notification => notification._id !== notificationId);
         alert('Notifica eliminata!');
       } catch (error) {
@@ -351,127 +773,10 @@ export default {
       }
     },
 
-    async getLastNote() {
-      try {
-        const token = sessionStorage.getItem('token');
-        const username = localStorage.getItem('username');
-        const response = await axios.get('/api/notes/last', {
-          headers: {
-            Authorization: `Bearer ${token}`
-          },
-          params: { author: username }
-        });
+    
+   
+    
 
-        if (response.data) {
-          this.lastNoteHeading = response.data.heading;
-          this.lastNoteAuthor = response.data.author;
-          this.noNotesMessage = '';
-        } else {
-          this.noNotesMessage = 'Non ci sono note trovate';
-        }
-      } catch (error) {
-        console.error('Errore nel recupero dell\'ultima nota:', error);
-        this.noNotesMessage = 'Errore nel caricamento dell\'ultima nota.';
-      }
-    },
-    async getLastPomodoro() {
-      try {
-        const token = sessionStorage.getItem('token');
-        const username = localStorage.getItem('username');
-        const response = await axios.get('/api/poms/last', {
-          headers: {
-            Authorization: `Bearer ${token}`
-          },
-          params: { username: username }
-        });
-
-        if (response.data) {
-          this.lastPomodoroTempoStudio = response.data.tempoStudio;
-          this.lastPomodoroTempoPausa = response.data.tempoPausa;
-          this.lastPomodoroRipetizioni = response.data.ripetizioni;
-          this.noPomodorosMessage = '';
-        } else {
-          this.noPomodorosMessage = 'Nessun pomodoro trovato';
-        }
-      } catch (error) {
-        console.error('Errore nel recupero dell\'ultimo pomodoro:', error);
-        this.noPomodorosMessage = 'Errore nel caricamento dell\'ultimo pomodoro.';
-      }
-    },
-    async getCurrentDayEvents() {
-  try { 
-    const token = sessionStorage.getItem('token');
-    const username = localStorage.getItem('username');
-    const response = await axios.get('/api/events/current-day', {
-      headers: {
-        Authorization: `Bearer ${token}`
-      },
-      params: { username: username }
-    });     
-
-    if (response.data && response.data.length > 0) {
-      // Assumiamo che la risposta sia un array di eventi
-      const event = response.data[0]; // Prendiamo il primo evento
-      this.lastEventTitle = event.title;
-      this.lastEventDescription = event.description;
-      this.lastEventDate = new Date(event.date).toLocaleDateString();
-      this.noEventsMessage = '';
-      this.isCurrentDay = true;
-      // Puliamo il messaggio di errore
-    } else {
-      this.noEventsMessage = 'Non ci sono eventi imminenti';
-      this.lastEventTitle = '';
-      this.lastEventDescription = '';
-      this.lastEventDate = '';
-    }
-    console.log("eventi del giorno corrente", response.data);
-  } catch (error) { 
-    console.error('Errore nel recupero degli eventi del giorno corrente:', error);
-    this.noEventsMessage = 'Errore nel caricamento degli eventi del giorno corrente.';
-    this.lastEventTitle = '';
-    this.lastEventDescription = '';
-    this.lastEventDate = '';
-  }
-},
-async getCurrentDayActivities() {
-  try {
-    const token = sessionStorage.getItem('token');
-    const username = localStorage.getItem('username');
-    const response = await axios.get('/api/activities/current-day', {
-      headers: {
-        Authorization: `Bearer ${token}`
-      },
-      params: { username: username }
-    });
-
-    if (response.data && response.data.length > 0) {
-      const activity = response.data[0];
-      this.lastActivityTitle = activity.title;
-      this.lastActivityDescription = activity.description;
-      this.lastActivityDeadline = new Date(activity.deadline).toLocaleDateString();
-      this.noActivitiesMessage = '';
-      this.isCurrentDayActivity = true;
-    } else {
-      this.noActivitiesMessage = 'Non ci sono attività imminenti';
-      this.lastActivityTitle = '';
-      this.lastActivityDescription = '';
-      this.lastActivityDeadline = '';
-      this.isCurrentDayActivity = true;
-    }
-  } catch (error) {
-    if (error.response && error.response.status === 404) {
-      this.noActivitiesMessage = 'Non ci sono attività imminenti123';
-      console.log("no",error) ;
-      this.lastActivityTitle = '';
-      this.lastActivityDescription = '';
-      this.lastActivityDeadline = '';
-      this.isCurrentDayActivity = true;
-    } else {
-      console.error('Errore nel recupero delle attività del giorno corrente:', error);
-      this.noActivitiesMessage = 'Errore nel caricamento delle attività del giorno corrente.';
-    }
-  }
-},
   }
 
 };
@@ -488,11 +793,11 @@ body {
   background-image:  url('https://images.hdqwalls.com/wallpapers/abstract-shapes-4k-q2.jpg');
   background-size: cover;
   background-position: center;
-  min-height: 100vh; /* Imposta l'altezza minima per riempire la viewport */
+  min-height: 100vh; 
   display: flex;
   flex-direction: column;
   justify-content: center;
-  color: rgb(0, 0, 0); /* colore testo */
+  color: rgb(0, 0, 0); 
 }
 
 .carousel-item {
@@ -561,5 +866,43 @@ button.btn:hover {
 button.btn-danger{
   background-color: rgb(194, 27, 27);
 }
+
+.note-text {
+  margin-top: 20px;
+  text-align: left;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+
+.custom-select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 2px solid #ced4da;
+  background-color: #f8f9fa;
+  color: #495057;
+  font-size: 16px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.custom-select:focus {
+  border-color: #80bdff;
+  outline: none;
+  box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+}
+
+.custom-select:hover {
+  border-color: #5a6268;
+}
+
+.form-group label {
+  font-weight: bold;
+  font-size: 16px;
+  margin-bottom: 5px;
+}
+
+
 
 </style>

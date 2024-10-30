@@ -54,10 +54,13 @@ exports.register = async (req, res) => {
 
     const savedUser = await newUser.save();
 
+    console.log("registrato") ;
+
     //await sendConfirmationEmail(email, username);
 
     res.status(201).json(savedUser);
   } catch (error) {
+    console.log("errore registrazione server:" , error) ;
     res.status(500).json({ error: 'Errore durante la registrazione dell\'utente' });
   }
 };
