@@ -56,8 +56,8 @@ exports.getLastPom = async (req, res) => {
 
 exports.getPomodorosByDate = async (req, res) => {
   try {
-    const { author, date } = req.query;
-    if (!author || !date) {
+    const { username, date } = req.query;
+    if (!username || !date) {
       return res.status(400).json({ message: 'Autore e data sono necessari' });
     }
 
@@ -66,8 +66,8 @@ exports.getPomodorosByDate = async (req, res) => {
     const endDate = new Date(date);
     endDate.setHours(23, 59, 59, 999);
 
-    const pomodoros = await Pomodoro.find({
-      author,
+    const pomodoros = await Pom.find({
+      username,
       giorno: { $gte: startDate, $lte: endDate }
     });
 

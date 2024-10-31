@@ -1,6 +1,9 @@
 <template>
   <div class="pomodoro-list">
     <h1>Lista delle Sessioni Pomodoro Salvate</h1>
+
+    <h2>Numero Pomodori : {{poms.length}}</h2>
+
     <ul v-if="poms.length > 0">
       <li v-for="pom in poms" :key="pom._id" class="pomodoro-item">
         <h2>Sessione Pomodoro</h2>
@@ -41,7 +44,7 @@ export default {
           }
         });
         console.log('Sessione Pomodoro eliminata');
-        this.fetchPoms(); // Ricarica la lista dopo l'eliminazione
+        this.fetchPoms(); 
       } catch (error) {
         console.error('Errore nell\'eliminazione della sessione:', error);
       }
@@ -58,8 +61,17 @@ export default {
           params: { username: username }
         });
 
-        console.log('Sessioni Pomodoro recuperate:', response.data);
-        this.poms = response.data;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        // Filtra solo le sessioni future o presenti
+        this.poms = response.data.filter(pom => {
+          const sessionDate = new Date(pom.giorno);
+          sessionDate.setHours(0, 0, 0, 0);
+          return sessionDate >= today;
+        });
+
+        console.log('Sessioni Pomodoro recuperate e filtrate:', this.poms);
       } catch (error) {
         console.error('Errore durante il recupero delle sessioni Pomodoro:', error);
       }
@@ -74,6 +86,7 @@ export default {
   }
 };
 </script>
+
 
 <style scoped>
 .pomodoro-list {

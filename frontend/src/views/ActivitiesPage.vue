@@ -1,7 +1,7 @@
 <template>
   <div class="activity-list">
     <h1>Lista delle Attività : </h1>
-    <h2>Numero Attività : {{activities.length}} </h2>
+    <h2>Numero Attività : {{ activities.length }} </h2>
     
     <ul v-if="activities.length > 0" class="activity-items">
       <li v-for="(activity, index) in activities" :key="index" class="activity-item">
@@ -10,7 +10,7 @@
         <p><strong>Scadenza:</strong> {{ formatDate(activity.deadline) }}</p>
         <p><strong>Autore:</strong> {{ activity.author }}</p>
         <p><strong>Completata:</strong> {{ activity.completed ? 'Sì' : 'No' }}</p>
-          <button @click="confirmDelete(activity._id)" class="delete-btn">🗑️</button>
+        <button @click="confirmDelete(activity._id)" class="delete-btn">🗑️</button>
       </li>
     </ul>
     
@@ -28,7 +28,7 @@ export default {
     };
   },
   methods: {
-      confirmDelete(id) {
+    confirmDelete(id) {
       if (confirm("Sicuro di voler eliminare questa Attività?")) {
         this.deleteActivities(id); 
       }
@@ -59,11 +59,16 @@ export default {
           },
           params: { username: username }
         });
-        this.activities = response.data;
+        // Filtraggio delle attività scadute
+        const currentDate = new Date();
+        this.activities = response.data.filter(activity => 
+          new Date(activity.deadline) >= currentDate
+        );
       } catch (error) {
         console.error('Errore durante il recupero delle attività:', error);
       }
     },
+    
     formatDate(date) {
       return new Date(date).toLocaleDateString();
     }

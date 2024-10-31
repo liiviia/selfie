@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2>Eventi e Attività per {{ formatDate(queryDate) }}</h2>
+    <h2>Eventi, Attività e Pomodori per {{ formatDate(queryDate) }}</h2>
     <div class="button-container">
       <button @click="navigateToAddEvent">Aggiungi Evento</button>
       <button @click="navigateToAddActivity">Aggiungi Attività</button>
@@ -14,6 +14,7 @@
         <p>Descrizione: {{ event.description }}</p>
       </div>
     </div>
+
     <div v-if="activities.length > 0">
       <h3>Attività:</h3>
       <div v-for="activity in activities" :key="activity._id">
@@ -22,8 +23,20 @@
         <p>Descrizione: {{ activity.description }}</p>
       </div>
     </div>
-    <div v-if="events.length === 0 && activities.length === 0">
-      <p>Nessun evento o attività per questa data.</p>
+
+    <div v-if="pomodoros.length > 0">
+      <h3>Pomodori:</h3>
+      <div v-for="pomodoro in pomodoros" :key="pomodoro._id">
+        <h4>Pomodoro Sessione</h4>
+        <p>Data: {{ formatDate(pomodoro.giorno) }}</p>
+        <p>Tempo di studio: {{ pomodoro.tempoStudio }} minuti</p>
+        <p>Tempo di pausa: {{ pomodoro.tempoPausa }} minuti</p>
+        <p>Ripetizioni: {{ pomodoro.ripetizioni }}</p>
+      </div>
+    </div>
+
+    <div v-if="events.length === 0 && activities.length === 0 && pomodoros.length === 0">
+      <p>Nessun evento o attività o pomodoro per questa data.</p>
     </div>
   </div>
 </template>
@@ -39,6 +52,7 @@ export default {
     const router = useRouter();
     const events = ref([]);
     const activities = ref([]);
+    const pomodoros = ref([]); 
     const queryDate = computed(() => route.query.date);
 
     const navigateToAddEvent = () => {
@@ -55,9 +69,14 @@ export default {
 
     const fetchEvents = async () => {
       try {
-        const { author, date } = route.query;
+        const author = route.query.author;
+        const date = route.query.date;
+        // mi serve per il pomodoro
+        const username = route.query.username || author;
+
         const token = sessionStorage.getItem('token');
         console.log('Fetching events for:', author, date);
+
         const response = await axios.get('/api/events/by-date', {
           headers: { Authorization: `Bearer ${token}` },
           params: { author, date }
@@ -71,8 +90,19 @@ export default {
         });
         activities.value = Array.isArray(activityResponse.data) ? activityResponse.data : [activityResponse.data];
         console.log('Fetched activities:', activities.value);
+
+        const pomodoroResponse = await axios.get('/api/poms/by-date', {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { username, date }
+        });
+
+        console.log('Pomodori recuperati:', pomodoroResponse.data);
+
+        pomodoros.value = Array.isArray(pomodoroResponse.data) ? pomodoroResponse.data : [pomodoroResponse.data];
+        console.log('Fetched pomodoros:', pomodoros.value);
+
       } catch (error) {
-        console.error('Errore nel recupero degli eventi e delle attività:', error);
+        console.error('Errore nel recupero degli eventi, delle attività e dei pomodori:', error);
       }
     };
 
@@ -93,6 +123,7 @@ export default {
     return {
       events,
       activities,
+      pomodoros, 
       formatDate,
       queryDate,
       navigateToAddEvent,
