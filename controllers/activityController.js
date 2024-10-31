@@ -1,6 +1,6 @@
 const Activity = require('../models/Activity');
 const User = require('../models/User');
-const { sendReminderEmail } = require('../emailService');
+const { sendReminderEmail } = require('../services/emailService');
 
 // Crea una nuova attività
 exports.createActivity = async (req, res) => {

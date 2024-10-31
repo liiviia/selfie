@@ -49,10 +49,19 @@ const sendNotifEmail = (recipientEmail, eventDetails) => {
     from: '"Servizio Sito SELFIE"<appp4905@gmail.com>',
     to: recipientEmail,
     subject: 'Evento: Evento creato',
-    text: `L'evento "${eventDetails.title}" inizierà alle ore : ${eventDetails.startTime}
-          del giorno : ${eventDetails.date}, con luogo : ${eventDetails.location} 
-          con durata : ${eventDetails.duration}.`
-
+    html: `
+       <div style="font-family: Arial, sans-serif;">
+        <h2 style="color: #2c3e50;">L'evento "${eventDetails.title}" è stato creato !</h2>
+        <p style="font-size: 16px;">
+          <strong>📅 Data:</strong> ${eventDetails.date}<br>
+          <strong>🕒 Ora di inizio:</strong> ${eventDetails.startTime}<br>
+          <strong>📍 Luogo:</strong> ${eventDetails.location}<br>
+          <strong>⏳ Durata:</strong> ${eventDetails.duration} minuti
+          <p style="font-size: 14px;">Non mancare! Preparati per l'evento.</p>
+        <p style="font-size: 14px;">Grazie,<br>Il Team SELFIE</p>
+        </p>        
+      </div>
+    `
   };
   sendMail(mailOptions);
 } ;

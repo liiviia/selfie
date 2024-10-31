@@ -15,4 +15,6 @@ router.get('/events/by-date', authenticateToken, eventController.getEventByDate)
 
 router.delete('/eventsRemove/:id', authenticateToken, eventController.deleteEvents) ;
 
+router.post('/events/email',authenticateToken, eventController.sendEmailNotificationCreate);
+
 module.exports = router;

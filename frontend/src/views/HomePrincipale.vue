@@ -352,7 +352,8 @@ export default {
       isCurrentDay: false,
       lastNoteText: '',
       showNoteText: false,
-      isCurrentDayActivity: false
+      isCurrentDayActivity: false,
+      notificationEnabled: false,
     };
   },
   mounted() {
@@ -767,7 +768,7 @@ export default {
         });
 
         this.notifications = this.notifications.filter(notification => notification._id !== notificationId);
-        alert('Notifica eliminata!');
+        alert('Notifica eliminata, aggiorna pagina per vedere effetto');
       } catch (error) {
         console.error('errore durante eliminazione notifica:', error);
         alert('errore durante leliminazione della notifica.');

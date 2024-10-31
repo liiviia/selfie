@@ -27,12 +27,13 @@
 
 <script>
 import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
 
 export default {
   setup() {
     const route = useRoute();
+    const router = useRouter();
 
     const newActivity = ref({
       title: '',
@@ -71,7 +72,9 @@ export default {
         message.value = 'Attività aggiunta con successo!';
         setTimeout(() => {
           message.value = '';
-          this.$router.push('/homePrincipale');
+          console.log('redirectiong......');
+          router.push('/homePrincipale');
+          //window.location.href = '/homePrincipale';
         }, 2000);
 
       } catch (error) {
