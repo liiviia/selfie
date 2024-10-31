@@ -5,7 +5,7 @@
       <div class="row">
 
         <div class="col-md-6">
-
+       
           <div class="notification-form mt-4">
             <div class="form-group">
               <label for="userSelect">Seleziona utenti per notifica:</label>
@@ -15,13 +15,12 @@
                 </option>
               </select>
             </div>
-
+          
             <div class="form-group">
               <label for="message">Scrivi il messaggio:</label>
-              <textarea id="message" v-model="notificationMessage" placeholder="Scrivi il tuo messaggio qui..."
-                class="form-control"></textarea>
+              <textarea id="message" v-model="notificationMessage" placeholder="Scrivi il tuo messaggio qui..." class="form-control"></textarea>
             </div>
-
+          
             <button @click="sendNotifications" class="btn btn-primary">Invia Notifica</button>
           </div>
         </div>
@@ -29,20 +28,15 @@
 
 
 
-        <!--   INIZIO CAROSELLO PREVIEW--> <!--   INIZIO CAROSELLO PREVIEW--> <!--   INIZIO CAROSELLO PREVIEW-->
-        <!--   INIZIO CAROSELLO PREVIEW-->
+        <!--   INIZIO CAROSELLO PREVIEW-->         <!--   INIZIO CAROSELLO PREVIEW-->         <!--   INIZIO CAROSELLO PREVIEW-->         <!--   INIZIO CAROSELLO PREVIEW-->
 
         <div class="col-md-6">
           <div id="carouselExampleIndicators" class="carousel slide mt-4" data-bs-ride="carousel">
             <div class="carousel-indicators">
-              <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active"
-                aria-current="true" aria-label="Slide 1"></button>
-              <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1"
-                aria-label="Slide 2"></button>
-              <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2"
-                aria-label="Slide 3"></button>
-              <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="3"
-                aria-label="Slide 4"></button>
+              <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+              <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+              <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+              <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="3" aria-label="Slide 4"></button>
             </div>
 
 
@@ -50,176 +44,137 @@
             <div class="carousel-inner">
 
 
-              <!-- <div class="carousel-item active">
-                <div class="d-block w-100 text-center p-4">
-                  <h2>{{ isCurrentDay ? 'Evento di Oggi' : 'Ultimo Evento' }}</h2>
-                  <p v-if="noEventsMessage">{{ noEventsMessage }}</p>
-                  <p v-else>
-                    <strong>Titolo:</strong> {{ lastEventTitle }}<br>
-                    <strong>Descrizione:</strong> {{ lastEventDescription }}<br>
-                    <strong>Data:</strong> {{ lastEventDate }}
-                  </p>
-                  <button v-if="!isCurrentDay" class="btn btn-primary mt-3" @click="getCurrentDayEvents">Vedi eventi del
-                    giorno corrente</button>
-                  <button v-else class="btn btn-secondary mt-3" @click="getLastEvent">Torna all'ultimo evento</button>
-                </div>
-              </div> -->
-              <div class="d-block w-100 text-center p-4">
-                <div class="form-group mt-3">
-                  <label for="eventSelect">Scegli preview:</label>
-                  <select id="eventSelect" v-model="isCurrentDay" @change="toggleEvent" class="custom-select">
-                    <option :value="false">Ultimo Evento</option>
-                    <option :value="true">Evento del giorno corrente</option>
-                    <option :value="null">Tutti gli Eventi</option>
-                  </select>
-                </div>
+              <div class="carousel-item active">
+  <div class="d-block w-100 text-center p-4">
+    <div class="form-group mt-3">
+      <label for="eventSelect">Scegli preview:</label>
+      <select id="eventSelect" v-model="isCurrentDay" @change="toggleEvent" class="custom-select">
+        <option :value="false">Ultimo Evento</option>
+        <option :value="true">Evento del giorno corrente</option>
+        <option :value="null">Tutti gli Eventi</option>
+      </select>
+    </div>
 
-                <h2>
-                  {{ isCurrentDay === null ? 'Tutti gli Eventi' : (isCurrentDay ? 'Evento di Oggi' : 'Ultimo Evento') }}
-                </h2>
-                <p v-if="noEventsMessage">{{ noEventsMessage }}</p>
+    <h2>
+      {{ isCurrentDay === null ? 'Tutti gli Eventi' : (isCurrentDay ? 'Evento di Oggi' : 'Ultimo Evento') }}
+    </h2>
+    <p v-if="noEventsMessage">{{ noEventsMessage }}</p>
 
-                <div v-if="isCurrentDay === null && allEvents.length > 0">
-                  <h3>Eventi Trovati:</h3>
-                  <ul>
-                    <li v-for="event in allEvents" :key="event.id">
-                      <strong>Titolo:</strong> {{ event.title || 'N/A' }}<br>
-                      <strong>Descrizione:</strong> {{ event.description || 'N/A' }}<br>
-                      <strong>Data:</strong> {{ formatDate(event.date) }}
-                    </li>
-                  </ul>
-                </div>
+    <div v-if="isCurrentDay === null && allEvents.length > 0">
+      <h3>Eventi Trovati:</h3>
+      <ul>
+        <li v-for="event in allEvents" :key="event.id">
+          <strong>Titolo:</strong> {{ event.title || 'N/A' }}<br>
+          <strong>Descrizione:</strong> {{ event.description || 'N/A' }}<br>
+          <strong>Data:</strong> {{ formatDate(event.date) }}
+        </li>
+      </ul>
+    </div>
 
-                <div v-else-if="isCurrentDay">
-                  <ul>
-                    <li v-for="event in allEventCurrent" :key="event.id">
-                      <strong>Titolo:</strong> {{ event.title || 'N/A' }}<br>
-                      <strong>Descrizione:</strong> {{ event.description || 'N/A' }}<br>
-                      <strong>Data:</strong> {{ formatDate(event.date) }}
-                    </li>
-                  </ul>
-                </div>
+    <div v-else-if="isCurrentDay">
+      <ul>
+        <li v-for="event in allEventCurrent" :key="event.id">
+          <strong>Titolo:</strong> {{ event.title || 'N/A' }}<br>
+          <strong>Descrizione:</strong> {{ event.description || 'N/A' }}<br>
+          <strong>Data:</strong> {{ formatDate(event.date) }}
+        </li>
+      </ul>
+    </div>
 
-                <div v-else>
-                  <p>
-                    <strong>Titolo:</strong> {{ lastEventTitle }}<br>
-                    <strong>Descrizione:</strong> {{ lastEventDescription }}<br>
-                    <strong>Data:</strong> {{ lastEventDate }}
-                  </p>
-                </div>
-              </div>
-            </div>
+    <div v-else>
+      <p>
+        <strong>Titolo:</strong> {{ lastEventTitle }}<br>
+        <strong>Descrizione:</strong> {{ lastEventDescription }}<br>
+        <strong>Data:</strong> {{ lastEventDate }}
+      </p>
+    </div>
+  </div>
+</div>
 
 
 
 
 
-            <div class="carousel-item">
-              <div class="d-block w-100 text-center p-4">
+<div class="carousel-item">
+  <div class="d-block w-100 text-center p-4">
 
-                <div class="form-group mt-3">
-                  <label for="activitySelect">Scegli preview:</label>
-                  <select id="activitySelect" v-model="isCurrentDayActivity" @change="toogleActivity"
-                    class="custom-select">
-                    <option :value="false">Ultima attività</option>
-                    <option :value="true">Attività del giorno corrente</option>
-                    <option :value="null">Tutte le attività</option>
-                  </select>
-                </div>
+    <div class="form-group mt-3">
+      <label for="activitySelect">Scegli preview:</label>
+      <select id="activitySelect" v-model="isCurrentDayActivity" @change="toogleActivity" class="custom-select">
+        <option :value="false">Ultima attività</option>
+        <option :value="true">Attività del giorno corrente</option>
+        <option :value="null">Tutte le attività</option>
+      </select>
+    </div>
 
-                <h2>
-                  {{ isCurrentDayActivity === null ? 'Tutte le Attività' : (isCurrentDayActivity ? 'Attività di Oggi' :
-                  'Ultima Attività') }}
-                </h2>
-                <p v-if="noActivitiesMessage">{{ noActivitiesMessage }}</p>
+    <h2>
+      {{ isCurrentDayActivity === null ? 'Tutte le Attività' : (isCurrentDayActivity ? 'Attività di Oggi' : 'Ultima Attività') }}
+    </h2>
+    <p v-if="noActivitiesMessage">{{ noActivitiesMessage }}</p>
 
-                <div v-if="isCurrentDayActivity === null && allActivities.length > 0">
-                  <h3>Attività Trovate:</h3>
-                  <ul>
-                    <li v-for="activity in allActivities" :key="activity.id">
-                      <strong>Titolo:</strong> {{ activity.title || 'N/A' }}<br>
-                      <strong>Descrizione:</strong> {{ activity.description || 'N/A' }}<br>
-                      <strong>Scadenza:</strong> {{ formatDate(activity.deadline) }}
-                    </li>
-                  </ul>
-                </div>
+    <div v-if="isCurrentDayActivity === null && allActivities.length > 0">
+      <h3>Attività Trovate:</h3>
+      <ul>
+        <li v-for="activity in allActivities" :key="activity.id">
+          <strong>Titolo:</strong> {{ activity.title || 'N/A' }}<br>
+          <strong>Descrizione:</strong> {{ activity.description || 'N/A' }}<br>
+          <strong>Scadenza:</strong> {{ formatDate(activity.deadline) }}
+        </li>
+      </ul>
+    </div>
 
-                <div v-else-if="isCurrentDayActivity">
-                  <p v-if="currentDayActivities.length === 0">Non ci sono attività per oggi.</p>
-                  <ul>
-                    <li v-for="activity in currentDayActivities" :key="activity.id">
-                      <strong>Titolo:</strong> {{ activity.title || 'N/A' }}<br>
-                      <strong>Descrizione:</strong> {{ activity.description || 'N/A' }}<br>
-                      <strong>Scadenza:</strong> {{ formatDate(activity.deadline) }}
-                    </li>
-                  </ul>
-                </div>
+    <div v-else-if="isCurrentDayActivity">
+      <p v-if="currentDayActivities.length === 0">Non ci sono attività per oggi.</p>
+      <ul>
+        <li v-for="activity in currentDayActivities" :key="activity.id">
+          <strong>Titolo:</strong> {{ activity.title || 'N/A' }}<br>
+          <strong>Descrizione:</strong> {{ activity.description || 'N/A' }}<br>
+          <strong>Scadenza:</strong> {{ formatDate(activity.deadline) }}
+        </li>
+      </ul>
+    </div>
 
-                <div v-else>
-                  <strong>Titolo:</strong> {{ lastActivityTitle }}<br>
-                  <strong>Descrizione:</strong> {{ lastActivityDescription }}<br>
-                  <strong>Scadenza:</strong> {{ lastActivityDeadline }}
-                </div>
-              </div>
-            </div>
+    <div v-else>
+      <strong>Titolo:</strong> {{ lastActivityTitle }}<br>
+      <strong>Descrizione:</strong> {{ lastActivityDescription }}<br>
+      <strong>Scadenza:</strong> {{ lastActivityDeadline }}
+    </div>
+  </div>
+</div>
 
 
 
 
 
+  
+  <div class="carousel-item">
+  <div class="d-block w-100 text-center p-4">
+    <h2>Ultima Nota</h2>
+    <p><strong>Titolo:</strong> {{ lastNoteHeading }}</p>
 
-            <div class="carousel-item">
-              <div class="d-block w-100 text-center p-4">
-                <h2>Ultima Nota</h2>
-                <p><strong>Titolo:</strong> {{ lastNoteHeading }}</p>
+    <div v-if="!showNoteText">
+      <p v-if="noNotesMessage">{{ noNotesMessage }}</p>
 
-                <div v-if="!showNoteText">
-                  <p v-if="noNotesMessage">{{ noNotesMessage }}</p>
+      <p v-else>
+        <strong>Autore:</strong> {{ lastNoteAuthor }}
+      </p>
+      <button v-if="lastNoteHeading" class="btn btn-primary mt-3" @click="getNoteText">Vedi testo completo della nota</button>
+    </div>
 
-                  <p v-else>
-                    <strong>Autore:</strong> {{ lastNoteAuthor }}
-                  </p>
-                  <button v-if="lastNoteHeading" class="btn btn-primary mt-3" @click="getNoteText">Vedi testo completo
-                    della nota</button>
-                </div>
-
-                <div v-if="showNoteText" class="note-text">
-                  <p><strong>Testo completo:</strong></p>
-                  <div v-html="convertMarkdown(lastNoteText)"></div>
-                  <!-- Bottone per tornare alla visualizzazione normale -->
-                  <button class="btn btn-secondary mt-3" @click="showNoteText = false">Torna indietro</button>
-                </div>
-              </div>
-            </div>
-
+    <div v-if="showNoteText" class="note-text">
+      <p><strong>Testo completo:</strong></p>
+      <div v-html="convertMarkdown(lastNoteText)"></div>
+      <!-- Bottone per tornare alla visualizzazione normale -->
+      <button class="btn btn-secondary mt-3" @click="showNoteText = false">Torna indietro</button>
+    </div>
+  </div>
+</div>
 
 
-            <!-- <div class="carousel-item">
-              <div class="d-block w-100 text-center p-4">
-                <h2>{{ isCurrentDayActivity ? 'Attività di Oggi' : 'Ultima Attività' }}</h2>
-                <p v-if="noActivitiesMessage">{{ noActivitiesMessage }}</p>
-                <p v-else>
-                  <strong>Titolo:</strong> {{ lastActivityTitle }}<br>
-                  <strong>Descrizione:</strong> {{ lastActivityDescription }}<br>
-                  <strong>Scadenza:</strong> {{ lastActivityDeadline }}
-                </p>
-                <button v-if="!isCurrentDayActivity" class="btn btn-primary mt-3" @click="getCurrentDayActivities">Vedi
-                  attività del giorno corrente</button>
-                <button v-else class="btn btn-secondary mt-3" @click="getLastActivity">Torna all'ultima
-                  attività</button>
-              </div>
-            </div> -->
 
-            <!-- <div class="carousel-item">
-              <div class="d-block w-100 text-center p-4">
-                <h2>Ultima Nota</h2>
-                <p v-if="noNotesMessage">{{ noNotesMessage }}</p>
-                <p v-else>
-                  <strong>Titolo:</strong> {{ lastNoteHeading }}<br>
-                  <strong>Autore:</strong> {{ lastNoteAuthor }}
-                </p>
-              </div>
-            </div> -->
+
+
+
 
 
             <div class="carousel-item">
@@ -227,81 +182,79 @@
                 <h2>Ultimo Pomodoro</h2>
                 <p v-if="noPomodorosMessage">{{ noPomodorosMessage }}</p>
                 <p v-else>
-                  <strong>tempo studio prefissato:</strong> {{ lastPomodoroTempoStudio }}<br>
-                  <strong>tempo pausa prefissato:</strong> {{ lastPomodoroTempoPausa }}<br>
-                  <strong>ripetizioni prefissate:</strong> {{ lastPomodoroRipetizioni }}
+                   <strong>tempo studio prefissato:</strong> {{ lastPomodoroTempoStudio }}<br>
+                   <strong>tempo pausa prefissato:</strong> {{ lastPomodoroTempoPausa }}<br>
+                   <strong>ripetizioni prefissate:</strong> {{ lastPomodoroRipetizioni }}
                 </p>
               </div>
             </div>
 
 
 
-            <!-- FINE CAROSELLO PREVIEW     --> <!-- FINE CAROSELLO PREVIEW     --> <!-- FINE CAROSELLO PREVIEW     -->
-            <!-- FINE CAROSELLO PREVIEW     -->
+            <!-- FINE CAROSELLO PREVIEW     --> <!-- FINE CAROSELLO PREVIEW     --> <!-- FINE CAROSELLO PREVIEW     --> <!-- FINE CAROSELLO PREVIEW     -->
+
+
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Next</span>
+            </button>
+
 
 
           </div>
-          <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators"
-            data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous</span>
-          </button>
-          <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators"
-            data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
-          </button>
 
 
-
-        </div>
-
-
-        <div id="carouselNotifications" class="carousel slide mt-4" data-bs-ride="carousel">
-          <div class="carousel-indicators">
-            <button v-for="(notification, index) in notifications" :key="index" type="button"
-              :data-bs-target="'#carouselNotifications'" :data-bs-slide-to="index" :class="{ active: index === 0 }"
-              :aria-current="index === 0 ? 'true' : 'false'" :aria-label="'Slide ' + (index + 1)">
+          <div id="carouselNotifications" class="carousel slide mt-4" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+              <button v-for="(notification, index) in notifications" :key="index" type="button" 
+                      :data-bs-target="'#carouselNotifications'" :data-bs-slide-to="index" 
+                      :class="{ active: index === 0 }" :aria-current="index === 0 ? 'true' : 'false'"
+                      :aria-label="'Slide ' + (index + 1)">
+              </button>
+            </div>
+          
+            <div class="carousel-inner">
+              <div v-if="notifications.length === 0" class="carousel-item active">
+                <div class="d-block w-100 text-center p-4">
+                  <h2>Nessuna Notifica</h2>
+                  <p>{{ noNotificationsMessage }}</p>
+                </div>
+              </div>
+          
+              <div v-else v-for="(notification, index) in notifications" :key="index" 
+                   :class="['carousel-item', { active: index === 0 }]">
+                <div class="d-block w-100 text-center p-4">
+                  <h2>Notifica {{ index + 1 }}</h2>
+                  <p>
+                    <strong>Messaggio:</strong> {{ notification.message }}<br>
+                    <strong>Data:</strong> {{ new Date(notification.createdAt).toLocaleDateString() }}
+                  </p>
+                  <button @click="deleteNotification(notification._id)" class="btn btn-danger">Elimina</button>
+                </div>
+              </div>
+            </div>
+          
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselNotifications"
+              data-bs-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Previous</span>
+            </button>
+          
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselNotifications"
+              data-bs-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Next</span>
             </button>
           </div>
-
-          <div class="carousel-inner">
-            <div v-if="notifications.length === 0" class="carousel-item active">
-              <div class="d-block w-100 text-center p-4">
-                <h2>Nessuna Notifica</h2>
-                <p>{{ noNotificationsMessage }}</p>
-              </div>
-            </div>
-
-            <div v-else v-for="(notification, index) in notifications" :key="index"
-              :class="['carousel-item', { active: index === 0 }]">
-              <div class="d-block w-100 text-center p-4">
-                <h2>Notifica {{ index + 1 }}</h2>
-                <p>
-                  <strong>Messaggio:</strong> {{ notification.message }}<br>
-                  <strong>Data:</strong> {{ new Date(notification.createdAt).toLocaleDateString() }}
-                </p>
-                <button @click="deleteNotification(notification._id)" class="btn btn-danger">Elimina</button>
-              </div>
-            </div>
-          </div>
-
-          <button class="carousel-control-prev" type="button" data-bs-target="#carouselNotifications"
-            data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous</span>
-          </button>
-
-          <button class="carousel-control-next" type="button" data-bs-target="#carouselNotifications"
-            data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
-          </button>
         </div>
       </div>
     </div>
   </div>
-
 </template>
 
 <script>
@@ -335,7 +288,6 @@ export default {
       lastNoteHeading: '',
       lastNoteAuthor: '',
       noEventsMessage: '',
-      notificationMessage: '',
       allEvents: [],
       allEventCurrent: [],
       noNotesMessage: '',
