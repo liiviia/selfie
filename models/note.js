@@ -5,6 +5,6 @@ const noteSchema = new mongoose.Schema({
     author: { type: String, required:true },
     content: {type: String, required: true},
     completed: { type: Boolean, default: false }
-});
+} ,{ timestamps: true }); 
 
 module.exports = mongoose.model("Note", noteSchema);

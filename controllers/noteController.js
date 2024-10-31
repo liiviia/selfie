@@ -98,3 +98,5 @@ exports.getLastNote = async (req, res) => {
     res.status(500).send('Errore nel recupero dell\'ultima nota');
   }
 };
+
+
