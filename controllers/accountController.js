@@ -80,3 +80,15 @@ exports.getAllUsers = async (req, res) => {
     res.status(500).json({ message: 'Errore nel recupero degli utenti' });
   }
 };
+
+
+exports.getUsers = async (req, res) => {
+  try {
+    const users = await User.find({}, 'username');
+    res.json(users);
+  } catch (error) {
+    console.error('Errore nel recupero degli utenti:', error);
+    res.status(500).json({ message: 'Errore nel recupero degli utenti' });
+  }
+};
+

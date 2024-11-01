@@ -9,4 +9,6 @@ router.delete('/deleteAccount', authenticateToken, accountController.deleteAccou
 
 router.get('/users', authenticateToken, accountController.getAllUsers);
 
+router.get('users1' , authenticateToken , accountController.getUsers) ;
+
 module.exports = router;

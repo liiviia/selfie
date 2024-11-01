@@ -9,12 +9,18 @@ exports.getAllNotes = async (req, res) => {
       return res.status(400).json({ message: 'Username è necessario' });
     }
 
-
-    const notes = await Note.find({ author: username });
+    // Recupera le note in base al livello di accesso
+    const notes = await Note.find({
+      $or: [
+        { access: "public" },
+        { author: username },
+        { access: "restricted", allowedUsers: username }
+      ]
+    });
 
     res.json(notes);
   } catch (error) {
-    console.error('Error fetching notes:', error);
+    console.error('Errore nel recupero delle note:', error);
     res.status(500).json({ message: 'Errore durante il recupero delle note' });
   }
 };
@@ -37,23 +43,24 @@ exports.getNoteById = async (req, res) => {
 
 exports.createNote = async (req, res) => {
   try {
-    const { heading, author, content, completed } = req.body;
+    const { heading, author, content, completed, access, allowedUsers } = req.body;
 
     const newNote = new Note({
       heading,
       author,
       content,
-      completed
+      completed,
+      access,
+      allowedUsers: access === "restricted" ? allowedUsers : []
     });
 
     await newNote.save();
     res.status(201).json(newNote);
   } catch (error) {
-    console.error('Error creating note:', error);
-    res.status(500).send('Error creating note');
+    console.error('Errore nella creazione della nota:', error);
+    res.status(500).send('Errore nella creazione della nota');
   }
 };
-
 
 exports.updateNote = async (req, res) => {
   try {

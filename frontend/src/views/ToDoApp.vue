@@ -7,9 +7,35 @@
         <input type="text" v-model="newNote.heading" id="heading" required class="form-input" />
       </div>
       <div class="form-group">
-        <label for="content">Contenuto:</label>
+        <label for="content">Contenuto(possibile scrivere in markdwon):</label>
         <textarea v-model="newNote.content" id="content" rows="4" class="form-textarea"></textarea>
       </div>
+
+      <div class="form-group">
+        <label for="access">Livello di Accesso:</label>
+        <select v-model="newNote.access" id="access" class="form-input">
+          <option value="public">Pubblico</option>
+          <option value="private">Privato</option>
+          <option value="restricted">Riservato</option>
+        </select>
+      </div>
+
+      <div class="form-group" v-if="newNote.access === 'restricted'">
+        <label>Utenti Autorizzati:</label>
+        <div v-for="user in filteredUsers" :key="user._id" class="form-check">
+          <input 
+            class="form-check-input" 
+            type="checkbox" 
+            :value="user.username" 
+            :id="user._id" 
+            v-model="newNote.allowedUsers" 
+          />
+          <label class="form-check-label" :for="user._id">
+            {{ user.username }} 
+          </label>
+        </div>
+      </div>
+
       <button type="submit" class="submit-button">Aggiungi Nota</button>
     </form>
 
@@ -19,6 +45,9 @@
         <h2>{{ note.heading }}</h2>
         <div class="note-content" v-html="renderMarkdown(note.content)"></div>
         <p>Autore: {{ note.author }}</p>
+        <p v-if="note.access === 'public' || (note.access === 'restricted' && note.allowedUsers && note.allowedUsers.includes(username))">
+          Condivisa con te da: {{ note.author }}
+        </p>
         <div class="note-actions">
           <button @click="editNote(note._id)" class="edit-btn">Modifica</button>
           <button @click="deleteNote(note._id)" class="delete-btn">Elimina</button>
@@ -27,6 +56,7 @@
     </ul>
   </div>
 </template>
+
 
 <script>
 import axios from 'axios';
@@ -37,25 +67,41 @@ export default {
     return {
       newNote: {
         heading: '',
+        access: 'private',
+        allowedUsers: [],
         content: ''
       },
-      notes: []
+      allUsers: [],
+      notes: [],
+      username: '' // Aggiungi un campo per memorizzare il nome utente
     };
   },
-  async created() {
-    this.fetchNotes();
+
+  computed: {
+    filteredUsers() {
+      return this.allUsers.filter(user => user.username !== this.username); 
+    }
   },
+
+  async created() {
+    // Sposta l'accesso a localStorage qui
+    this.username = localStorage.getItem('username'); 
+    console.log("username nota", this.username); // Usa this.username
+
+    await this.fetchNotes();
+    await this.fetchUsers(); 
+  },
+  
   methods: {
     async fetchNotes() {
       try {
         const token = sessionStorage.getItem('token');
-        const username = localStorage.getItem('username');
-        if (!username) {
+        if (!this.username) {
           console.error('Username non trovato');
           return;
         }
         const response = await axios.get('/api/notesGET', {
-          params: { username: username },
+          params: { username: this.username },
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -65,15 +111,15 @@ export default {
         console.error('Errore nel recupero delle note:', error);
       }
     },
+    
     async addNote() {
       try {
         const token = sessionStorage.getItem('token');
-        const username = localStorage.getItem('username');
-        if (!username) {
+        if (!this.username) {
           console.error('Username non trovato, impossibile creare la nota');
           return;
         }
-        this.newNote.author = username;
+        this.newNote.author = this.username;
 
         const response = await axios.post('/api/notes', this.newNote, {
           headers: {
@@ -82,21 +128,17 @@ export default {
         });
         console.log('Nota aggiunta:', response.data);
 
-        this.newNote = {
-          heading: '',
-          content: '',
-          author: username,
-          completed: false
-        };
-
+        this.newNote = { heading: '', content: '', access: 'private', allowedUsers: [] };
         this.fetchNotes();
       } catch (error) {
         console.error("Errore nell'aggiunta della nota:", error);
       }
     },
+
     editNote(id) {
       this.$router.push(`/edit-note/${id}`);
     },
+
     async deleteNote(id) {
       try {
         const token = sessionStorage.getItem('token');
@@ -111,12 +153,26 @@ export default {
         console.error("Errore nell'eliminazione della nota:", error);
       }
     },
+
+    async fetchUsers() {
+      try {
+        const token = sessionStorage.getItem('token');
+        const response = await axios.get('/api/users', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        this.allUsers = response.data;
+      } catch (error) {
+        console.error('Errore nel recupero degli utenti:', error);
+      }
+    },
+
     renderMarkdown(content) {
       if (!content) return '';
       return marked(content);
     }
   }
 };
+
 </script>
 
 <style scoped>
