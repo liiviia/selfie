@@ -9,7 +9,6 @@ exports.getAllNotes = async (req, res) => {
       return res.status(400).json({ message: 'Username è necessario' });
     }
 
-    // Recupera le note in base al livello di accesso
     const notes = await Note.find({
       $or: [
         { access: "public" },
@@ -62,9 +61,8 @@ exports.createNote = async (req, res) => {
   }
 };
 
-// Controller delle note
 
-// Aggiorna una nota (solo l'autore può farlo)
+
 exports.updateNote = async (req, res) => {
   try {
     const noteId = req.params.id;
@@ -77,7 +75,6 @@ exports.updateNote = async (req, res) => {
     }
 
 
-    // Permetti l'update solo se l'utente è l'autore
     if (note.author !== username) {
       return res.status(403).json({ message: 'Solo l\'autore può modificare questa nota' });
     }
@@ -90,11 +87,10 @@ exports.updateNote = async (req, res) => {
   }
 };
 
-// Elimina una nota
 exports.deleteNote = async (req, res) => {
   try {
     const noteId = req.params.id;
-    const username = req.body.username;  // assume che l'username dell'utente corrente sia passato nel body
+    const username = req.body.username;  
 
     const note = await Note.findById(noteId);
 
@@ -104,11 +100,9 @@ exports.deleteNote = async (req, res) => {
 
 
     if (note.author === username) {
-      // L'autore può eliminare la nota definitivamente
       await Note.findByIdAndDelete(noteId);
       return res.json({ message: 'Nota eliminata con successo' });
     } else if (note.allowedUsers.includes(username)) {
-      // Utente non autore può solo rimuovere se stesso da allowedUsers
       note.allowedUsers = note.allowedUsers.filter(user => user !== username);
       await note.save();
       return res.json({ message: 'Accesso rimosso dalla nota per l\'utente' });

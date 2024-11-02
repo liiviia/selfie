@@ -57,24 +57,6 @@ export default {
 
 
 
-     /*
-
-async updateNote() {
-      try {
-        const token = sessionStorage.getItem('token');
-        const noteId = this.$route.params.id;
-        const response = await axios.put(`/api/notes/${noteId}`, this.note, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        console.log('Nota aggiornata:', response.data);
-        this.$router.push('/todo');
-      } catch (error) {
-        console.error('Errore nell\'aggiornamento della nota:', error);
-      }
-    },
-     */
 
 
 
@@ -84,10 +66,9 @@ async updateNote() {
     const username = localStorage.getItem('username');
     const noteId = this.$route.params.id;
 
-    // Assicurati che `username` sia incluso nel body della richiesta
     const updatedNoteData = {
       ...this.note,
-      username: username  // Aggiungi `username` al body
+      username: username  
     };
 
     const response = await axios.put(`/api/notes/${noteId}`, updatedNoteData, {
@@ -123,7 +104,7 @@ async updateNote() {
         Authorization: `Bearer ${token}`
       },
       params: {
-        username: username // Aggiungi `username` come parametro di query
+        username: username 
       }
     });
 
@@ -147,7 +128,7 @@ async updateNote() {
   max-width: 800px;
   margin: 20px auto;
   padding: 20px;
-  background-color: #f8f9fa; /* Colore sfondo simile alle attività */
+  background-color: #f8f9fa; 
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
@@ -197,7 +178,7 @@ textarea {
 
 .button-group {
   display: flex;
-  justify-content: space-between; /* Allinea i pulsanti orizzontalmente */
+  justify-content: space-between; 
   margin-top: 20px;
 }
 

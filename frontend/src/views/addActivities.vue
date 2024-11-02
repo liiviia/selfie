@@ -60,7 +60,7 @@ export default {
     const route = useRoute();
     const router = useRouter();
 
-    const loggedInUsername = localStorage.getItem('username') || 'Guest'; // Username loggato
+    const loggedInUsername = localStorage.getItem('username') || 'Guest'; 
 
     const newActivity = ref({
       title: '',
@@ -70,7 +70,7 @@ export default {
       email: localStorage.getItem('email') || '',
       completed: false,
       type: 'singola',
-      participants: [loggedInUsername] // Aggiungi l'username loggato ai partecipanti
+      participants: [loggedInUsername] 
     });
 
     const users = ref([]); 
@@ -142,7 +142,6 @@ export default {
 
 
 <style scoped>
-/* Stili come nel tuo codice originale */
 .activity-form {
   max-width: 600px;
   margin: 50px auto;

@@ -85,9 +85,8 @@ export default {
       return new Date(date).toLocaleDateString();
     },
 
-    // Funzione per formattare il gruppo di utenti
     formatGroup(group) {
-      return group.join(', '); // Unisce i nomi degli utenti con una virgola
+      return group.join(', '); 
     }
   },
   mounted() {

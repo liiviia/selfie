@@ -62,7 +62,6 @@ exports.getActivities = async (req, res) => {
   }
 };
 
-// Recupera l'ultima attività di un utente
 exports.getLastActivity = async (req, res) => {
   try {
     const username = req.query.username;
@@ -258,26 +257,22 @@ exports.getActivitiesByDate = async (req, res) => {
 
 
 
-// Modifica la funzione di cancellazione delle attività
 exports.deleteActivities = async (req, res) => {
   try {
     const activityID = req.params.id;
-    const username = req.query.username; // Ottieni l'username dalla query
+    const username = req.query.username; 
 
-    // Trova l'attività
     const activity = await Activity.findById(activityID);
 
     if (!activity) {
       return res.status(404).json({ message: 'Attività non trovata' });
     }
 
-    // Verifica se l'utente è l'autore dell'attività
+    
     if (activity.author === username) {
-      // L'autore può eliminare definitivamente l'attività
       await Activity.findByIdAndDelete(activityID);
       return res.json({ message: 'Attività eliminata con successo' });
     } else if (activity.participants.includes(username)) {
-      // Se l'utente è solo un partecipante, rimuovilo dalla lista dei partecipanti
       activity.participants = activity.participants.filter(participant => participant !== username);
       await activity.save();
       return res.json({ message: 'Partecipazione rimossa con successo' });

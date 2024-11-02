@@ -73,7 +73,7 @@ export default {
       },
       allUsers: [],
       notes: [],
-      username: '' // Aggiungi un campo per memorizzare il nome utente
+      username: '' 
     };
   },
 
@@ -84,9 +84,9 @@ export default {
   },
 
   async created() {
-    // Sposta l'accesso a localStorage qui
+
     this.username = localStorage.getItem('username'); 
-    console.log("username nota", this.username); // Usa this.username
+    console.log("username nota", this.username); 
 
     await this.fetchNotes();
     await this.fetchUsers(); 
