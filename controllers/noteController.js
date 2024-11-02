@@ -62,13 +62,27 @@ exports.createNote = async (req, res) => {
   }
 };
 
+// Controller delle note
+
+// Aggiorna una nota (solo l'autore può farlo)
 exports.updateNote = async (req, res) => {
   try {
     const noteId = req.params.id;
-    const updatedNote = await Note.findByIdAndUpdate(noteId, req.body, { new: true });
-    if (!updatedNote) {
-      return res.status(404).send('Nota non trovata');
+    const username = req.body.username;  
+
+    const note = await Note.findById(noteId);
+
+    if (!note) {
+      return res.status(404).json({ message: 'Nota non trovata' });
     }
+
+
+    // Permetti l'update solo se l'utente è l'autore
+    if (note.author !== username) {
+      return res.status(403).json({ message: 'Solo l\'autore può modificare questa nota' });
+    }
+
+    const updatedNote = await Note.findByIdAndUpdate(noteId, req.body, { new: true });
     res.json(updatedNote);
   } catch (error) {
     console.error('Errore nell\'aggiornamento della nota:', error);
@@ -76,23 +90,37 @@ exports.updateNote = async (req, res) => {
   }
 };
 
-
-
+// Elimina una nota
 exports.deleteNote = async (req, res) => {
   try {
     const noteId = req.params.id;
-    const result = await Note.findByIdAndDelete(noteId);
+    const username = req.body.username;  // assume che l'username dell'utente corrente sia passato nel body
 
-    if (!result) {
+    const note = await Note.findById(noteId);
+
+    if (!note) {
       return res.status(404).json({ message: 'Nota non trovata' });
     }
 
-    res.json({ message: 'Nota eliminata con successo' });
+
+    if (note.author === username) {
+      // L'autore può eliminare la nota definitivamente
+      await Note.findByIdAndDelete(noteId);
+      return res.json({ message: 'Nota eliminata con successo' });
+    } else if (note.allowedUsers.includes(username)) {
+      // Utente non autore può solo rimuovere se stesso da allowedUsers
+      note.allowedUsers = note.allowedUsers.filter(user => user !== username);
+      await note.save();
+      return res.json({ message: 'Accesso rimosso dalla nota per l\'utente' });
+    } else {
+      return res.status(403).json({ message: 'Non hai i permessi per eliminare questa nota' });
+    }
   } catch (error) {
     console.error('Errore nella cancellazione della nota:', error);
     res.status(500).send('Errore nella cancellazione della nota');
   }
 };
+
 
 
 exports.getLastNote = async (req, res) => {

@@ -1,7 +1,7 @@
 <template>
   <div class="activity-list">
-    <h1>Lista delle Attività : </h1>
-    <h2>Numero Attività : {{ activities.length }} </h2>
+    <h1>Lista delle Attività:</h1>
+    <h2>Numero Attività: {{ activities.length }}</h2>
     
     <ul v-if="activities.length > 0" class="activity-items">
       <li v-for="(activity, index) in activities" :key="index" class="activity-item">
@@ -10,6 +10,14 @@
         <p><strong>Scadenza:</strong> {{ formatDate(activity.deadline) }}</p>
         <p><strong>Autore:</strong> {{ activity.author }}</p>
         <p><strong>Completata:</strong> {{ activity.completed ? 'Sì' : 'No' }}</p>
+
+        <p v-if="activity.participants && activity.participants.length > 0">
+  <strong>Attività di Gruppo Creata da:</strong> {{ activity.author }} 
+  <br>
+  <strong>Gruppo Composto da:</strong> {{ formatGroup(activity.participants) }}
+</p>
+
+
         <button @click="confirmDelete(activity._id)" class="delete-btn">🗑️</button>
       </li>
     </ul>
@@ -37,15 +45,17 @@ export default {
     async deleteActivities(id) {
       try {
         const token = sessionStorage.getItem('token');
+        const username = localStorage.getItem('username') ;
         await axios.delete(`/api/activitiesRemove/${id}`, {
           headers: {
             Authorization: `Bearer ${token}` 
-          }
+          },
+          params:{username: username} 
         });
         console.log('Attività eliminata');
         this.fetchActivities(); 
       } catch (error) {
-        console.error('Errore nell\'eliminazione della attivita:', error);
+        console.error('Errore nell\'eliminazione della attività:', error);
       }
     },
     
@@ -64,13 +74,20 @@ export default {
         this.activities = response.data.filter(activity => 
           new Date(activity.deadline) >= currentDate
         );
+        console.log(response.data);
       } catch (error) {
         console.error('Errore durante il recupero delle attività:', error);
       }
     },
-    
+
+    // Funzione per formattare la data
     formatDate(date) {
       return new Date(date).toLocaleDateString();
+    },
+
+    // Funzione per formattare il gruppo di utenti
+    formatGroup(group) {
+      return group.join(', '); // Unisce i nomi degli utenti con una virgola
     }
   },
   mounted() {

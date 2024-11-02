@@ -302,6 +302,7 @@ export default {
       currentActivityDescription: '',
       currentActivityDeadline: '',
       isCurrentDay: false,
+      lastGroupActivity: '' ,
       lastNoteText: '',
       showNoteText: false,
       isCurrentDayActivity: false,
@@ -383,6 +384,8 @@ export default {
           this.lastActivityTitle = response.data.title;
           this.lastActivityDescription = response.data.description;
           this.lastActivityDeadline = new Date(response.data.deadline).toLocaleDateString();
+          this.lastGroupActivity = response.data.type;
+          console.log(this.lastGroupActivity) ;
           this.noActivitiesMessage = '';
           this.isCurrentDayActivity = false;
         } else {

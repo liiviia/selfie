@@ -6,6 +6,8 @@ const activitySchema = new mongoose.Schema({
   deadline: { type: Date, required: true },
   author: { type: String, required: true },
   email: { type: String, required: true }, 
+  type: { type: String, enum: ['singola', 'gruppo'], default: 'singola' },
+  participants: [{ type: String }],
   completed: { type: Boolean, default: false }
 });
 

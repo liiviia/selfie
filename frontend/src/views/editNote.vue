@@ -54,7 +54,12 @@ export default {
         console.error('Errore nel recupero della nota:', error);
       }
     },
-    async updateNote() {
+
+
+
+     /*
+
+async updateNote() {
       try {
         const token = sessionStorage.getItem('token');
         const noteId = this.$route.params.id;
@@ -69,25 +74,70 @@ export default {
         console.error('Errore nell\'aggiornamento della nota:', error);
       }
     },
+     */
+
+
+
+     async updateNote() {
+  try {
+    const token = sessionStorage.getItem('token');
+    const username = localStorage.getItem('username');
+    const noteId = this.$route.params.id;
+
+    // Assicurati che `username` sia incluso nel body della richiesta
+    const updatedNoteData = {
+      ...this.note,
+      username: username  // Aggiungi `username` al body
+    };
+
+    const response = await axios.put(`/api/notes/${noteId}`, updatedNoteData, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    console.log('Nota aggiornata:', response.data);
+    this.$router.push('/todo');
+  } catch (error) {
+    if (error.response && error.response.status === 403) {
+      alert('Non autorizzato a modificare la nota');
+    } else {
+      console.error('Errore nell\'aggiornamento della nota:', error);
+    }
+  }
+},
+
+
     confirmDelete(id) {
       if (confirm("Sicuro di voler eliminare questa nota?")) {
         this.deleteNote(id);
       }
     },
     async deleteNote(id) {
-      try {
-        const token = sessionStorage.getItem('token');
-        await axios.delete(`/api/notes/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        console.log('Nota eliminata');
-        this.$router.push('/todo');
-      } catch (error) {
-        console.error('Errore nell\'eliminazione della nota:', error);
+  try {
+    const token = sessionStorage.getItem('token');
+    const username = localStorage.getItem('username');
+    
+    await axios.delete(`/api/notesRIM/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      params: {
+        username: username // Aggiungi `username` come parametro di query
       }
+    });
+
+    console.log('Nota eliminata');
+    this.fetchNotes();
+  } catch (error) {
+    if (error.response && error.response.status === 403) {
+      alert('Non autorizzato a eliminare la nota');
+    } else {
+      console.error("Errore nell'eliminazione della nota:", error);
     }
+  }
+}
+
   }
 };
 </script>

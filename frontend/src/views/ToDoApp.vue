@@ -140,19 +140,30 @@ export default {
     },
 
     async deleteNote(id) {
-      try {
-        const token = sessionStorage.getItem('token');
-        await axios.delete(`/api/notesRIM/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        console.log('Nota eliminata');
-        this.fetchNotes();
-      } catch (error) {
-        console.error("Errore nell'eliminazione della nota:", error);
+  try {
+    const token = sessionStorage.getItem('token');
+    const username = localStorage.getItem('username');
+    
+    await axios.delete(`/api/notesRIM/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      data: {
+        username: username 
       }
-    },
+    });
+
+    console.log('Nota eliminata');
+    this.fetchNotes();
+  } catch (error) {
+    if (error.response && error.response.status === 403) {
+      alert('Non autorizzato a eliminare la nota');
+    } else {
+      console.error("Errore nell'eliminazione della nota:", error);
+    }
+  }
+},
+
 
     async fetchUsers() {
       try {

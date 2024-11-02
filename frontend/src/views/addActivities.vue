@@ -18,6 +18,31 @@
         <input v-model="newActivity.deadline" type="date" id="deadline" required class="form-input">
       </div>
 
+      <div class="form-group">
+        <label for="type">Tipo di Attività:</label>
+        <select v-model="newActivity.type" id="type" class="form-input">
+          <option value="singola">Singola</option>
+          <option value="gruppo">Gruppo</option>
+        </select>
+      </div>
+
+      <div v-if="newActivity.type === 'gruppo'" class="form-group">
+        <label>Partecipanti:</label>
+        <div v-for="user in users" :key="user.username" class="form-check">
+          <input 
+            class="form-check-input" 
+            type="checkbox" 
+            :value="user.username" 
+            :id="user.username" 
+            v-model="newActivity.participants" 
+            v-if="user.username !== loggedInUsername"  
+          />
+          <label class="form-check-label" :for="user.username">
+            {{ user.username }} 
+          </label>
+        </div>
+      </div>
+
       <button type="submit" class="submit-button">Aggiungi Attività</button>
     </form>
 
@@ -35,16 +60,37 @@ export default {
     const route = useRoute();
     const router = useRouter();
 
+    const loggedInUsername = localStorage.getItem('username') || 'Guest'; // Username loggato
+
     const newActivity = ref({
       title: '',
       description: '',
       deadline: '',
-      author: localStorage.getItem('username') || 'Guest',
+      author: loggedInUsername,
       email: localStorage.getItem('email') || '',
-      completed: false
+      completed: false,
+      type: 'singola',
+      participants: [loggedInUsername] // Aggiungi l'username loggato ai partecipanti
     });
 
-    onMounted(() => {
+    const users = ref([]); 
+    const message = ref('');
+
+    const fetchUsers = async () => {
+      try {
+        const token = sessionStorage.getItem('token');
+        const response = await axios.get('/api/users', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        users.value = response.data; 
+      } catch (error) {
+        console.error('Errore nel recupero degli utenti:', error);
+      }
+    };
+
+    onMounted(async () => {
+      await fetchUsers();
+
       if (route.query.date) {
         newActivity.value.deadline = route.query.date;
       }
@@ -53,48 +99,50 @@ export default {
     const submitActivity = async () => {
       try {
         const token = sessionStorage.getItem('token');
-        const response = await axios.post('/api/activities', newActivity.value, {
+        await axios.post('/api/activities', newActivity.value, {
           headers: {
             Authorization: `Bearer ${token}`
           }
         });
-        console.log('Attività aggiunta:', response.data);
 
         newActivity.value = {
           title: '',
           description: '',
           deadline: '',
-          author: localStorage.getItem('username') || 'Guest',
+          author: loggedInUsername,
           email: localStorage.getItem('email') || '',
-          completed: false
+          completed: false,
+          type: 'singola',
+          participants: [loggedInUsername] 
         };
 
         message.value = 'Attività aggiunta con successo!';
         setTimeout(() => {
           message.value = '';
-          console.log('redirectiong......');
           router.push('/homePrincipale');
-          //window.location.href = '/homePrincipale';
         }, 2000);
-
       } catch (error) {
         message.value = 'Errore: ' + error.message;
         console.error('Errore:', error);
       }
     };
 
-    const message = ref('');
-
     return {
       newActivity,
+      users,
       message,
-      submitActivity
+      submitActivity,
+      loggedInUsername
     };
   }
 };
 </script>
 
+
+
+
 <style scoped>
+/* Stili come nel tuo codice originale */
 .activity-form {
   max-width: 600px;
   margin: 50px auto;

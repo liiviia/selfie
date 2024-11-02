@@ -21,6 +21,10 @@
         <h4>{{ activity.title }}</h4>
         <p>Data: {{ formatDate(activity.deadline || activity.date) }}</p>
         <p>Descrizione: {{ activity.description }}</p>
+        <p v-if="activity.type === 'gruppo'" style="color: #FF6347;">
+          Attività di gruppo creata da: {{ activity.author }}<br>
+          Gruppo composto da: {{ activity.participants.join(', ') }}
+        </p>
       </div>
     </div>
 
@@ -71,7 +75,6 @@ export default {
       try {
         const author = route.query.author;
         const date = route.query.date;
-        // mi serve per il pomodoro
         const username = route.query.username || author;
 
         const token = sessionStorage.getItem('token');
