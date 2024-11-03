@@ -1,9 +1,8 @@
 <template>
-  <div class="mess">
-    <h3>accedi o registrati</h3>
-  </div>
   <div class="login">
+    <h1 class="login__header">SELFIE</h1>
     <div class="login__container">
+      <img src="@/assets/images/logo.png" alt="Logo" class="login__logo" />
       <h1 class="login__title">Login</h1>
       <form @submit.prevent="login">
         <div class="login__field">
@@ -42,20 +41,19 @@ export default {
           username: this.username,
           password: this.password
         });
-                
-          //TOKEN
+
         const token = response.data.token;
         sessionStorage.setItem('token', token);
-        console.log("token login:" , response.data.token) ;
+        console.log("token login:", response.data.token);
 
         localStorage.setItem('username', this.username);
         const userEmail = response.data.email; 
         localStorage.setItem('email', userEmail);
         const numeroTel = response.data.phone;
-        localStorage.setItem('phone',numeroTel);
+        localStorage.setItem('phone', numeroTel);
 
-        console.log("email:",userEmail);
-        console.log("tel:",numeroTel);
+        console.log("email:", userEmail);
+        console.log("tel:", numeroTel);
         this.$router.push('/homePrincipale'); 
       
       } catch (error) {
@@ -66,24 +64,38 @@ export default {
 };
 </script>
 
-
 <style scoped>
 
 .login {
-  background: linear-gradient(90deg, #C7C5F4, #776BCC);
+  background: linear-gradient(to bottom, #f4a460, #eee8aa);
   display: flex;
+  flex-direction: column; 
   align-items: center;
   justify-content: center;
   min-height: 100vh;
 }
 
+.login__header {
+  text-align: center; 
+  color: #fff;
+  font-size: 80px; 
+  margin-bottom: 100px; 
+}
+
 .login__container {
-  background: linear-gradient(90deg, #5D54A4, #7C78B8);
+  background: linear-gradient(to bottom, #f4a460, #eee8aa);
   border-radius: 20px;
   box-shadow: 0px 0px 24px #5C5696;
   width: 360px;
   padding: 30px;
   position: relative;
+}
+
+.login__logo {
+  display: block;
+  margin: 0 auto 20px; 
+  max-width: 100%; 
+  height: auto; 
 }
 
 .login__title {
@@ -152,7 +164,7 @@ export default {
 
 .menu__item {
   display: inline-block;
-  color: #fff;
+  color: #f4a460;
   text-decoration: none;
   font-weight: 700;
   margin-top: 20px;

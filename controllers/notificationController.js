@@ -3,16 +3,14 @@ const Notification = require('../models/Notification');
 const User = require('../models/User');
 //const notificationService = require('../services/NotificationService');
 
-//manda notifica ad un utente
 exports.sendNotification = async (req, res) => {
-   const { recipients, message } = req.body;
+   const { recipients, message, username } = req.body;
 
   if (!recipients || recipients.length === 0 || !message) {
     return res.status(400).json({ message: 'I destinatari e il messaggio sono necessari' });
   }
 
   try {
-    // Invia la notifica a ciascun destinatario selezionato
     for (const recipientId of recipients) {
       const user = await User.findById(recipientId);
 
@@ -24,6 +22,7 @@ exports.sendNotification = async (req, res) => {
         recipient: user._id,
         message: message,
         isRead: false,
+        username: username,
         createdAt: new Date()
       });
 
@@ -39,11 +38,11 @@ exports.sendNotification = async (req, res) => {
 
 //notifiche dell utente
 exports.getNotificationsForUser = async (req, res) => {
-    const userId = req.user.id; // Supponendo che tu stia usando middleware per autenticare l'utente e impostare req.user
+    const userId = req.user.id; 
     if (!userId) {return res.status(400).json({ message: 'userId mancante' }); }
 
     try {
-        const notifications = await Notification.find({ recipient: userId }).sort({ createdAt: -1 }); // Recupera le notifiche per l'utente loggato, ordinate per data
+        const notifications = await Notification.find({ recipient: userId }).sort({ createdAt: -1 }); 
         res.status(200).json(notifications);
     } catch (error) {
         console.error('Errore durante il recupero delle notifiche:', error);
@@ -51,9 +50,8 @@ exports.getNotificationsForUser = async (req, res) => {
     }
 };
   
-//elimina una notifica con id
 exports.deleteNotification = async (req, res) => {
-    const { id } = req.params; // id della notifica dai parametri della richiesta
+    const { id } = req.params; 
   
     try {
       const notification = await Notification.findByIdAndDelete(id);

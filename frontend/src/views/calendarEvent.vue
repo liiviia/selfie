@@ -1,4 +1,5 @@
 <template>
+  <div class="container">
   <div class="calendar">
     <div class="calendar-header">
       <button @click="prevMonth">&lt;</button>
@@ -32,11 +33,8 @@
           <div class="day-content">
             <span class="day-number">{{ day.dayOfMonth }}</span>
             <div class="indicators">
-              <!-- Pallino blu per eventi -->
               <span v-if="day.hasEvents" class="event-dot"></span>
-              <!-- Pallino verde per attività -->
               <span v-if="day.hasActivities" class="activity-dot"></span>
-              <!-- Pallino rosso per pomodori -->
               <span v-if="day.hasPomodoros" class="pomodoro-dot"></span>
             </div>
           </div>
@@ -44,6 +42,7 @@
       </div>
     </div>
   </div>
+</div>
 </template>
 
 <script>
@@ -97,19 +96,16 @@ export default {
       const calendarArray = [];
       const today = new Date();
 
-      // Giorni del mese precedente
       for (let i = startingDayOfWeek - 1; i >= 0; i--) {
         const day = new Date(year, month, -i);
         calendarArray.push(createDayObject(day, false, today));
       }
 
-      // Giorni del mese corrente
       for (let i = 1; i <= daysInMonth; i++) {
         const day = new Date(year, month, i);
         calendarArray.push(createDayObject(day, true, today));
       }
 
-      // Giorni del mese successivo
       const remainingDays = 42 - calendarArray.length;
       for (let i = 1; i <= remainingDays; i++) {
         const day = new Date(year, month + 1, i);
@@ -258,6 +254,8 @@ export default {
 </script>
 
 <style scoped>
+
+
 .calendar {
   max-width: 800px;
   margin: 0 auto;
@@ -266,6 +264,7 @@ export default {
   border-radius: 10px; 
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
   padding: 20px; 
+  background: linear-gradient(to bottom, #f4a460, #eee8aa);
 }
 
 .calendar-header {
@@ -355,7 +354,7 @@ export default {
 }
 
 .event-dot, .activity-dot, .pomodoro-dot {
-  height: 8px;  /* Pallini piccoli */
+  height: 8px; 
   width: 8px;
   border-radius: 50%; 
   display: inline-block;
@@ -383,4 +382,105 @@ export default {
   border-radius: 10px; 
   box-shadow: 0 0 10px rgba(0, 123, 255, 0.3); 
 }
+
+@media (max-width: 600px) {
+  .calendar {
+    padding: 10px; 
+  }
+
+  .calendar-header button {
+    font-size: 14px;
+    padding: 8px; 
+  }
+
+  .weekdays {
+    grid-template-columns: repeat(7, 1fr); 
+  }
+
+  .days {
+    grid-template-columns: repeat(7, 1fr); 
+  }
+  .weekdays div {
+  display: flex;
+  justify-content: center; 
+  align-items: center;
+  text-align: center; 
+}
+
+.days div {
+  display: flex;
+  flex-direction: column; 
+  justify-content: center; 
+  align-items: center; 
+  text-align: center; 
+}
+
+
+  .days div {
+    height: 70px; 
+    font-size: 1.0em; 
+    display: flex; 
+    flex-direction: column;
+    align-items: center; 
+    justify-content: center; 
+    padding: 5px; 
+    border: 1px solid transparent; 
+    padding-left: 1000px; 
+  }
+
+  .days div:nth-child(7n + 1) {
+    padding-left: 0; 
+  }
+
+  .days div:not(:nth-child(7n + 1)) {
+    padding-left: 0px; 
+  }
+
+  .day-number {
+    font-size: 1.2em;
+    font-weight: bold; 
+    margin-bottom: 5px; 
+  }
+
+  .indicators {
+    justify-content: center; 
+  }
+
+  .other-month {
+    opacity: 0.5; 
+  }
+
+  .today {
+    background-color: #e6f2ff;
+    font-weight: bold;
+    border-radius: 10px; 
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.3); 
+  }
+  .calendar {
+  max-width: 600px; 
+  padding: 10px; 
+}
+
+.calendar-header button {
+  font-size: 14px; 
+  padding: 8px 12px; 
+}
+
+.weekdays div, .days div {
+  padding: 5px; 
+  font-size: 0.9em; 
+}
+
+.days div {
+  height: 80px; 
+}
+
+.day-number {
+  font-size: 1em; 
+}
+
+}
+
+
+
 </style>

@@ -1,8 +1,11 @@
 <template>
   <div id="App">
-    <!-- Navbar, visibile solo se non siamo nella schermata di login -->
     <Nav v-if="!isLoginPage" />
-    <router-view/>
+    
+    <div class="container">
+      <router-view/>
+    </div>
+    
     <AppFooter v-if="!isLoginPage"/>
   </div>
 </template>
@@ -11,29 +14,42 @@
 import AppFooter from './components/AppFooter.vue';
 import Nav from './components/NavigationBar.vue';
 
-
 export default {
   name: 'App', 
-   components: {
+  components: {
     Nav,
     AppFooter,
   },
   computed:{
-    //verifico se sono nella pagina di login
     isLoginPage(){
-      return this.$route.path==='/';
+      return this.$route.path === '/';
     }
   },
 }; 
 </script>
 
 <style>
-#app {
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+#App {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; 
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  background: linear-gradient(90deg, #525169, #776BCC);
+  background: linear-gradient(to bottom, #f4a460, #eee8aa);
 }
+
+.container {
+  flex: 1; 
+}
+
 </style>

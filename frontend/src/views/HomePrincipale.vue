@@ -1,106 +1,103 @@
 <template>
-
   <div class="home-principale">
-    <div class="container mt-3">
+    <div class="container mt-3 text-center">
+      <div class="row" style="height: 10%; width: 100%;">
+        <div class="col-12">
+          <h1 class="title">Ciao {{ username }}, bentornato su SELFIE</h1>
+        </div>
+      </div>
       <div class="row">
-
-        <div class="col-md-6">
-       
-          <div class="notification-form mt-4">
-            <div class="form-group">
-              <label for="userSelect">Seleziona utenti per notifica:</label>
-              <select id="userSelect" v-model="selectedUsers" multiple class="form-control">
-                <option v-for="user in users" :key="user._id" :value="user._id">
-                  {{ user.username }}
-                </option>
-              </select>
-            </div>
-          
-            <div class="form-group">
-              <label for="message">Scrivi il messaggio:</label>
-              <textarea id="message" v-model="notificationMessage" placeholder="Scrivi il tuo messaggio qui..." class="form-control"></textarea>
-            </div>
-          
-            <button @click="sendNotifications" class="btn btn-primary">Invia Notifica</button>
+        <div class="col-md-3 d-flex flex-column align-items-center">
+          <img :src="gestisciImagePath" alt="Gestisci eventi e attività" class="img-left" />
+          <div class="img-description-container">
+            <p class="img-description">Con SELFIE, puoi gestire i tuoi eventi e le tue attività quotidiane in modo semplice e visualizzarle nel tuo calendario!</p>
           </div>
         </div>
+        <div class="col-md-6 d-flex justify-content-center">
+          <img :src="imagePath" alt="Homepage Design" class="img-fluid" />
+        </div>
+        <div class="col-md-3 d-flex flex-column align-items-center justify-content-center">
+          <div class="img-description-container-2">
+            <p class="img-description-2">SELFIE ti permette di creare delle note per gestire i tuoi appunti, condividendoli anche con altre persone, e ti permette di studiare comodamente con cicli di studio e pausa programmabili a piacere.</p>
+          </div>
+          <img :src="img2Path" alt="Immagine a destra" class="img-right" />
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <h2 class="reminder-title">Non scordare i tuoi prossimi impegni!</h2>
+        </div>
+      </div>
 
 
 
 
-        <!--   INIZIO CAROSELLO PREVIEW-->         <!--   INIZIO CAROSELLO PREVIEW-->         <!--   INIZIO CAROSELLO PREVIEW-->         <!--   INIZIO CAROSELLO PREVIEW-->
-
-        <div class="col-md-6">
-          <div id="carouselExampleIndicators" class="carousel slide mt-4" data-bs-ride="carousel">
-            <div class="carousel-indicators">
-              <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-              <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
-              <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
-              <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="3" aria-label="Slide 4"></button>
-            </div>
 
 
 
-            <div class="carousel-inner">
 
 
-              <div class="carousel-item active">
-  <div class="d-block w-100 text-center p-4">
-    <div class="form-group mt-3">
-      <label for="eventSelect">Scegli preview:</label>
-      <select id="eventSelect" v-model="isCurrentDay" @change="toggleEvent" class="custom-select">
-        <option :value="false">Ultimo Evento</option>
-        <option :value="true">Evento del giorno corrente</option>
-        <option :value="null">Tutti gli Eventi</option>
-      </select>
-    </div>
 
-    <h2>
-      {{ isCurrentDay === null ? 'Tutti gli Eventi' : (isCurrentDay ? 'Evento di Oggi' : 'Ultimo Evento') }}
-    </h2>
-    <p v-if="noEventsMessage">{{ noEventsMessage }}</p>
 
-    <div v-if="isCurrentDay === null && allEvents.length > 0">
-      <h3>Eventi Trovati:</h3>
-      <ul>
-        <li v-for="event in allEvents" :key="event.id">
-          <strong>Titolo:</strong> {{ event.title || 'N/A' }}<br>
-          <strong>Descrizione:</strong> {{ event.description || 'N/A' }}<br>
-          <strong>Data:</strong> {{ formatDate(event.date) }}
-        </li>
-      </ul>
-    </div>
 
-    <div v-else-if="isCurrentDay">
-      <ul>
-        <li v-for="event in allEventCurrent" :key="event.id">
-          <strong>Titolo:</strong> {{ event.title || 'N/A' }}<br>
-          <strong>Descrizione:</strong> {{ event.description || 'N/A' }}<br>
-          <strong>Data:</strong> {{ formatDate(event.date) }}
-        </li>
-      </ul>
-    </div>
 
-    <div v-else>
-      <p>
-        <strong>Titolo:</strong> {{ lastEventTitle }}<br>
-        <strong>Descrizione:</strong> {{ lastEventDescription }}<br>
-        <strong>Data:</strong> {{ lastEventDate }}
-      </p>
+
+      <div class="home-preview" style="margin-top: 50px;">
+
+
+   <div class="row">
+  <div class="col-5 section-container">
+    <div class="text-center p-4">
+      <div class="form-group mt-3">
+        <label for="eventSelect">Scegli preview:</label>
+        <select id="eventSelect" v-model="isCurrentDay" @change="toggleEvent" class="custom-select event-select">
+          <option :value="false">Ultimo Evento</option>
+          <option :value="true">Evento del giorno corrente</option>
+          <option :value="null">Tutti gli Eventi</option>
+        </select>
+      </div>
+
+      <h2 class="section-title">
+        {{ isCurrentDay === null ? 'Tutti gli Eventi' : (isCurrentDay ? 'Evento di Oggi' : 'Ultimo Evento') }}
+      </h2>
+      <p v-if="noEventsMessage">{{ noEventsMessage }}</p>
+
+      <div v-if="isCurrentDay === null && allEvents.length > 0">
+        <h3>Eventi Trovati:</h3>
+        <ul>
+          <li v-for="event in allEvents" :key="event.id">
+            <strong>Titolo:</strong> {{ event.title || 'N/A' }}<br>
+            <strong>Descrizione:</strong> {{ event.description || 'N/A' }}<br>
+            <strong>Data:</strong> {{ formatDate(event.date) }}
+          </li>
+        </ul>
+      </div>
+
+      <div v-else-if="isCurrentDay">
+        <ul>
+          <li v-for="event in allEventCurrent" :key="event.id">
+            <strong>Titolo:</strong> {{ event.title || 'N/A' }}<br>
+            <strong>Descrizione:</strong> {{ event.description || 'N/A' }}<br>
+            <strong>Data:</strong> {{ formatDate(event.date) }}
+          </li>
+        </ul>
+      </div>
+
+      <div v-else>
+        <p>
+          <strong>Titolo:</strong> {{ lastEventTitle }}<br>
+          <strong>Descrizione:</strong> {{ lastEventDescription }}<br>
+          <strong>Data:</strong> {{ formatDate(lastEventDate) }}
+        </p>
+      </div>
     </div>
   </div>
-</div>
 
 
-
-
-
-<div class="carousel-item">
-  <div class="d-block w-100 text-center p-4">
-
+   <div class="col-5 section-container">
     <div class="form-group mt-3">
       <label for="activitySelect">Scegli preview:</label>
-      <select id="activitySelect" v-model="isCurrentDayActivity" @change="toogleActivity" class="custom-select">
+      <select id="activitySelect" v-model="isCurrentDayActivity" @change="toogleActivity" class="custom-select event-select">
         <option :value="false">Ultima attività</option>
         <option :value="true">Attività del giorno corrente</option>
         <option :value="null">Tutte le attività</option>
@@ -139,17 +136,14 @@
       <strong>Descrizione:</strong> {{ lastActivityDescription }}<br>
       <strong>Scadenza:</strong> {{ lastActivityDeadline }}
     </div>
-  </div>
+   </div>
 </div>
 
 
+<div class="row" style="margin-top: 50px;">
+  <div class="col-5 section-container">
 
-
-
-  
-  <div class="carousel-item">
-  <div class="d-block w-100 text-center p-4">
-    <h2>Ultima Nota</h2>
+<h2>Ultima Nota</h2>
     <p><strong>Titolo:</strong> {{ lastNoteHeading }}</p>
 
     <div v-if="!showNoteText">
@@ -158,116 +152,135 @@
       <p v-else>
         <strong>Autore:</strong> {{ lastNoteAuthor }}
       </p>
-      <button v-if="lastNoteHeading" class="btn btn-primary mt-3" @click="getNoteText">Vedi testo completo della nota</button>
+      <button v-if="lastNoteHeading" class="btn btn-primary mt-3" style="background: white; color: black; " @click="getNoteText">Vedi testo completo della nota</button>
     </div>
 
     <div v-if="showNoteText" class="note-text">
       <p><strong>Testo completo:</strong></p>
       <div v-html="convertMarkdown(lastNoteText)"></div>
-      <!-- Bottone per tornare alla visualizzazione normale -->
-      <button class="btn btn-secondary mt-3" @click="showNoteText = false">Torna indietro</button>
+      <button class="btn btn-secondary mt-3" style="background: white; color: black; " @click="showNoteText = false">Torna indietro</button>
     </div>
   </div>
-</div>
-
-
-
-
-
-
-
-
-            <div class="carousel-item">
-              <div class="d-block w-100 text-center p-4">
-                <h2>Ultimo Pomodoro</h2>
+   
+  <div class="col-5 section-container">
+    <h2>Ultimo Pomodoro</h2>
                 <p v-if="noPomodorosMessage">{{ noPomodorosMessage }}</p>
                 <p v-else>
                    <strong>tempo studio prefissato:</strong> {{ lastPomodoroTempoStudio }}<br>
                    <strong>tempo pausa prefissato:</strong> {{ lastPomodoroTempoPausa }}<br>
                    <strong>ripetizioni prefissate:</strong> {{ lastPomodoroRipetizioni }}
                 </p>
-              </div>
+  </div>
+
+
+</div>
+
+
+
+  </div>
+
+ 
+
+
+  <button class="fixed-button" @click="openNotificationModal" style="background:#f4a460; margin-bottom: 50px;">
+  Vedi Notifiche
+</button>
+
+<!-- Pulsante per inviare notifiche -->
+<button class="fixed-button" @click="openModal" style="background:#f4a460;">
+  <i class="fas fa-paper-plane"></i>
+</button>
+
+    <!-- Nuovo Modal per le notifiche -->
+    <div v-if="isNotificationModalOpen" class="modal" @click.self="closeNotificationModal">
+      <div class="modal-dialog">
+        <div class="modal-content" style="background: linear-gradient(to bottom, #f4a460, #eee8aa);">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5">Notifiche</h1>
+          </div>
+          <div class="modal-body">
+            <p>Qui puoi visualizzare tutte le notifiche ricevute.</p>
+            <ul>
+             <li v-for="notification in notifications" :key="notification.id" class="notification-item">
+              <span>Inviato da: <strong>{{ notification.username }}</strong></span><br />
+              <span>{{ notification.message }}</span>
+             <div class="notification-footer">
+              <button @click="deleteNotification(notification._id)" class="delete-btn">🗑️</button>
             </div>
+            <hr class="notification-separator" />
+            </li>
+           </ul>
 
 
-
-            <!-- FINE CAROSELLO PREVIEW     --> <!-- FINE CAROSELLO PREVIEW     --> <!-- FINE CAROSELLO PREVIEW     --> <!-- FINE CAROSELLO PREVIEW     -->
-
-
-            </div>
-            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
-              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-              <span class="visually-hidden">Previous</span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
-              <span class="carousel-control-next-icon" aria-hidden="true"></span>
-              <span class="visually-hidden">Next</span>
-            </button>
 
 
 
           </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @click="closeNotificationModal" style="background:#f4a460;">Chiudi</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
-
-          <div id="carouselNotifications" class="carousel slide mt-4" data-bs-ride="carousel">
-            <div class="carousel-indicators">
-              <button v-for="(notification, index) in notifications" :key="index" type="button" 
-                      :data-bs-target="'#carouselNotifications'" :data-bs-slide-to="index" 
-                      :class="{ active: index === 0 }" :aria-current="index === 0 ? 'true' : 'false'"
-                      :aria-label="'Slide ' + (index + 1)">
-              </button>
-            </div>
-          
-            <div class="carousel-inner">
-              <div v-if="notifications.length === 0" class="carousel-item active">
-                <div class="d-block w-100 text-center p-4">
-                  <h2>Nessuna Notifica</h2>
-                  <p>{{ noNotificationsMessage }}</p>
-                </div>
+    <!-- Modal per inviare notifiche -->
+    <div v-if="isModalOpen" class="modal" @click.self="closeModal">
+      <div class="modal-dialog">
+        <div class="modal-content" style="background: linear-gradient(to bottom, #f4a460, #eee8aa);">
+          <div class="modal-header">
+            <h1 class="modal-title">Nuovo messaggio</h1>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="form-group">
+                <label for="recipient-name">Destinatario:</label>
+                <select id="userSelect" v-model="selectedUsers" multiple class="form-control">
+                  <option v-for="user in users" :key="user._id" :value="user._id">
+                    {{ user.username }}
+                  </option>
+                </select>
               </div>
-          
-              <div v-else v-for="(notification, index) in notifications" :key="index" 
-                   :class="['carousel-item', { active: index === 0 }]">
-                <div class="d-block w-100 text-center p-4">
-                  <h2>Notifica {{ index + 1 }}</h2>
-                  <p>
-                    <strong>Messaggio:</strong> {{ notification.message }}<br>
-                    <strong>Data:</strong> {{ new Date(notification.createdAt).toLocaleDateString() }}
-                  </p>
-                  <button @click="deleteNotification(notification._id)" class="btn btn-danger">Elimina</button>
-                </div>
+              <div class="form-group">
+                <label for="message-text">Messaggio:</label>
+                <textarea class="form-control" id="message-text" v-model="notificationMessage"></textarea>
               </div>
-            </div>
-          
-            <button class="carousel-control-prev" type="button" data-bs-target="#carouselNotifications"
-              data-bs-slide="prev">
-              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-              <span class="visually-hidden">Previous</span>
-            </button>
-          
-            <button class="carousel-control-next" type="button" data-bs-target="#carouselNotifications"
-              data-bs-slide="next">
-              <span class="carousel-control-next-icon" aria-hidden="true"></span>
-              <span class="visually-hidden">Next</span>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" @click="closeModal" style="background:#f4a460;">Chiudi</button>
+            <button class="btn btn-primary" @click="sendNotifications" style="background:#f4a460;">
+              <i class="fas fa-paper-plane"></i>
             </button>
           </div>
         </div>
       </div>
     </div>
+
+
+
+
+    </div>
   </div>
 </template>
+
 
 <script>
 
 
 import axios from 'axios';
 import { marked } from 'marked';
-
+import homePageImage from '@/assets/images/home page design with calendar, activities, study management, and notes preview.jpeg';
+import gestisciImmagine from '@/assets/images/img1.jpeg'; 
 export default {
   name: 'HomePrincipale',
 
   data() {
     return {
+      imagePath: homePageImage,
+     gestisciImagePath: gestisciImmagine,
+     isModalOpen: false,
+     isNotificationModalOpen: false,
+     img2Path: require('@/assets/images/img2.jpeg'), 
       username: localStorage.getItem('username'),
       lastEventTitle: '',
       lastEventDescription: '',
@@ -282,9 +295,9 @@ export default {
       notifications: [],
       noNotificationsMessage: '',
 
-      users: [], // array con tutti gli utenti
-      selectedUsers: [], //ID degli utenti selezionati
-      notificationMessage: '',// Il messaggio personalizzato inserito dall'utente
+      users: [], 
+      selectedUsers: [], 
+      notificationMessage: '',
       lastNoteHeading: '',
       lastNoteAuthor: '',
       noEventsMessage: '',
@@ -318,6 +331,22 @@ export default {
     this.getLastPomodoro();
   },
   methods: {
+
+    openModal() {
+      this.isModalOpen = true;
+    },
+    closeModal() {
+      this.isModalOpen = false;
+    },
+
+    openNotificationModal() {
+      this.isNotificationModalOpen = true;
+    },
+    closeNotificationModal() {
+      this.isNotificationModalOpen = false;
+    },
+
+
 
     async getCurrentDayActivities() {
       console.log("Chiamata a getCurrentDayActivities");
@@ -695,10 +724,12 @@ export default {
 
       try {
         const token = sessionStorage.getItem('token');
+        const us = localStorage.getItem('username') ;
 
         await axios.post('/api/notifications/send', {
           recipients: this.selectedUsers,
-          message: this.notificationMessage
+          message: this.notificationMessage,
+          username: us
         }, {
           headers: {
             Authorization: `Bearer ${token}`
@@ -723,7 +754,7 @@ export default {
         });
 
         this.notifications = this.notifications.filter(notification => notification._id !== notificationId);
-        alert('Notifica eliminata, aggiorna pagina per vedere effetto');
+        alert('Notifica eliminata');
       } catch (error) {
         console.error('errore durante eliminazione notifica:', error);
         alert('errore durante leliminazione della notifica.');
@@ -736,125 +767,368 @@ export default {
 </script>
 
 <style scoped>
-body {
-  background: linear-gradient(to bottom, #0000ff, #ffffff);
-  margin: 0;
-}
-
 .home-principale {
-  text-align: center;
-  background-image: url('https://images.hdqwalls.com/wallpapers/abstract-shapes-4k-q2.jpg');
-  background-size: cover;
-  background-position: center;
-  min-height: 100vh;
-  /* Imposta l'altezza minima per riempire la viewport */
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  color: rgb(0, 0, 0);
-  /* colore testo */
+  flex-direction: column; 
+  justify-content: flex-start; 
+  background: linear-gradient(to bottom, #f4a460, #eee8aa);
+  padding: 20px; 
 }
 
-.carousel-item {
-  background-color: #f0f0f0;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+
+.container {
+  padding-bottom: 0;
 }
 
-.carousel-control-prev-icon,
-.carousel-control-next-icon {
-  background-color: #000;
-  border-radius: 50%;
+.title {
+  font-size: 2.5rem; 
+  margin-bottom: 20px; 
+  position: relative; 
+  z-index: 1; 
 }
 
-.notification-form {
-  max-width: 300px;
-  margin: 0 auto;
-  padding: 20px;
-  background-color: #f9f9f9;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
+.img-left {
+  max-width: 150%; 
+  height: auto; 
+  max-height: 60%; 
+  margin-top: 0px; 
+  margin-left: -250px;
 }
+
+.img-right {
+  max-width: 150%;
+  height: auto;
+  max-height: 60%;
+  margin-right: -250px;
+  margin-top: 200px;
+
+}
+
+
+.img-fluid {
+  max-width: 100%; 
+  height: auto; 
+  max-height: 80%; 
+  margin-top: 10px; 
+  margin-right: 50px; 
+}
+
+.img-description-container {
+  display: flex;
+  justify-content: center; 
+  align-items: center; 
+  text-align: center;
+  padding: 0 20px; 
+  width: 700px;
+}
+
+.img-description-container-2 {
+  display: flex;
+  justify-content: center; 
+  align-items: center; 
+  text-align: center; 
+  padding: 0 20px; 
+  width: 500px;
+  height: 2%;
+  margin-left: 200px;
+  margin-top: -40px;
+}
+
+.img-description-2 {
+  font-family: 'Lora', serif;
+  font-size: 1.2rem; 
+  color: #333; 
+  text-align: center; 
+  padding: 10px; 
+  line-height: 1.5; 
+  margin-right: 0px;
+  margin-top: 100px;
+}
+
+.img-description {
+  font-family: 'Lora', serif;
+  font-size: 1.2rem; 
+  color: #333; 
+  text-align: center;
+  padding: 10px; 
+  line-height: 1.5; 
+  margin-right: 300px;
+  margin-top: 30px; 
+}
+
+.reminder-title {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #4a4a4a;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
 
 .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 20px;
+  text-align: center;
 }
-
-.form-group label {
-  display: block;
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-
-.form-group select,
-.form-group textarea {
-  width: 100%;
-  padding: 8px;
-  font-size: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-textarea {
-  height: 100px;
-  resize: vertical;
-}
-
-button.btn {
-  display: block;
-  width: 100%;
-  padding: 10px;
-  background-color: #007bff;
-  color: white;
-  font-size: 1.1rem;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-button.btn:hover {
-  background-color: #0056b3;
-}
-
-button.btn-danger {
-  background-color: rgb(194, 27, 27);
-}
-
-.note-text {
-  margin-top: 20px;
-  text-align: left;
-  font-size: 16px;
-  line-height: 1.5;
-}
-
 
 .custom-select {
   width: 100%;
-  padding: 10px;
+  padding: 8px;
   border-radius: 8px;
-  border: 2px solid #ced4da;
-  background-color: #f8f9fa;
-  color: #495057;
-  font-size: 16px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid #eee8aa;
+  font-size: 1rem;
+  color: #4a4a4a;
 }
 
-.custom-select:focus {
-  border-color: #80bdff;
+.event-content {
+  padding: 10px;
+}
+
+.event-heading {
+  font-size: 1.4rem;
+  color: #555;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.event-list {
+  list-style: none;
+  padding: 0;
+}
+
+.event-item {
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.event-item strong {
+  color: #333;
+}
+
+.no-events {
+  font-style: italic;
+  color: #999;
+  text-align: center;
+}
+
+.events-section {
+  background: linear-gradient(to bottom, #f4a460, #eee8aa);
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.section-title {
+  color: #333; 
+}
+
+.event-select {
+  background-color: #EEE8AA;
+  color: #333; 
+  border: none;
+  border-radius: 4px;
+  padding: 5px;
+}
+
+.event-select:focus {
   outline: none;
-  box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2); 
 }
 
-.custom-select:hover {
-  border-color: #5a6268;
+.event-select option {
+  color: black; 
 }
 
-.form-group label {
-  font-weight: bold;
-  font-size: 16px;
-  margin-bottom: 5px;
+.section-container {
+  background: linear-gradient(to bottom, #f4a460, #eee8aa);
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
 }
+
+.events-section,
+.event-section {
+  background: inherit; 
+}
+
+
+.row > .col-5:not(:last-child) {
+  margin-right: 150px; 
+}
+
+
+
+.fixed-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 10px 20px;
+  background-color: #007bff; 
+  color: white; 
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  z-index: 1000; 
+}
+
+.fixed-button:hover {
+  background-color: #0056b3; 
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5); 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1001; 
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+.fixed-button {
+  position: fixed;
+  bottom: 20px; 
+  right: 20px;  
+}
+
+.fixed-button:nth-of-type(1) {
+  margin-bottom: 50px; 
+}
+
+.notification-item {
+  padding: 10px; 
+}
+
+.notification-separator {
+  border: none; 
+  height: 5px; 
+  background-color: blue;
+  margin: 10px 0; 
+}
+
+.notification-item:last-child .notification-separator {
+  display: none; 
+}
+
+
+.notification-item {
+  position: relative;
+  padding: 10px;
+  margin: 10px;
+  border: 1px solid #ccc; 
+}
+
+.notification-footer {
+  position: absolute; 
+  bottom: 30px; 
+  right: 10px; 
+}
+
+.delete-btn {
+  background: none;
+  border: none; 
+  cursor: pointer;
+}
+
+
+@media (max-width: 768px) {
+  .home-preview {
+    margin-top: 30px; 
+  }
+
+  .row {
+    flex-direction: column; 
+    align-items: stretch; 
+  }
+
+  .section-container {
+    width: 100%; 
+    margin-bottom: 20px; 
+    padding: 20px; 
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    background-color: #fff; 
+    border-radius: 5px;
+  }
+
+  h2.section-title {
+    margin-bottom: 10px; 
+  }
+
+  .form-group {
+    margin-bottom: 20px; 
+  }
+
+
+  .img-left,
+  .img-right {
+    max-width: 100%; 
+    height: auto; 
+    margin: 0 auto;
+    display: block; 
+  }
+
+  .img-right {
+    margin-top: 50px;
+  }
+  .img-description-container,
+  .img-description-container-2 {
+    width: 90%; 
+    margin: 0 auto; 
+    text-align: center;
+  }
+
+  .fixed-button {
+    width: 90%; 
+    margin: 10px auto;
+    display: block;
+  }
+
+  .title,
+  .reminder-title,
+  .img-description,
+  .img-description-2 {
+    text-align: center; 
+    margin: 10px 0; 
+  }
+
+  .title {
+    font-size: 2rem; 
+  }
+
+  .reminder-title {
+    font-size: 1.5rem; 
+  }
+
+  .img-description,
+  .img-description-2 {
+    font-size: 1rem; 
+  }
+  .img-description-2 {
+    margin-top: 10%;
+  }
+
+  .img-fluid {
+    max-width: 100%;
+    max-height: 100%;
+    height: auto; 
+    margin: 0 auto; 
+    display: block; 
+  }
+}
+
+
+
+
+
 </style>

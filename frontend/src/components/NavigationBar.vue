@@ -1,9 +1,7 @@
 <template>
   <nav class="navbar bg-body-tertiary">
     <div class="container-fluid">
-      <!-- Contenitore flessibile per sidebar e link Home -->
       <div class="d-flex align-items-center">
-        <!-- Button per aprire la sidebar -->
         <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
           aria-controls="offcanvasNavbar">
           <span class="navbar-toggler-icon"></span>
@@ -11,8 +9,7 @@
         
       </div>
 
-        <!-- Time Machine Controls, mostra solo nelle pagine specificate -->
-        <div v-if="showTimeMachine" class="time-machine-control d-flex ms-3">
+        <div v-if="showTimeMachine" class="time-machine-control d-none d-md-flex ms-3">
           <div>
             <label for="date">Data:</label>
             <input type="date" v-model="timeMachineDate">
@@ -26,20 +23,16 @@
           </div>
         </div>
 
-       <!-- Pulsanti Home e Gestione Profilo allineati a destra -->
       <div class="d-flex ms-auto align-items-center">
-        <!-- Pulsante Home -->
         <a class="navbar-brand me-4" href="/homePrincipale">
             <i class="fas fa-home"></i>
         </a>
 
-        <!-- Pulsante Gestione Profilo -->
         <a class="me-4" href="/accountUtente">
             <i class="fas fa-user" style="color: black;"></i>
             <span class="username-initials">{{ username }}</span>
         </a>
 
-        <!-- Notifiche -->
         <a class="me-4" href="#" @click="toggleNotifications">
           <i class="fas fa-bell" style="color: black;"></i> 
           <span v-if="notifications.length" class="badge">{{ notifications.length }}</span> 
@@ -54,7 +47,7 @@
               Nessuna notifica
             </li>
           </ul>
-          <button @click="sendEmail" class="btn btn-primary">Invia Email</button> <!-- Pulsante per inviare l'email -->
+          <button @click="sendEmail" class="btn btn-primary">Invia Email</button> 
         </div>        
 
       </div>
@@ -70,35 +63,31 @@
             <span class="nav-item username-text">
               Benvenuto, {{ username }}!
             </span>
-            <!-- link Note -->
             <li class="nav-item"><a class="nav-link" href="/todo">Note</a></li>
 
-            <!-- dropdown Eventi -->
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="eventDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Eventi
               </a>
               <ul class="dropdown-menu" aria-labelledby="eventDropdown">
                 <li><a class="dropdown-item" href="/addEvent">Aggiungi evento</a></li>
-                <li><a class="dropdown-item" href="/eventsE">Lista eventi</a></li>
+             <!--   <li><a class="dropdown-item" href="/eventsE">Lista eventi</a></li>-->
               </ul>
             </li>
   
-            <!-- dropdown Attività -->
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="activityDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Attività
               </a>
               <ul class="dropdown-menu" aria-labelledby="activityDropdown">
                 <li><a class="dropdown-item" href="/addActivities">Aggiungi attività</a></li>
-                <li><a class="dropdown-item" href="/activities">Lista attività</a></li>
+              <!--  <li><a class="dropdown-item" href="/activities">Lista attività</a></li> -->
               </ul>
             </li>
   
-            <!-- altri link -->
             <li class="nav-item"><a class="nav-link" href="/calendarEvent">Calendario</a></li>
             <li class="nav-item"><a class="nav-link" href="/pomodoroTempo">Pomodoro</a></li>
-            <li class="nav-item"><a class="nav-link" href="/pomSession">Sessioni Pomodoro</a></li>
+          <!--  <li class="nav-item"><a class="nav-link" href="/pomSession">Sessioni Pomodoro</a></li>-->
             <!-- <li class="nav-item"><a class="nav-link" href="/accountUtente">Gestisci il tuo Account</a></li> --> 
           </ul>
           <!-- Logout Button -->
@@ -122,8 +111,8 @@ import axios from 'axios';
         simulatedTime: '--:--:--', 
         intervalId: null, 
         currentSimulatedTime: null,
-        showNotifications: false, // Controlla se il menu delle notifiche è visibile
-        notifications: [] //contiene notifiche
+        showNotifications: false,
+        notifications: [] 
       };
     }, 
     computed:{
@@ -141,16 +130,15 @@ import axios from 'axios';
           '/pomSession': 'Sessioni Pomodoro',
           '/accountUtente': 'Gestisci il tuo Account',
         };
-        return routeNameMap[this.$route.path] || ''; // Mostra il nome della pagina corrente
+        return routeNameMap[this.$route.path] || ''; 
       },
       showTimeMachine() {
-        // Controlla se la pagina corrente è una di quelle in cui vogliamo mostrare la Time Machine
         const routesWithTimeMachine = [
-          '/todo',              // Lista Note
-          '/calendarEvent',      // Calendario
-          '/eventsE',            // Lista Eventi
-          '/activities',         // Lista Attività
-          '/pomSession'          // Sessioni Pomodoro
+          '/todo',              
+          '/calendarEvent',      
+          '/eventsE',         
+          '/activities',         
+          '/pomSession'          
         ];
         return routesWithTimeMachine.includes(this.$route.path);
       }
@@ -225,7 +213,7 @@ import axios from 'axios';
             {headers: { Authorization: `Bearer ${token}` }  // Headers separati
             }
           );
-          alert(response.data.message); // Mostra il messaggio di successo o errore
+          alert(response.data.message); 
         } catch (error) {
           console.error('Errore nell invio dell email:', error);
           alert('Errore durante invio email');
@@ -257,36 +245,30 @@ import axios from 'axios';
 
 .navbar {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
-  /* ombreggiatura navbar */
 }
 
 .nav-link {
   padding: 10px 15px;
   transition: background-color 0.3s;
-  /* transizione passaggio del mouse */
 }
 
 .nav-link:hover {
   background-color: rgba(255, 255, 255, 0.1);
-  /* cambia colore al passaggio del mouse */
   border-radius: 5px;
-  /* angoli arrotondati */
 }
 
 .btn-danger {
   margin-left: 10px;
-  /* margine pulsante Logout */
 }
 
-/* effetto di hover per il pulsante */
+
 .btn-danger:hover {
   background-color: #c82333;
-  /* colore scuro al passaggio del mouse */
   transition: background-color 0.3s;
 }
 
 .username-text{
-  color: #1100ff; /* Cambia con il colore che preferisci */
+  color: #1100ff; 
   font-weight: bold;
 }
 
@@ -321,7 +303,7 @@ import axios from 'axios';
 
 .notifications-dropdown {
   position: absolute;
-  top: 50px; /* Aggiusta in base alla tua navbar */
+  top: 50px; 
   right: 10px;
   width: 200px;
   background-color: white;
@@ -329,7 +311,7 @@ import axios from 'axios';
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   padding: 10px;
-  z-index: 1000; /* Assicurati che sia sopra altri elementi */
+  z-index: 1000; 
 }
 
 .notifications-dropdown ul {
@@ -349,7 +331,7 @@ import axios from 'axios';
 
 .notifications-dropdown button {
   margin-top: 10px;
-  width: 100%; /* Rende il pulsante a larghezza piena */
+  width: 100%; 
 }
 
 </style>

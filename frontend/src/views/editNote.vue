@@ -10,10 +10,6 @@
         <label for="content">Contenuto:</label>
         <textarea v-model="note.content" id="content" rows="4" required></textarea>
       </div>
-      <div class="form-group checkbox-group">
-        <label for="completed">Completata:</label>
-        <input type="checkbox" v-model="note.completed" id="completed" />
-      </div>
       <div class="button-group">
         <button type="submit" class="update-btn">Aggiorna Nota</button>
         <button type="button" @click="confirmDelete(note._id)" class="delete-btn">Elimina Nota</button>

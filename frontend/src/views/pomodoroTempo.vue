@@ -33,12 +33,17 @@
     </div>
 
     <div class="controls">
-      <button @click="skipPhase">Salta alla fase successiva</button>
-      <button @click="restartCycle">Ricomincia ciclo</button>
-      <button @click="endCycle">Termina ciclo</button>
-      <button @click="pauseTimer">Stoppa timer</button>
-      <button v-if="isPaused" @click="resumeTimer">Riprendi timer</button> <!-- Pulsante per riprendere -->
-    </div>
+  <div class="button-row">
+    <button @click="skipPhase">Salta alla fase successiva</button>
+    <button @click="restartCycle">Ricomincia ciclo</button>
+  </div>
+  <div class="button-row">
+    <button @click="endCycle">Termina ciclo</button>
+    <button @click="pauseTimer">Stoppa timer</button>
+    <button v-if="isPaused" @click="resumeTimer">Riprendi timer</button> 
+  </div>
+</div>
+
   </div>
 </template>
 
@@ -53,17 +58,17 @@ export default {
 
     const newPom = ref({
       username: localStorage.getItem('username') || 'Guest',
-      tempoStudio: 30,  // Default di 30 minuti
-      tempoPausa: 5,    // Default di 5 minuti
-      ripetizioni: 5,   // Default di 5 cicli
+      tempoStudio: 30,  
+      tempoPausa: 5,    
+      ripetizioni: 5,  
       giorno: ''
     });
     const statusMessage = ref('');
-    let studyCycles = ref(0); // Numero di cicli rimanenti
-    let timerInterval = null; // Per gestire il timeout
-    let isStudyPhase = ref(true); // Per sapere se siamo nella fase di studio o di pausa
-    let remainingTime = ref(0); // Per tenere traccia del tempo rimanente nel ciclo corrente
-    let isPaused = ref(false); // Stato di pausa del timer
+    let studyCycles = ref(0); 
+    let timerInterval = null;
+    let isStudyPhase = ref(true); 
+    let remainingTime = ref(0); 
+    let isPaused = ref(false); 
 
     onMounted(() => {
       if (route.query.date) {
@@ -75,7 +80,6 @@ export default {
       try {
         const token = sessionStorage.getItem('token');
 
-        // Controlla se la data selezionata è nel futuro
         const currentDate = new Date();
         const selectedDate = new Date(newPom.value.giorno);
 
@@ -251,16 +255,21 @@ button:hover {
 }
 
 button.rounded-btn {
-  border-radius: 20px; /* Arrotonda il pulsante */
+  border-radius: 20px; 
 }
+
 
 .controls {
   margin-top: 20px;
+  margin-bottom: 40px;
+  display: flex; 
+  flex-wrap: wrap; 
+  justify-content: center; 
 }
 
 .controls button {
   padding: 10px;
-  margin-right: 10px;
+  margin: 10px; 
   background-color: #007bff;
   color: white;
   border: none;
@@ -268,16 +277,35 @@ button.rounded-btn {
   border-radius: 5px;
 }
 
-.controls button:hover {
-  background-color: #0056b3;
+.button-row {
+  display: flex; 
+  justify-content: space-between; 
+  margin-bottom: 10px; 
 }
 
-.controls {
-  margin-top: 20px;
-  margin-bottom: 40px;
+.controls button {
+  flex: 1; 
+  margin-right: 10px; 
+}
+
+.controls button:last-child {
+  margin-right: 0;
 }
 
 #clock {
   margin-top: 40px;
 }
+
+@media (max-width: 600px) {
+  h1 {
+    margin-top: 30px; 
+  }
+
+  .controls button {
+    margin-right: 10px; 
+  }
+}
+
+
+
 </style>

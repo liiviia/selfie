@@ -1,10 +1,11 @@
 const mongoose = require('mongoose');
 
 const notificationSchema = new mongoose.Schema({
-  recipient: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Riferimento all'utente che riceve la notifica
+  recipient: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, 
   message: { type: String, required: true },
-  isRead: { type: Boolean, default: false },    //letto: si no
-  createdAt: { type: Date, default: Date.now }, //data creazione
+  username: {type: String, required: true},
+  isRead: { type: Boolean, default: false },    
+  createdAt: { type: Date, default: Date.now }, 
 });
 
 const Notification = mongoose.model('Notification', notificationSchema);

@@ -1,6 +1,8 @@
 <template>
   <div class="registration">
+    <h1 class="registration__header">SELFIE</h1> 
     <div class="registration__container">
+      <img src="@/assets/images/logo.png" alt="Logo" class="registration__logo" />
       <h1 class="registration__title">Registrati</h1>
       <form @submit.prevent="registerUser">
         <div class="registration__field">
@@ -26,8 +28,6 @@
     </div>
   </div>
 </template>
-
-
 
 <script>
 import axios from 'axios';
@@ -66,23 +66,37 @@ export default {
 };
 </script>
 
-
 <style scoped>
 .registration {
-  background: linear-gradient(90deg, #C7C5F4, #776BCC);
+  background: linear-gradient(to bottom, #f4a460, #eee8aa);
   display: flex;
+  flex-direction: column; 
   align-items: center;
   justify-content: center;
   min-height: 100vh;
 }
 
+.registration__header {
+  text-align: center; 
+  color: #fff;
+  font-size: 48px;
+  margin-bottom: 20px; 
+}
+
 .registration__container {
-  background: linear-gradient(90deg, #5D54A4, #7C78B8);
+  background: linear-gradient(to bottom, #f4a460, #eee8aa); 
   border-radius: 20px;
   box-shadow: 0px 0px 24px #5C5696;
   width: 360px;
   padding: 30px;
   position: relative;
+}
+
+.registration__logo {
+  display: block;
+  margin: 0 auto 20px; 
+  max-width: 100%; 
+  height: auto;
 }
 
 .registration__title {
@@ -152,11 +166,10 @@ export default {
 .registration__link {
   display: block;
   text-align: center;
-  color: #fff;
+  color: #f4a460;
   text-decoration: none;
   font-weight: 700;
   margin-top: 20px;
   cursor: pointer;
 }
-
 </style>
