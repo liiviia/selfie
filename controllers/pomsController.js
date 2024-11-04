@@ -3,13 +3,17 @@ const Pom = require('../models/pom');
 // Crea una nuova sessione Pomodoro
 exports.createPom = async (req, res) => {
   try {
-    const { username, tempoStudio, tempoPausa, ripetizioni, giorno } = req.body;
+    const { username, tempoStudio, tempoPausa, ripetizioni, giorno, cicliRimanenti, remainingTime, isStudyPhase, studyCycles } = req.body;
     const newPom = new Pom({
       username,
       tempoStudio,
       tempoPausa,
       ripetizioni,
-      giorno
+      giorno, 
+      cicliRimanenti, 
+      remainingTime, 
+      isStudyPhase, 
+      studyCycles
     });
 
     const savedPom = await newPom.save();
@@ -82,6 +86,48 @@ exports.getPomodorosByDate = async (req, res) => {
     res.status(500).json({ error: 'Errore nel recupero delle sessioni Pomodoro' });
   }
 };
+
+// Salva Pomodoro incompleta
+exports.saveUncompletedPom = async (req, res) => {
+  try {
+    const { username, giorno, remainingTime, isStudyPhase, studyCycles } = req.body;
+
+    let pomodoro = await Pom.findOneAndUpdate(
+      { username, giorno },
+      { remainingTime, isStudyPhase, studyCycles },
+      { new: true, upsert: true }
+    );
+   
+    res.status(200).json({ message: 'Sessione incompleta salvata', pomodoro });
+  } catch (error) {
+    console.error('Errore nel salvataggio della sessione incompleta:', error);
+    res.status(500).json({ error: 'Errore nel salvataggio della sessione incompleta' });
+  }
+};
+
+// Recupera Pomodoro incompleta
+exports.getUncompletedPomodoros = async (req, res) => {
+  
+  try {
+    const username = req.query.username.trim();
+    console.log("Username ricevuto:", username);
+    if (!username) {
+      return res.status(400).json({ message: 'Username è necessario' });
+    }
+
+    const pomodoro = await Pom.findOne({ username, remainingTime: { $gt: 0 } }).sort({ updatedAt: -1 });
+    
+    if (pomodoro) {
+      res.status(200).json(pomodoro);
+    } else {
+      res.status(404).json({ message: 'Nessuna sessione incompleta trovata' });
+    }
+  } catch (error) {
+    console.error('Errore nel recupero delle sessioni incompleta:', error);
+    res.status(500).json({ error: 'Errore nel recupero delle sessioni incompleta' });
+  }
+};
+
 
 exports.deletePom = async (req, res) => {
 

@@ -6,6 +6,10 @@ const pomSchema = new mongoose.Schema({
     tempoPausa: {type: Number, required: true},
     ripetizioni: {type: Number, required: true},
     giorno: {type: Date, required: true},
-});
+    remainingTime: { type: Number, default: 0 },   
+    isStudyPhase: { type: Boolean, default: true }, 
+    studyCycles: { type: Number, default: 0 }      
+}, { timestamps: true });
+
 
 module.exports = mongoose.model("Pom", pomSchema);

@@ -31,7 +31,19 @@
         <p>Data: {{ formatDate(pomodoro.giorno) }}</p>
         <p>Tempo di studio: {{ pomodoro.tempoStudio }} minuti</p>
         <p>Tempo di pausa: {{ pomodoro.tempoPausa }} minuti</p>
-        <p>Ripetizioni: {{ pomodoro.ripetizioni }}</p>
+       <!-- <p>Ripetizioni: {{ pomodoro.ripetizioni }}</p>
+        <p v-if="pomodoro.remainingTime">Tempo rimanente: {{ Math.floor(pomodoro.remainingTime / 60) }}:{{ pomodoro.remainingTime % 60 }}</p>
+        <p v-if="pomodoro.studyCycles !== undefined">Cicli rimanenti: {{ pomodoro.studyCycles }}</p>-->
+      </div>
+    </div>
+
+     <div v-if="incompleteSessions.length > 0">
+      <h3>Sessioni Pomodoro Incomplete:</h3>
+      <div v-for="session in incompleteSessions" :key="session._id">
+        <p>Data: {{ formatDate(session.giorno) }}</p>
+        <p>Tempo rimanente: {{ Math.floor(session.remainingTime / 60) }}:{{ session.remainingTime % 60 }}</p>
+        <p>Cicli rimanenti: {{ session.studyCycles }}</p>
+         <button @click="resumePomodoro(session)">Riprendi Sessione</button>
       </div>
     </div>
 
@@ -53,6 +65,7 @@ export default {
     const events = ref([]);
     const activities = ref([]);
     const pomodoros = ref([]); 
+    const incompleteSessions = ref([]);
     const queryDate = computed(() => route.query.date);
 
     const navigateToAddEvent = () => {
@@ -106,6 +119,43 @@ export default {
       }
     };
 
+    const fetchIncompleteSessions = async () => {
+      console.log("fetchIncompleteSessions chiamata");
+      const token = sessionStorage.getItem('token');
+      const username = localStorage.getItem('username');
+
+  console.log('Token:', token);
+  console.log('Username:', username);
+
+      try {
+        const response = await axios.get('/api/poms/incomplete', {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { username }
+        });
+
+        console.log('Dati ricevuti dal backend:', response.data);
+        incompleteSessions.value = Array.isArray(response.data) ? response.data : [response.data];
+      } catch (error) {
+        console.error('Errore nel recupero delle sessioni incomplete:', error);
+      }
+    };
+
+    const resumePomodoro = (session) => {
+
+      router.push({
+        path: '/pomodoroTempo',
+        query: {
+          date:  session.giorno,
+          remainingTime: session.remainingTime,
+          studyCycles: session.studyCycles,
+          isStudyPhase: session.isStudyPhase,
+          tempoStudio: session.tempoStudio,
+          tempoPausa: session.tempoPausa,
+          ripetizioni: session.ripetizioni,
+        },
+      });
+    };
+
     const formatDate = (dateString) => {
       if (!dateString) return 'Data non disponibile';
       const date = new Date(dateString);
@@ -118,17 +168,22 @@ export default {
         : 'Data non valida';
     };
 
-    onMounted(fetchEvents);
+    onMounted(() => {
+      fetchEvents();
+      fetchIncompleteSessions();
+    });
 
     return {
       events,
       activities,
       pomodoros, 
+      incompleteSessions, 
       formatDate,
       queryDate,
       navigateToAddEvent,
       navigateToAddActivity,
-      navigateToAddPomodoro
+      navigateToAddPomodoro, 
+      resumePomodoro, 
     };
   }
 };
@@ -152,4 +207,5 @@ button {
 button:hover {
   background-color: #45a049;
 }
+
 </style>

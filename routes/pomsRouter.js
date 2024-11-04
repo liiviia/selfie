@@ -11,6 +11,10 @@ router.get('/poms/last', authenticateToken, pomController.getLastPom);
 
 router.get('/poms/by-date', authenticateToken, pomController.getPomodorosByDate);
 
+router.post('/poms/save-incomplete', authenticateToken, pomController.saveUncompletedPom);
+
+router.get('/poms/incomplete', authenticateToken, pomController.getUncompletedPomodoros);
+
 router.delete('/pomRemove/:id', authenticateToken, pomController.deletePom) ;
 
 module.exports = router;

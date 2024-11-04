@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted,  onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
 
@@ -58,31 +58,54 @@ export default {
       ripetizioni: 5,   // Default di 5 cicli
       giorno: ''
     });
-    const statusMessage = ref('');
-    let studyCycles = ref(0); // Numero di cicli rimanenti
-    let timerInterval = null; // Per gestire il timeout
-    let isStudyPhase = ref(true); // Per sapere se siamo nella fase di studio o di pausa
-    let remainingTime = ref(0); // Per tenere traccia del tempo rimanente nel ciclo corrente
-    let isPaused = ref(false); // Stato di pausa del timer
+   const statusMessage = ref('');
+    let studyCycles = ref(parseInt(route.query.studyCycles) || newPom.value.ripetizioni);
+    let timerInterval = null;
+    let isStudyPhase = ref(route.query.isStudyPhase === 'true');
+    let remainingTime = ref(parseInt(route.query.remainingTime) || 0);
+    let isPaused = ref(false);
 
     onMounted(() => {
-      if (route.query.date) {
-        newPom.value.giorno = route.query.date;
-      }
+      newPom.value.giorno = route.query.date || new Date().toISOString();
+      remainingTime.value = parseInt(route.query.remainingTime) || 0;
+      studyCycles.value = parseInt(route.query.studyCycles) || newPom.value.ripetizioni;
+      isStudyPhase.value = route.query.isStudyPhase === 'true';
+      newPom.value.tempoStudio = parseInt(route.query.tempoStudio) || newPom.value.tempoStudio;
+      newPom.value.tempoPausa = parseInt(route.query.tempoPausa) || newPom.value.tempoPausa;
+      newPom.value.ripetizioni = parseInt(route.query.ripetizioni) || newPom.value.ripetizioni;
+
+  console.log("Parametri inizializzati:", {
+    giorno: newPom.value.giorno,
+    remainingTime: remainingTime.value,
+    studyCycles: studyCycles.value,
+    isStudyPhase: isStudyPhase.value,
+    tempoStudio: newPom.value.tempoStudio,
+    tempoPausa: newPom.value.tempoPausa,
+    ripetizioni: newPom.value.ripetizioni,
+  });
+
+  if (remainingTime.value > 0) {
+    document.getElementById('timerDisplay').textContent = formatTime(remainingTime.value);
+    if (isStudyPhase.value) {
+      startTimerWithRemainingTime();
+    } else {
+      startBreakTimer(newPom.value.tempoPausa, studyCycles.value);
+    }
+  }
+    });
+
+    onUnmounted(() => {
+      clearInterval(timerInterval); 
     });
 
     const aggiungiPomodoro = async () => {
       try {
         const token = sessionStorage.getItem('token');
-
-        // Controlla se la data selezionata è nel futuro
         const currentDate = new Date();
         const selectedDate = new Date(newPom.value.giorno);
 
         const response = await axios.post('/api/pomsPOST', newPom.value, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
+          headers: { Authorization: `Bearer ${token}` }
         });
 
         console.log('Sessione pomodoro aggiunta:', response.data);
@@ -98,53 +121,63 @@ export default {
       }
     };
 
-    const startStudyTimer = (studyTime, cycles, pause) => {
-      if (cycles <= 0) {
-        alert('Ciclo completato!');
-        return;
-      }
-
-      statusMessage.value = `Studio! Numero cicli rimanenti: ${cycles}`;
-      remainingTime.value = studyTime * 60;
-      isStudyPhase.value = true;
+      
+   const startTimerWithRemainingTime = () => {
       isPaused.value = false;
-
-      clearInterval(timerInterval);
+      clearInterval(timerInterval); // Rim timer precedenti
       timerInterval = setInterval(() => {
-        updateTimer(remainingTime.value, studyTime, pause, cycles, startBreakTimer);
-        remainingTime.value--;
-      }, 1000);
-    };
+      updateTimer(remainingTime.value, newPom.value.tempoStudio, newPom.value.tempoPausa, studyCycles.value, isStudyPhase.value ? startBreakTimer : startStudyTimer);
+    }, 1000); 
+  };
 
-    const startBreakTimer = (pauseTime, cycles) => {
-      if (cycles <= 0) {
-        alert('Ciclo completato!');
-        return;
-      }
+const startStudyTimer = (studyTime, cycles, pause) => {
+  if (cycles <= 0) {
+    alert('Ciclo completato!');
+    return;
+  }
+  statusMessage.value = `Studio! Numero cicli rimanenti: ${cycles}`;
+  remainingTime.value = studyTime * 60;
+  isStudyPhase.value = true;
+  isPaused.value = false;
 
-      statusMessage.value = `Pausa! Numero cicli rimanenti: ${cycles}`;
-      remainingTime.value = pauseTime * 60;
-      isStudyPhase.value = false;
-      isPaused.value = false;
+  clearInterval(timerInterval); // Rim timer precedenti
+  timerInterval = setInterval(() => {
+    updateTimer(remainingTime.value, studyTime, pause, cycles, startBreakTimer);
+  }, 1000); 
+};
 
-      clearInterval(timerInterval);
-      timerInterval = setInterval(() => {
-        updateTimer(remainingTime.value, pauseTime, pauseTime, cycles, startStudyTimer);
-        remainingTime.value--;
-      }, 1000);
-    };
+const startBreakTimer = (pauseTime, cycles) => {
+  if (cycles <= 0) {
+    alert('Ciclo completato!');
+    return;
+  }
+  statusMessage.value = `Pausa! Numero cicli rimanenti: ${cycles}`;
+  remainingTime.value = pauseTime * 60;
+  isStudyPhase.value = false;
+  isPaused.value = false;
 
-    const updateTimer = (remaining, phaseTime, pauseTime, cycles, nextPhase) => {
-      if (remaining > 0) {
-        const minutes = Math.floor(remaining / 60);
-        const seconds = remaining % 60;
-        document.getElementById('timerDisplay').textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-      } else {
-        clearInterval(timerInterval);
-        studyCycles.value--;
-        nextPhase(phaseTime, studyCycles.value);
-      }
-    };
+  clearInterval(timerInterval); // Anche qui
+  timerInterval = setInterval(() => {
+    updateTimer(remainingTime.value, pauseTime, pauseTime, cycles, startStudyTimer);
+  }, 1000); 
+};
+
+  const formatTime = (timeInSeconds) => {
+  const minutes = Math.floor(timeInSeconds / 60);
+  const seconds = timeInSeconds % 60;
+  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+};
+
+const updateTimer = (remaining, phaseTime, pauseTime, cycles, nextPhase) => {
+  if (remaining > 0) {
+    document.getElementById('timerDisplay').textContent = formatTime(remaining);
+    remainingTime.value = remaining - 1;
+  } else {
+    clearInterval(timerInterval);
+    studyCycles.value--;
+    nextPhase(phaseTime, studyCycles.value);
+  }
+};
 
     const skipPhase = () => {
       clearInterval(timerInterval);
@@ -173,20 +206,41 @@ export default {
       studyCycles.value = 0;
       statusMessage.value = 'Ciclo terminato manualmente.';
       document.getElementById('timerDisplay').textContent = "00:00";
+      saveIncompleteSession();
     };
 
     const pauseTimer = () => {
       clearInterval(timerInterval);
       isPaused.value = true;
+      saveIncompleteSession();
     };
 
     const resumeTimer = () => {
       isPaused.value = false;
       clearInterval(timerInterval);
       timerInterval = setInterval(() => {
-        updateTimer(remainingTime.value, newPom.value.tempoStudio, newPom.value.tempoPausa, studyCycles.value, isStudyPhase.value ? startBreakTimer : startStudyTimer);
-        remainingTime.value--;
-      }, 1000); 
+      updateTimer(remainingTime.value, newPom.value.tempoStudio, newPom.value.tempoPausa, studyCycles.value, isStudyPhase.value ? startBreakTimer : startStudyTimer);
+    }, 1000); 
+  };
+
+    const saveIncompleteSession = async () => {
+      const token = sessionStorage.getItem('token');
+      const username = newPom.value.username.trim();
+
+      try {
+        await axios.post('/api/poms/save-incomplete', {
+          username,
+          giorno: newPom.value.giorno,
+          remainingTime: remainingTime.value,
+          isStudyPhase: isStudyPhase.value,
+          studyCycles: studyCycles.value,
+        }, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        console.log('Incomplete session saved.');
+      } catch (error) {
+        console.error('Error saving incomplete session:', error);
+      }
     };
 
     return {
@@ -203,6 +257,7 @@ export default {
   }
 };
 </script>
+
 
 <style scoped>
 #clock {
@@ -281,3 +336,9 @@ button.rounded-btn {
   margin-top: 40px;
 }
 </style>
+
+
+
+
+
+
