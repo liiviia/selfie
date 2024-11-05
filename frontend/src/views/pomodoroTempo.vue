@@ -66,14 +66,23 @@ export default {
     let isPaused = ref(false);
 
     onMounted(() => {
-      newPom.value.giorno = route.query.date ? new Date(route.query.date).toISOString() : new Date().toISOString();
-      remainingTime.value = parseInt(route.query.remainingTime) || 0;
-      studyCycles.value = parseInt(route.query.studyCycles) || newPom.value.ripetizioni;
-      isStudyPhase.value = route.query.isStudyPhase === 'true';
-      newPom.value.tempoStudio = parseInt(route.query.tempoStudio) || newPom.value.tempoStudio;
-      newPom.value.tempoPausa = parseInt(route.query.tempoPausa) || newPom.value.tempoPausa;
-      newPom.value.ripetizioni = parseInt(route.query.ripetizioni) || newPom.value.ripetizioni;
+       if (route.query.date) {
+    // Se viene passata una data tramite `route.query.date`, significa che stai riprendendo una sessione
+    newPom.value.giorno = new Date(route.query.date).toISOString().split('T')[0];
+  } else {
+    // Se non viene passata nessuna data, imposta `giorno` a oggi per una nuova sessione
+    newPom.value.giorno = new Date().toISOString().split('T')[0];
+  }
 
+  // Imposta gli altri parametri necessari per la sessione in corso o ripresa
+  remainingTime.value = parseInt(route.query.remainingTime) || 0;
+  studyCycles.value = parseInt(route.query.studyCycles) || newPom.value.ripetizioni;
+  isStudyPhase.value = route.query.isStudyPhase === 'true';
+  newPom.value.tempoStudio = parseInt(route.query.tempoStudio) || newPom.value.tempoStudio;
+  newPom.value.tempoPausa = parseInt(route.query.tempoPausa) || newPom.value.tempoPausa;
+  newPom.value.ripetizioni = parseInt(route.query.ripetizioni) || newPom.value.ripetizioni;
+
+  // Log di controllo
   console.log("Parametri inizializzati:", {
     giorno: newPom.value.giorno,
     remainingTime: remainingTime.value,

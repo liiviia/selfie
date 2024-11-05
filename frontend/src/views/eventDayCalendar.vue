@@ -38,7 +38,7 @@
     </div>
 
      <div v-if="incompleteSessions.length > 0">
-      <h3>Sessioni Pomodoro Incomplete:</h3>
+      <h4>Sessioni Pomodoro Incomplete:</h4>
       <div v-for="session in incompleteSessions" :key="session._id">
         <p>Data: {{ formatDate(session.giorno) }}</p>
         <p>Tempo rimanente: {{ Math.floor(session.remainingTime / 60) }}:{{ session.remainingTime % 60 }}</p>
@@ -141,7 +141,7 @@ export default {
       router.push({
         path: '/pomodoroTempo',
         query: {
-          date:  session.giorno,
+          date:  new Date(session.giorno).toISOString(),
           remainingTime: session.remainingTime,
           studyCycles: session.studyCycles,
           isStudyPhase: session.isStudyPhase,

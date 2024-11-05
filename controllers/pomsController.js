@@ -77,7 +77,7 @@ exports.getPomodorosByDate = async (req, res) => {
 
     const formattedPomodoros = pomodoros.map(pomodoro => ({
       ...pomodoro.toObject(),
-      giorno: pomodoro.giorno.toISOString()
+      giorno: pomodoro.giorno ? pomodoro.giorno.toISOString() : null
     }));
 
     res.json(formattedPomodoros);
@@ -119,7 +119,6 @@ exports.getUncompletedPomodoros = async (req, res) => {
   
   try {
     const username = req.query.username.trim();
-    console.log("Username ricevuto:", username);
     if (!username) {
       return res.status(400).json({ message: 'Username è necessario' });
     }
