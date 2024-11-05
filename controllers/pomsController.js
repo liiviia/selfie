@@ -92,9 +92,18 @@ exports.saveUncompletedPom = async (req, res) => {
   try {
     const { username, giorno, remainingTime, isStudyPhase, studyCycles } = req.body;
 
+    if (!giorno) {
+      return res.status(400).json({ error: "Il campo 'giorno' è obbligatorio e non può essere nullo." });
+    }
+
+    const startDate = new Date(giorno);
+    startDate.setHours(0, 0, 0, 0);
+    const endDate = new Date(giorno);
+    endDate.setHours(23, 59, 59, 999);
+
     let pomodoro = await Pom.findOneAndUpdate(
-      { username, giorno },
-      { remainingTime, isStudyPhase, studyCycles },
+      { username, giorno: { $gte: startDate, $lte: endDate } },
+      { remainingTime, isStudyPhase, studyCycles, giorno: new Date(giorno) },
       { new: true, upsert: true }
     );
    

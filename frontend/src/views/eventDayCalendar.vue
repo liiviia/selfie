@@ -31,8 +31,8 @@
         <p>Data: {{ formatDate(pomodoro.giorno) }}</p>
         <p>Tempo di studio: {{ pomodoro.tempoStudio }} minuti</p>
         <p>Tempo di pausa: {{ pomodoro.tempoPausa }} minuti</p>
-       <!-- <p>Ripetizioni: {{ pomodoro.ripetizioni }}</p>
-        <p v-if="pomodoro.remainingTime">Tempo rimanente: {{ Math.floor(pomodoro.remainingTime / 60) }}:{{ pomodoro.remainingTime % 60 }}</p>
+        <p>Cicli: {{ pomodoro.ripetizioni }}</p>
+        <!--<p v-if="pomodoro.remainingTime">Tempo rimanente: {{ Math.floor(pomodoro.remainingTime / 60) }}:{{ pomodoro.remainingTime % 60 }}</p>
         <p v-if="pomodoro.studyCycles !== undefined">Cicli rimanenti: {{ pomodoro.studyCycles }}</p>-->
       </div>
     </div>
@@ -124,16 +124,12 @@ export default {
       const token = sessionStorage.getItem('token');
       const username = localStorage.getItem('username');
 
-  console.log('Token:', token);
-  console.log('Username:', username);
-
       try {
         const response = await axios.get('/api/poms/incomplete', {
           headers: { Authorization: `Bearer ${token}` },
           params: { username }
         });
-
-        console.log('Dati ricevuti dal backend:', response.data);
+        
         incompleteSessions.value = Array.isArray(response.data) ? response.data : [response.data];
       } catch (error) {
         console.error('Errore nel recupero delle sessioni incomplete:', error);

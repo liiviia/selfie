@@ -66,7 +66,7 @@ export default {
     let isPaused = ref(false);
 
     onMounted(() => {
-      newPom.value.giorno = route.query.date || new Date().toISOString();
+      newPom.value.giorno = route.query.date ? new Date(route.query.date).toISOString() : new Date().toISOString();
       remainingTime.value = parseInt(route.query.remainingTime) || 0;
       studyCycles.value = parseInt(route.query.studyCycles) || newPom.value.ripetizioni;
       isStudyPhase.value = route.query.isStudyPhase === 'true';
@@ -230,7 +230,7 @@ const updateTimer = (remaining, phaseTime, pauseTime, cycles, nextPhase) => {
       try {
         await axios.post('/api/poms/save-incomplete', {
           username,
-          giorno: newPom.value.giorno,
+          giorno: new Date(newPom.value.giorno).toISOString(), 
           remainingTime: remainingTime.value,
           isStudyPhase: isStudyPhase.value,
           studyCycles: studyCycles.value,
