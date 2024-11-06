@@ -50,6 +50,7 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
+import { EventBus } from '@/EventBus';
 
 export default {
   setup() {
@@ -237,6 +238,21 @@ export default {
     onMounted(async () => {
       await fetchEvents();
       updateCalendarDays();
+
+      EventBus.on('timeMachineSet', (simulatedTime) => {
+        currentDate.value = simulatedTime;
+        updateCalendarDays();
+      });
+
+      EventBus.on('timeMachineUpdate', (simulatedTime) => {
+        currentDate.value = simulatedTime;
+        updateCalendarDays();
+      });
+
+      EventBus.on('timeMachineReset', () => {
+        currentDate.value = new Date();
+        updateCalendarDays();
+      });
     });
 
     watch(currentDate, async () => {
@@ -253,6 +269,11 @@ export default {
       nextMonth,
       selectDate,
     };
+  }, 
+  beforeUnmount() {
+    EventBus.off('timeMachineSet');
+    EventBus.off('timeMachineUpdate');
+    EventBus.off('timeMachineReset');
   }
 };
 </script>
@@ -355,7 +376,7 @@ export default {
 }
 
 .event-dot, .activity-dot, .pomodoro-dot {
-  height: 8px;  /* Pallini piccoli */
+  height: 8px;  
   width: 8px;
   border-radius: 50%; 
   display: inline-block;

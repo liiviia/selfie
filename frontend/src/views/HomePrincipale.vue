@@ -25,11 +25,7 @@
           </div>
         </div>
 
-
-
-
         <!--   INIZIO CAROSELLO PREVIEW-->         <!--   INIZIO CAROSELLO PREVIEW-->         <!--   INIZIO CAROSELLO PREVIEW-->         <!--   INIZIO CAROSELLO PREVIEW-->
-
         <div class="col-md-6">
           <div id="carouselExampleIndicators" class="carousel slide mt-4" data-bs-ride="carousel">
             <div class="carousel-indicators">
@@ -39,10 +35,7 @@
               <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="3" aria-label="Slide 4"></button>
             </div>
 
-
-
             <div class="carousel-inner">
-
 
               <div class="carousel-item active">
   <div class="d-block w-100 text-center p-4">
@@ -91,10 +84,6 @@
   </div>
 </div>
 
-
-
-
-
 <div class="carousel-item">
   <div class="d-block w-100 text-center p-4">
 
@@ -141,11 +130,6 @@
     </div>
   </div>
 </div>
-
-
-
-
-
   
   <div class="carousel-item">
   <div class="d-block w-100 text-center p-4">
@@ -169,14 +153,6 @@
     </div>
   </div>
 </div>
-
-
-
-
-
-
-
-
             <div class="carousel-item">
               <div class="d-block w-100 text-center p-4">
                 <h2>Ultimo Pomodoro</h2>
@@ -188,12 +164,8 @@
                 </p>
               </div>
             </div>
-
-
-
             <!-- FINE CAROSELLO PREVIEW     --> <!-- FINE CAROSELLO PREVIEW     --> <!-- FINE CAROSELLO PREVIEW     --> <!-- FINE CAROSELLO PREVIEW     -->
-
-
+            
             </div>
             <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
               <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -203,11 +175,7 @@
               <span class="carousel-control-next-icon" aria-hidden="true"></span>
               <span class="visually-hidden">Next</span>
             </button>
-
-
-
           </div>
-
 
           <div id="carouselNotifications" class="carousel slide mt-4" data-bs-ride="carousel">
             <div class="carousel-indicators">
@@ -393,7 +361,6 @@ export default {
       }
     },
 
-
     async getAllActivity() {
       const token = sessionStorage.getItem('token');
       const username = localStorage.getItem('username');
@@ -417,21 +384,14 @@ export default {
       } catch (error) {
         console.error("error", error);
         this.noActivitiesMessage = 'errore nel recupero delle attivita';
-
       }
-
-
     },
-
-
 
     formatDate(date) {
       if (!date) return 'N/A';
       const d = new Date(date);
       return isNaN(d.getTime()) ? 'Data non valida' : d.toLocaleDateString();
     },
-
-
 
     toggleEvent() {
       if (this.isCurrentDay === null) {

@@ -27,18 +27,20 @@
 
     <p id="studio-pausa">{{ statusMessage }}</p>
 
-    <div id="clock" class="blob">
-      <div class="timer" id="timerDisplay">00:00</div>
-      <div class="progress-bar"></div>
-    </div>
+    <div class="timer" id="timerDisplay">00:00</div>
 
     <div class="controls">
       <button @click="skipPhase">Salta alla fase successiva</button>
       <button @click="restartCycle">Ricomincia ciclo</button>
       <button @click="endCycle">Termina ciclo</button>
       <button @click="pauseTimer">Stoppa timer</button>
-      <button v-if="isPaused" @click="resumeTimer">Riprendi timer</button> <!-- Pulsante per riprendere -->
+      <button v-if="isPaused" @click="resumeTimer">Riprendi timer</button> 
     </div>
+
+    <div class="progress-bar-container">
+      <div class="progress-bar" :style="{ width: progressWidth + '%' }"></div>
+    </div>
+
   </div>
 </template>
 
@@ -64,48 +66,52 @@ export default {
     let isStudyPhase = ref(route.query.isStudyPhase === 'true');
     let remainingTime = ref(parseInt(route.query.remainingTime) || 0);
     let isPaused = ref(false);
+    const progressWidth = ref(0);
 
     onMounted(() => {
        if (route.query.date) {
-    // Se viene passata una data tramite `route.query.date`, significa che stai riprendendo una sessione
-    newPom.value.giorno = new Date(route.query.date).toISOString().split('T')[0];
-  } else {
-    // Se non viene passata nessuna data, imposta `giorno` a oggi per una nuova sessione
-    newPom.value.giorno = new Date().toISOString().split('T')[0];
-  }
+        newPom.value.giorno = new Date(route.query.date).toISOString().split('T')[0];
+      } else {
+        newPom.value.giorno = new Date().toISOString().split('T')[0];
+      }
 
-  // Imposta gli altri parametri necessari per la sessione in corso o ripresa
-  remainingTime.value = parseInt(route.query.remainingTime) || 0;
-  studyCycles.value = parseInt(route.query.studyCycles) || newPom.value.ripetizioni;
-  isStudyPhase.value = route.query.isStudyPhase === 'true';
-  newPom.value.tempoStudio = parseInt(route.query.tempoStudio) || newPom.value.tempoStudio;
-  newPom.value.tempoPausa = parseInt(route.query.tempoPausa) || newPom.value.tempoPausa;
-  newPom.value.ripetizioni = parseInt(route.query.ripetizioni) || newPom.value.ripetizioni;
+      remainingTime.value = parseInt(route.query.remainingTime) || 0;
+      studyCycles.value = parseInt(route.query.studyCycles) || newPom.value.ripetizioni;
+      isStudyPhase.value = route.query.isStudyPhase === 'true';
+      newPom.value.tempoStudio = parseInt(route.query.tempoStudio) || newPom.value.tempoStudio;
+      newPom.value.tempoPausa = parseInt(route.query.tempoPausa) || newPom.value.tempoPausa;
+      newPom.value.ripetizioni = parseInt(route.query.ripetizioni) || newPom.value.ripetizioni;
 
-  // Log di controllo
-  console.log("Parametri inizializzati:", {
-    giorno: newPom.value.giorno,
-    remainingTime: remainingTime.value,
-    studyCycles: studyCycles.value,
-    isStudyPhase: isStudyPhase.value,
-    tempoStudio: newPom.value.tempoStudio,
-    tempoPausa: newPom.value.tempoPausa,
-    ripetizioni: newPom.value.ripetizioni,
-  });
+      console.log("Parametri inizializzati:", {
+        giorno: newPom.value.giorno,
+        remainingTime: remainingTime.value,
+        studyCycles: studyCycles.value,
+        isStudyPhase: isStudyPhase.value,
+        tempoStudio: newPom.value.tempoStudio,
+        tempoPausa: newPom.value.tempoPausa,
+        ripetizioni: newPom.value.ripetizioni,
+      });
 
-  if (remainingTime.value > 0) {
-    document.getElementById('timerDisplay').textContent = formatTime(remainingTime.value);
-    if (isStudyPhase.value) {
-      startTimerWithRemainingTime();
-    } else {
-      startBreakTimer(newPom.value.tempoPausa, studyCycles.value);
+      if (remainingTime.value > 0) {
+        document.getElementById('timerDisplay').textContent = formatTime(remainingTime.value);
+      if (isStudyPhase.value) {
+        startTimerWithRemainingTime();
+      } else {
+        startBreakTimer(newPom.value.tempoPausa, studyCycles.value);
+      }
     }
-  }
-    });
+});
 
     onUnmounted(() => {
       clearInterval(timerInterval); 
     });
+
+
+    const updateProgressBar = (totalTime) => {
+      const percentage = ((totalTime - remainingTime.value) / totalTime) * 100;
+      progressWidth.value = Math.min(percentage, 100);
+    };
+
 
     const aggiungiPomodoro = async () => {
       try {
@@ -133,63 +139,73 @@ export default {
       
    const startTimerWithRemainingTime = () => {
       isPaused.value = false;
-      clearInterval(timerInterval); // Rim timer precedenti
+      clearInterval(timerInterval);
+      const totalTime = isStudyPhase.value ? newPom.value.tempoStudio * 60 : newPom.value.tempoPausa * 60;
       timerInterval = setInterval(() => {
-      updateTimer(remainingTime.value, newPom.value.tempoStudio, newPom.value.tempoPausa, studyCycles.value, isStudyPhase.value ? startBreakTimer : startStudyTimer);
-    }, 1000); 
-  };
+        updateTimer(totalTime);
+      }, 1000);
+    };
 
-const startStudyTimer = (studyTime, cycles, pause) => {
-  if (cycles <= 0) {
-    alert('Ciclo completato!');
-    return;
-  }
-  statusMessage.value = `Studio! Numero cicli rimanenti: ${cycles}`;
-  remainingTime.value = studyTime * 60;
-  isStudyPhase.value = true;
-  isPaused.value = false;
+    const startStudyTimer = (studyTime, cycles) => {
+      if (cycles <= 0) {
+        alert('Ciclo completato!');
+        return;
+      }
+      statusMessage.value = `Studio! Numero cicli rimanenti: ${cycles}`;
+      remainingTime.value = studyTime * 60;
+      isStudyPhase.value = true;
+      isPaused.value = false;
+      progressWidth.value = 0;
 
-  clearInterval(timerInterval); // Rim timer precedenti
-  timerInterval = setInterval(() => {
-    updateTimer(remainingTime.value, studyTime, pause, cycles, startBreakTimer);
-  }, 1000); 
-};
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        updateTimer(studyTime * 60);
+      }, 1000);
+    };
 
-const startBreakTimer = (pauseTime, cycles) => {
-  if (cycles <= 0) {
-    alert('Ciclo completato!');
-    return;
-  }
-  statusMessage.value = `Pausa! Numero cicli rimanenti: ${cycles}`;
-  remainingTime.value = pauseTime * 60;
-  isStudyPhase.value = false;
-  isPaused.value = false;
+     const startBreakTimer = (pauseTime, cycles) => {
+      if (cycles <= 0) {
+        alert('Ciclo completato!');
+        return;
+      }
+      statusMessage.value = `Pausa! Numero cicli rimanenti: ${cycles}`;
+      remainingTime.value = pauseTime * 60;
+      isStudyPhase.value = false;
+      isPaused.value = false;
+      progressWidth.value = 0;
 
-  clearInterval(timerInterval); // Anche qui
-  timerInterval = setInterval(() => {
-    updateTimer(remainingTime.value, pauseTime, pauseTime, cycles, startStudyTimer);
-  }, 1000); 
-};
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        updateTimer(pauseTime * 60);
+      }, 1000);
+    };
+    
+    const updateTimer = (totalTime) => {
+      if (remainingTime.value > 0) {
+        remainingTime.value -= 1;
+        document.getElementById('timerDisplay').textContent = formatTime(remainingTime.value);
+        updateProgressBar(totalTime);
+      } else {
+        clearInterval(timerInterval);
+        studyCycles.value--;
+        if (isStudyPhase.value) {
+          startBreakTimer(newPom.value.tempoPausa, studyCycles.value);
+        } else {
+          startStudyTimer(newPom.value.tempoStudio, studyCycles.value, newPom.value.tempoPausa);
+        }
+      }
+    };
 
-  const formatTime = (timeInSeconds) => {
-  const minutes = Math.floor(timeInSeconds / 60);
-  const seconds = timeInSeconds % 60;
-  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-};
+    const formatTime = (timeInSeconds) => {
+      const minutes = Math.floor(timeInSeconds / 60);
+      const seconds = timeInSeconds % 60;
+      return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    };
 
-const updateTimer = (remaining, phaseTime, pauseTime, cycles, nextPhase) => {
-  if (remaining > 0) {
-    document.getElementById('timerDisplay').textContent = formatTime(remaining);
-    remainingTime.value = remaining - 1;
-  } else {
-    clearInterval(timerInterval);
-    studyCycles.value--;
-    nextPhase(phaseTime, studyCycles.value);
-  }
-};
 
     const skipPhase = () => {
       clearInterval(timerInterval);
+      progressWidth.value = 0;
 
       if (isStudyPhase.value) {
         studyCycles.value--;
@@ -207,12 +223,14 @@ const updateTimer = (remaining, phaseTime, pauseTime, cycles, nextPhase) => {
     const restartCycle = () => {
       clearInterval(timerInterval);
       studyCycles.value = newPom.value.ripetizioni;
+      progressWidth.value = 0;
       startStudyTimer(newPom.value.tempoStudio, studyCycles.value, newPom.value.tempoPausa);
     };
 
     const endCycle = () => {
       clearInterval(timerInterval);
       studyCycles.value = 0;
+      progressWidth.value = 0;
       statusMessage.value = 'Ciclo terminato manualmente.';
       document.getElementById('timerDisplay').textContent = "00:00";
       saveIncompleteSession();
@@ -226,10 +244,12 @@ const updateTimer = (remaining, phaseTime, pauseTime, cycles, nextPhase) => {
 
     const resumeTimer = () => {
       isPaused.value = false;
+      const totalTime = isStudyPhase.value ? newPom.value.tempoStudio * 60 : newPom.value.tempoPausa * 60;
+
       clearInterval(timerInterval);
       timerInterval = setInterval(() => {
-      updateTimer(remainingTime.value, newPom.value.tempoStudio, newPom.value.tempoPausa, studyCycles.value, isStudyPhase.value ? startBreakTimer : startStudyTimer);
-    }, 1000); 
+      updateTimer(totalTime);
+      }, 1000); 
   };
 
     const saveIncompleteSession = async () => {
@@ -261,7 +281,8 @@ const updateTimer = (remaining, phaseTime, pauseTime, cycles, nextPhase) => {
       endCycle,
       pauseTimer,
       resumeTimer,
-      isPaused
+      isPaused, 
+      progressWidth
     };
   }
 };
@@ -273,10 +294,18 @@ const updateTimer = (remaining, phaseTime, pauseTime, cycles, nextPhase) => {
   margin-top: 20px;
 }
 
-.progress-bar {
-  width: 0;
+.progress-bar-container {
+  width: 100%;
   height: 20px;
+  background-color: #e0e0e0; 
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.progress-bar {
+  height: 100%;
   background-color: green;
+  width: 0%;
   transition: width 1s linear;
 }
 
@@ -315,7 +344,7 @@ button:hover {
 }
 
 button.rounded-btn {
-  border-radius: 20px; /* Arrotonda il pulsante */
+  border-radius: 20px; 
 }
 
 .controls {

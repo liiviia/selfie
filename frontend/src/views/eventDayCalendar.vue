@@ -43,7 +43,10 @@
         <p>Data: {{ formatDate(session.giorno) }}</p>
         <p>Tempo rimanente: {{ Math.floor(session.remainingTime / 60) }}:{{ session.remainingTime % 60 }}</p>
         <p>Cicli rimanenti: {{ session.studyCycles }}</p>
-         <button @click="resumePomodoro(session)">Riprendi Sessione</button>
+         <button @click="resumePomodoro(session)" class="action-button">Riprendi Sessione</button>
+         <button @click="discardPomodoro(session)" class="action-button">
+          <span class="trash-icon">🗑️</span>Scarta
+         </button> 
       </div>
     </div>
 
@@ -130,7 +133,9 @@ export default {
           params: { username }
         });
         
-        incompleteSessions.value = Array.isArray(response.data) ? response.data : [response.data];
+      incompleteSessions.value = (Array.isArray(response.data) ? response.data : [response.data])
+        .filter(session => session.studyCycles > 0);
+        
       } catch (error) {
         console.error('Errore nel recupero delle sessioni incomplete:', error);
       }
@@ -151,6 +156,20 @@ export default {
         },
       });
     };
+
+    const discardPomodoro = async (session) => {
+      const token = sessionStorage.getItem('token');
+      try {
+        await axios.delete(`/api/pomRemove/${session._id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+        incompleteSessions.value = incompleteSessions.value.filter(s => s._id !== session._id);
+        console.log('Sessione Pomodoro scartata.');
+      } catch (error) {
+        console.error('Errore nello scartare la sessione pomodoro:', error.response?.data || error);
+      }
+    };
+
 
     const formatDate = (dateString) => {
       if (!dateString) return 'Data non disponibile';
@@ -180,6 +199,7 @@ export default {
       navigateToAddActivity,
       navigateToAddPomodoro, 
       resumePomodoro, 
+      discardPomodoro,
     };
   }
 };
@@ -198,6 +218,22 @@ button {
   border: none;
   border-radius: 4px;
   cursor: pointer;
+}
+
+button {
+  margin-right: 10px;
+  margin-bottom: 10px; 
+  padding: 8px 16px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.trash-icon {
+  margin-right: 5px; 
+  font-size: 1.2em; 
 }
 
 button:hover {
