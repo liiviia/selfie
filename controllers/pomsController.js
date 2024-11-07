@@ -101,5 +101,3 @@ exports.deletePom = async (req, res) => {
 }
 
     
-
-
