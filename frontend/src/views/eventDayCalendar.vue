@@ -261,28 +261,37 @@ export default {
           params: { username }
         });
         
-      incompleteSessions.value = (Array.isArray(response.data) ? response.data : [response.data])
-        .filter(session => session.studyCycles > 0);
-        
+        incompleteSessions.value = (Array.isArray(response.data) ? response.data : [response.data]).filter(session => {
+        return (
+          session.studyCycles > 0 && 
+          session.remainingTime > 0 &&
+          session.tempoStudio && 
+          session.tempoPausa 
+      );
+    });
+
       } catch (error) {
         console.error('Errore nel recupero delle sessioni incomplete:', error);
       }
     };
 
     const resumePomodoro = (session) => {
+    const plainSession = JSON.parse(JSON.stringify(session));
 
-      router.push({
-        path: '/pomodoroTempo',
-        query: {
-          date:  new Date(session.giorno).toISOString(),
-          remainingTime: session.remainingTime,
-          studyCycles: session.studyCycles,
-          isStudyPhase: session.isStudyPhase,
-          tempoStudio: session.tempoStudio,
-          tempoPausa: session.tempoPausa,
-          ripetizioni: session.ripetizioni,
-        },
-      });
+    console.log("Sessione passata a pomodoroTempo:", plainSession);
+
+    router.push({
+      path: '/pomodoroTempo',
+      query: {
+        date: new Date(plainSession.giorno).toISOString(),
+        remainingTime: plainSession.remainingTime,
+        studyCycles: plainSession.studyCycles,
+        isStudyPhase: plainSession.isStudyPhase,
+        tempoStudio: plainSession.tempoStudio, 
+        tempoPausa: plainSession.tempoPausa,   
+        ripetizioni: plainSession.ripetizioni, 
+    },
+  });
     };
 
     const discardPomodoro = async (session) => {
