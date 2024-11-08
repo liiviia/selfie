@@ -60,12 +60,7 @@ export default {
       ripetizioni: 5,  
       giorno: ''
     });
-    const statusMessage = ref('');
-    let studyCycles = ref(0); 
-    let timerInterval = null;
-    let isStudyPhase = ref(true); 
-    let remainingTime = ref(0); 
-    let isPaused = ref(false); 
+    
    const statusMessage = ref('');
     let studyCycles = ref(parseInt(route.query.studyCycles) || newPom.value.ripetizioni);
     let timerInterval = null;
