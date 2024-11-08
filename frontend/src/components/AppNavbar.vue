@@ -53,6 +53,7 @@
 
 <script>
 import { Collapse } from 'bootstrap';
+import { EventBus } from '@./EventBus';
 
 export default {
   data() {
@@ -82,9 +83,8 @@ export default {
       return routeNameMap[this.$route.path] || ''; // Mostra il nome della pagina corrente
     },
     showTimeMachine() {
-      // Controlla se la pagina corrente è una di quelle in cui vogliamo mostrare la Time Machine
       const routesWithTimeMachine = [
-        '/todo',              // Lista Note
+        'eventDayCalendar', 
         '/calendarEvent',      // Calendario
         '/eventsE',            // Lista Eventi
         '/activities',         // Lista Attività
@@ -114,34 +114,45 @@ export default {
       localStorage.clear();
       this.isAut=false;
       console.log("autenticato:", this.isAut);
-      this.$router.push('/'); // Ritorna alla pagina di login
+      this.$router.push('/'); 
     },
     setTimeMachine() {
       if (this.timeMachineDate && this.timeMachineTime) {
-        // Crea un nuovo oggetto Date usando la data e l'ora impostate
         const newDateTime = new Date(`${this.timeMachineDate}T${this.timeMachineTime}`);
-        this.currentSimulatedTime = newDateTime; // Memorizza il tempo simulato
+        this.currentSimulatedTime = newDateTime; 
         this.simulatedTime = this.currentSimulatedTime.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
         this.startTimeFlow();
+        EventBus.emit('timeMachineSet', this.currentSimulatedTime);
       }
     },
     resetTimeMachine() {
-      clearInterval(this.intervalId); // Ferma lo scorrimento del tempo
+      clearInterval(this.intervalId); 
       this.simulatedTime = '--:--:--'; 
-      this.currentSimulatedTime = null; 
+      this.currentSimulatedTime = null;
+      EventBus.emit('timeMachineReset');
     },
-    startTimeFlow() {
-      // Prima ferma ogni intervallo precedente
+     startTimeFlow() {
       clearInterval(this.intervalId);
-
       this.intervalId = setInterval(() => {
-        
         if (this.currentSimulatedTime) {
-          this.currentSimulatedTime.setSeconds(this.currentSimulatedTime.getSeconds() + 1); // Incrementa di 1 secondo
+          this.currentSimulatedTime.setSeconds(this.currentSimulatedTime.getSeconds() + 1);
           this.simulatedTime = this.currentSimulatedTime.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+          
+          EventBus.emit('timeMachineUpdate', this.currentSimulatedTime);
         }
-      }, 1000); // Aggiorna ogni secondo
+      }, 1000);
     }
+  },
+  created() {
+    EventBus.$on('timeMachineReset', () => {
+      clearInterval(this.intervalId);
+      this.simulatedTime = '--:--:--';
+      this.currentSimulatedTime = null;
+    });
+  },
+  beforeDestroy() {
+    clearInterval(this.intervalId);
+    EventBus.$off('timeMachineReset');
   }
 };
 </script>

@@ -41,25 +41,31 @@
             </button>
         </div>
       </div>
-      
-      <div class="section pomodoros-section">
-        <h3>I TUOI POMODORI:</h3>
-        <div v-if="pomodoros.length > 0">
-          <div v-for="pomodoro in pomodoros" :key="pomodoro._id" class="item-container">
-            <h4>Pomodoro Sessione</h4>
-            <p>Data: {{ formatDate(pomodoro.giorno) }}</p>
-            <p>Tempo di studio: {{ pomodoro.tempoStudio }} minuti</p>
-            <p>Tempo di pausa: {{ pomodoro.tempoPausa }} minuti</p>
-            <p>Ripetizioni: {{ pomodoro.ripetizioni }}</p>
-            <button @click="confirmDeletePomodoro(pomodoro._id)" class="delete-btn">🗑️</button>
-          </div>
-        </div>
-        <p v-else>Nessun pomodoro per questa data.</p>
-        <div class="button-container">
-          <button class="fixed-button" @click="navigateToAddPomodoro" style="background:#f4a460;">
-            Aggiungi pomodoro
-            </button>
-        </div>
+    </div>
+
+    <div v-if="pomodoros.length > 0">
+      <h3>Pomodori:</h3>
+      <div v-for="pomodoro in pomodoros" :key="pomodoro._id">
+        <h4>Pomodoro Sessione</h4>
+        <p>Data: {{ formatDate(pomodoro.giorno) }}</p>
+        <p>Tempo di studio: {{ pomodoro.tempoStudio }} minuti</p>
+        <p>Tempo di pausa: {{ pomodoro.tempoPausa }} minuti</p>
+        <p>Cicli: {{ pomodoro.ripetizioni }}</p>
+        <!--<p v-if="pomodoro.remainingTime">Tempo rimanente: {{ Math.floor(pomodoro.remainingTime / 60) }}:{{ pomodoro.remainingTime % 60 }}</p>
+        <p v-if="pomodoro.studyCycles !== undefined">Cicli rimanenti: {{ pomodoro.studyCycles }}</p>-->
+      </div>
+    </div>
+
+     <div v-if="incompleteSessions.length > 0">
+      <h4>Sessioni Pomodoro Incomplete:</h4>
+      <div v-for="session in incompleteSessions" :key="session._id">
+        <p>Data: {{ formatDate(session.giorno) }}</p>
+        <p>Tempo rimanente: {{ Math.floor(session.remainingTime / 60) }}:{{ session.remainingTime % 60 }}</p>
+        <p>Cicli rimanenti: {{ session.studyCycles }}</p>
+         <button @click="resumePomodoro(session)" class="action-button">Riprendi Sessione</button>
+         <button @click="discardPomodoro(session)" class="action-button">
+          <span class="trash-icon">🗑️</span>Scarta
+         </button> 
       </div>
     </div>
   </div>
@@ -78,6 +84,7 @@ export default {
     const events = ref([]);
     const activities = ref([]);
     const pomodoros = ref([]); 
+    const incompleteSessions = ref([]);
     const queryDate = computed(() => route.query.date);
 
     const confirmDeleteActivity = (id) => {
@@ -180,34 +187,54 @@ export default {
       }
     };
 
-    const fetchPoms = async () => {
-      try {
-        const username = localStorage.getItem('username'); 
-        const token = sessionStorage.getItem('token');
-        const date = route.query.date;
+    const fetchIncompleteSessions = async () => {
+      console.log("fetchIncompleteSessions chiamata");
+      const token = sessionStorage.getItem('token');
+      const username = localStorage.getItem('username');
 
-        const response = await axios.get('/api/poms/by-date', {
+      try {
+        const response = await axios.get('/api/poms/incomplete', {
           headers: { Authorization: `Bearer ${token}` },
-          params: { username, date }
+          params: { username }
         });
-        pomodoros.value = Array.isArray(response.data) ? response.data : [response.data];
-        console.log('Fetched pomodoros:', pomodoros.value);
+        
+      incompleteSessions.value = (Array.isArray(response.data) ? response.data : [response.data])
+        .filter(session => session.studyCycles > 0);
+        
       } catch (error) {
-        console.error('Errore nel recupero delle sessioni Pomodoro:', error);
+        console.error('Errore nel recupero delle sessioni incomplete:', error);
       }
     };
 
-    const navigateToAddEvent = () => {
-      router.push({ path: '/addEvent', query: { date: queryDate.value } });
+    const resumePomodoro = (session) => {
+
+      router.push({
+        path: '/pomodoroTempo',
+        query: {
+          date:  new Date(session.giorno).toISOString(),
+          remainingTime: session.remainingTime,
+          studyCycles: session.studyCycles,
+          isStudyPhase: session.isStudyPhase,
+          tempoStudio: session.tempoStudio,
+          tempoPausa: session.tempoPausa,
+          ripetizioni: session.ripetizioni,
+        },
+      });
     };
 
-    const navigateToAddActivity = () => {
-      router.push({ path: '/addActivities', query: { date: queryDate.value } });
+    const discardPomodoro = async (session) => {
+      const token = sessionStorage.getItem('token');
+      try {
+        await axios.delete(`/api/pomRemove/${session._id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+        incompleteSessions.value = incompleteSessions.value.filter(s => s._id !== session._id);
+        console.log('Sessione Pomodoro scartata.');
+      } catch (error) {
+        console.error('Errore nello scartare la sessione pomodoro:', error.response?.data || error);
+      }
     };
 
-    const navigateToAddPomodoro = () => {
-      router.push({ path: '/pomodoroTempo', query: { date: queryDate.value } });
-    };
 
     const formatDate = (dateString) => {
       if (!dateString) return 'Data non disponibile';
@@ -221,21 +248,23 @@ export default {
         : 'Data non valida';
     };
 
-    onMounted(fetchEvents);
-    onMounted(fetchPoms);
+    onMounted(() => {
+      fetchEvents();
+      fetchIncompleteSessions();
+    });
 
     return {
       events,
       activities,
       pomodoros, 
+      incompleteSessions, 
       formatDate,
       queryDate,
       navigateToAddEvent,
       navigateToAddActivity,
-      navigateToAddPomodoro,
-      confirmDeleteActivity,
-      confirmDeleteEvent,    
-      confirmDeletePomodoro,  
+      navigateToAddPomodoro, 
+      resumePomodoro, 
+      discardPomodoro,
     };
   }
 };
@@ -257,6 +286,22 @@ button {
   border: none;
   border-radius: 4px;
   cursor: pointer;
+}
+
+button {
+  margin-right: 10px;
+  margin-bottom: 10px; 
+  padding: 8px 16px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.trash-icon {
+  margin-right: 5px; 
+  font-size: 1.2em; 
 }
 
 button:hover {

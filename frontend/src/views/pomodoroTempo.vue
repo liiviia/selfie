@@ -27,10 +27,7 @@
 
     <p id="studio-pausa">{{ statusMessage }}</p>
 
-    <div id="clock" class="blob">
-      <div class="timer" id="timerDisplay">00:00</div>
-      <div class="progress-bar"></div>
-    </div>
+    <div class="timer" id="timerDisplay">00:00</div>
 
     <div class="controls">
   <div class="button-row">
@@ -48,7 +45,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted,  onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
 
@@ -69,24 +66,67 @@ export default {
     let isStudyPhase = ref(true); 
     let remainingTime = ref(0); 
     let isPaused = ref(false); 
+   const statusMessage = ref('');
+    let studyCycles = ref(parseInt(route.query.studyCycles) || newPom.value.ripetizioni);
+    let timerInterval = null;
+    let isStudyPhase = ref(route.query.isStudyPhase === 'true');
+    let remainingTime = ref(parseInt(route.query.remainingTime) || 0);
+    let isPaused = ref(false);
+    const progressWidth = ref(0);
 
     onMounted(() => {
-      if (route.query.date) {
-        newPom.value.giorno = route.query.date;
+       if (route.query.date) {
+        newPom.value.giorno = new Date(route.query.date).toISOString().split('T')[0];
+      } else {
+        newPom.value.giorno = new Date().toISOString().split('T')[0];
       }
+
+      remainingTime.value = parseInt(route.query.remainingTime) || 0;
+      studyCycles.value = parseInt(route.query.studyCycles) || newPom.value.ripetizioni;
+      isStudyPhase.value = route.query.isStudyPhase === 'true';
+      newPom.value.tempoStudio = parseInt(route.query.tempoStudio) || newPom.value.tempoStudio;
+      newPom.value.tempoPausa = parseInt(route.query.tempoPausa) || newPom.value.tempoPausa;
+      newPom.value.ripetizioni = parseInt(route.query.ripetizioni) || newPom.value.ripetizioni;
+
+      console.log("Parametri inizializzati:", {
+        giorno: newPom.value.giorno,
+        remainingTime: remainingTime.value,
+        studyCycles: studyCycles.value,
+        isStudyPhase: isStudyPhase.value,
+        tempoStudio: newPom.value.tempoStudio,
+        tempoPausa: newPom.value.tempoPausa,
+        ripetizioni: newPom.value.ripetizioni,
+      });
+
+      if (remainingTime.value > 0) {
+        document.getElementById('timerDisplay').textContent = formatTime(remainingTime.value);
+      if (isStudyPhase.value) {
+        startTimerWithRemainingTime();
+      } else {
+        startBreakTimer(newPom.value.tempoPausa, studyCycles.value);
+      }
+    }
+});
+
+    onUnmounted(() => {
+      clearInterval(timerInterval); 
     });
+
+
+    const updateProgressBar = (totalTime) => {
+      const percentage = ((totalTime - remainingTime.value) / totalTime) * 100;
+      progressWidth.value = Math.min(percentage, 100);
+    };
+
 
     const aggiungiPomodoro = async () => {
       try {
         const token = sessionStorage.getItem('token');
-
         const currentDate = new Date();
         const selectedDate = new Date(newPom.value.giorno);
 
         const response = await axios.post('/api/pomsPOST', newPom.value, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
+          headers: { Authorization: `Bearer ${token}` }
         });
 
         console.log('Sessione pomodoro aggiunta:', response.data);
@@ -102,56 +142,76 @@ export default {
       }
     };
 
-    const startStudyTimer = (studyTime, cycles, pause) => {
+      
+   const startTimerWithRemainingTime = () => {
+      isPaused.value = false;
+      clearInterval(timerInterval);
+      const totalTime = isStudyPhase.value ? newPom.value.tempoStudio * 60 : newPom.value.tempoPausa * 60;
+      timerInterval = setInterval(() => {
+        updateTimer(totalTime);
+      }, 1000);
+    };
+
+    const startStudyTimer = (studyTime, cycles) => {
       if (cycles <= 0) {
         alert('Ciclo completato!');
         return;
       }
-
       statusMessage.value = `Studio! Numero cicli rimanenti: ${cycles}`;
       remainingTime.value = studyTime * 60;
       isStudyPhase.value = true;
       isPaused.value = false;
+      progressWidth.value = 0;
 
       clearInterval(timerInterval);
       timerInterval = setInterval(() => {
-        updateTimer(remainingTime.value, studyTime, pause, cycles, startBreakTimer);
-        remainingTime.value--;
+        updateTimer(studyTime * 60);
       }, 1000);
     };
 
-    const startBreakTimer = (pauseTime, cycles) => {
+     const startBreakTimer = (pauseTime, cycles) => {
       if (cycles <= 0) {
         alert('Ciclo completato!');
         return;
       }
-
       statusMessage.value = `Pausa! Numero cicli rimanenti: ${cycles}`;
       remainingTime.value = pauseTime * 60;
       isStudyPhase.value = false;
       isPaused.value = false;
+      progressWidth.value = 0;
 
       clearInterval(timerInterval);
       timerInterval = setInterval(() => {
-        updateTimer(remainingTime.value, pauseTime, pauseTime, cycles, startStudyTimer);
-        remainingTime.value--;
+        updateTimer(pauseTime * 60);
       }, 1000);
     };
-
-    const updateTimer = (remaining, phaseTime, pauseTime, cycles, nextPhase) => {
-      if (remaining > 0) {
-        const minutes = Math.floor(remaining / 60);
-        const seconds = remaining % 60;
-        document.getElementById('timerDisplay').textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    
+    const updateTimer = (totalTime) => {
+      if (remainingTime.value > 0) {
+        remainingTime.value -= 1;
+        document.getElementById('timerDisplay').textContent = formatTime(remainingTime.value);
+        updateProgressBar(totalTime);
       } else {
         clearInterval(timerInterval);
         studyCycles.value--;
-        nextPhase(phaseTime, studyCycles.value);
+        if (isStudyPhase.value) {
+          startBreakTimer(newPom.value.tempoPausa, studyCycles.value);
+        } else {
+          startStudyTimer(newPom.value.tempoStudio, studyCycles.value, newPom.value.tempoPausa);
+        }
       }
     };
 
+    const formatTime = (timeInSeconds) => {
+      const minutes = Math.floor(timeInSeconds / 60);
+      const seconds = timeInSeconds % 60;
+      return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    };
+
+
     const skipPhase = () => {
       clearInterval(timerInterval);
+      progressWidth.value = 0;
 
       if (isStudyPhase.value) {
         studyCycles.value--;
@@ -169,28 +229,53 @@ export default {
     const restartCycle = () => {
       clearInterval(timerInterval);
       studyCycles.value = newPom.value.ripetizioni;
+      progressWidth.value = 0;
       startStudyTimer(newPom.value.tempoStudio, studyCycles.value, newPom.value.tempoPausa);
     };
 
     const endCycle = () => {
       clearInterval(timerInterval);
       studyCycles.value = 0;
+      progressWidth.value = 0;
       statusMessage.value = 'Ciclo terminato manualmente.';
       document.getElementById('timerDisplay').textContent = "00:00";
+      saveIncompleteSession();
     };
 
     const pauseTimer = () => {
       clearInterval(timerInterval);
       isPaused.value = true;
+      saveIncompleteSession();
     };
 
     const resumeTimer = () => {
       isPaused.value = false;
+      const totalTime = isStudyPhase.value ? newPom.value.tempoStudio * 60 : newPom.value.tempoPausa * 60;
+
       clearInterval(timerInterval);
       timerInterval = setInterval(() => {
-        updateTimer(remainingTime.value, newPom.value.tempoStudio, newPom.value.tempoPausa, studyCycles.value, isStudyPhase.value ? startBreakTimer : startStudyTimer);
-        remainingTime.value--;
+      updateTimer(totalTime);
       }, 1000); 
+  };
+
+    const saveIncompleteSession = async () => {
+      const token = sessionStorage.getItem('token');
+      const username = newPom.value.username.trim();
+
+      try {
+        await axios.post('/api/poms/save-incomplete', {
+          username,
+          giorno: new Date(newPom.value.giorno).toISOString(), 
+          remainingTime: remainingTime.value,
+          isStudyPhase: isStudyPhase.value,
+          studyCycles: studyCycles.value,
+        }, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        console.log('Incomplete session saved.');
+      } catch (error) {
+        console.error('Error saving incomplete session:', error);
+      }
     };
 
     return {
@@ -202,21 +287,31 @@ export default {
       endCycle,
       pauseTimer,
       resumeTimer,
-      isPaused
+      isPaused, 
+      progressWidth
     };
   }
 };
 </script>
+
 
 <style scoped>
 #clock {
   margin-top: 20px;
 }
 
-.progress-bar {
-  width: 0;
+.progress-bar-container {
+  width: 100%;
   height: 20px;
+  background-color: #e0e0e0; 
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.progress-bar {
+  height: 100%;
   background-color: green;
+  width: 0%;
   transition: width 1s linear;
 }
 

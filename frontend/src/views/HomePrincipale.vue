@@ -425,7 +425,6 @@ export default {
       }
     },
 
-
     async getAllActivity() {
       const token = sessionStorage.getItem('token');
       const username = localStorage.getItem('username');
@@ -449,21 +448,14 @@ export default {
       } catch (error) {
         console.error("error", error);
         this.noActivitiesMessage = 'errore nel recupero delle attivita';
-
       }
-
-
     },
-
-
 
     formatDate(date) {
       if (!date) return 'N/A';
       const d = new Date(date);
       return isNaN(d.getTime()) ? 'Data non valida' : d.toLocaleDateString();
     },
-
-
 
     toggleEvent() {
       if (this.isCurrentDay === null) {

@@ -20,11 +20,13 @@
 
 <script>
 import axios from 'axios';
+import { EventBus } from '@/EventBus'; 
 
 export default {
   data() {
     return {
-      events: []
+      events: [],
+      currentDate: new Date() 
     };
   },
   methods: {
@@ -59,10 +61,9 @@ export default {
           },
           params: { author: username }
         });
-        // Filtraggio degli eventi scaduti
-        const currentDate = new Date();
+        
         this.events = response.data.filter(event => 
-          new Date(event.date) >= currentDate
+          new Date(event.date) >= this.currentDate
         );
       } catch (error) {
         console.error('Errore nel recupero degli eventi:', error);
@@ -93,6 +94,27 @@ export default {
   },
   mounted() {
     this.fetchEvents();
+
+      EventBus.on('timeMachineSet', (simulatedTime) => {
+      this.currentDate = simulatedTime;
+      this.fetchEvents(); 
+    });
+
+     EventBus.on('timeMachineUpdate', (simulatedTime) => {
+      this.currentDate = simulatedTime;
+      this.fetchEvents(); 
+    });
+
+    EventBus.on('timeMachineReset', () => {
+      this.currentDate = new Date();
+      this.fetchEvents();
+    });
+  },
+
+  beforeUnmount() {
+    EventBus.off('timeMachineSet');
+    EventBus.off('timeMachineUpdate');
+    EventBus.off('timeMachineReset');
   }
 };
 </script>
