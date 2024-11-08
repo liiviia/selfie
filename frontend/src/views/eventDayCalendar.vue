@@ -1,5 +1,5 @@
 <template>
-  <div>
+   <div>
     <h2 class="main-title">Eventi, Attività e Pomodori per {{ formatDate(queryDate) }}</h2>
     <div class="content-container">
       <div class="section activities-section">
@@ -41,24 +41,37 @@
             </button>
         </div>
       </div>
+      
+      
     </div>
 
-    <div v-if="pomodoros.length > 0">
-      <h3>Pomodori:</h3>
-      <div v-for="pomodoro in pomodoros" :key="pomodoro._id">
-        <h4>Pomodoro Sessione</h4>
-        <p>Data: {{ formatDate(pomodoro.giorno) }}</p>
-        <p>Tempo di studio: {{ pomodoro.tempoStudio }} minuti</p>
-        <p>Tempo di pausa: {{ pomodoro.tempoPausa }} minuti</p>
-        <p>Cicli: {{ pomodoro.ripetizioni }}</p>
-        <!--<p v-if="pomodoro.remainingTime">Tempo rimanente: {{ Math.floor(pomodoro.remainingTime / 60) }}:{{ pomodoro.remainingTime % 60 }}</p>
-        <p v-if="pomodoro.studyCycles !== undefined">Cicli rimanenti: {{ pomodoro.studyCycles }}</p>-->
+
+<div class="content-container">
+  <div class="section pomodoros-section">
+        <h3>I TUOI POMODORI:</h3>
+        <div v-if="pomodoros.length > 0">
+          <div v-for="pomodoro in pomodoros" :key="pomodoro._id" class="item-container">
+            <h4>Pomodoro Sessione</h4>
+            <p>Data: {{ formatDate(pomodoro.giorno) }}</p>
+            <p>Tempo di studio: {{ pomodoro.tempoStudio }} minuti</p>
+            <p>Tempo di pausa: {{ pomodoro.tempoPausa }} minuti</p>
+            <p>Ripetizioni: {{ pomodoro.ripetizioni }}</p>
+            <button @click="confirmDeletePomodoro(pomodoro._id)" class="delete-btn">🗑️</button>
+          </div>
+        </div>
+        <p v-else>Nessun pomodoro per questa data.</p>
+        <div class="button-container">
+          <button class="fixed-button" @click="navigateToAddPomodoro" style="background:#f4a460;">
+            Aggiungi pomodoro
+            </button>
+        </div>
       </div>
-    </div>
 
-     <div v-if="incompleteSessions.length > 0">
-      <h4>Sessioni Pomodoro Incomplete:</h4>
-      <div v-for="session in incompleteSessions" :key="session._id">
+
+      <div class="section pomodorosScaduti-section">
+        <h3>I TUOI POMODORI INCOMPLETI</h3>
+      <div v-if="incompleteSessions.length > 0">
+      <div v-for="session in incompleteSessions" :key="session._id" class="item-container">
         <p>Data: {{ formatDate(session.giorno) }}</p>
         <p>Tempo rimanente: {{ Math.floor(session.remainingTime / 60) }}:{{ session.remainingTime % 60 }}</p>
         <p>Cicli rimanenti: {{ session.studyCycles }}</p>
@@ -68,7 +81,18 @@
          </button> 
       </div>
     </div>
+    <p v-else>nessun pomodoro da portare a termine</p>
   </div>
+
+  </div>
+
+
+
+
+  </div>
+
+
+ 
 </template>
 
 
@@ -91,6 +115,15 @@ export default {
       if (confirm("Sicuro di voler eliminare questa Attività?")) {
         deleteActivities(id); 
       }
+    };
+    const navigateToAddActivity = () => {
+      router.push({ path: '/addActivities', query: { date: queryDate.value } });
+    };
+    const navigateToAddEvent = () => {
+      router.push({ path: '/addEvent', query: { date: queryDate.value } });
+    };
+    const navigateToAddPomodoro = () => {
+      router.push({ path: '/pomodoroTempo', query: { date: queryDate.value } });
     };
 
     const deleteActivities = async (id) => {
@@ -151,6 +184,36 @@ export default {
         console.error('Errore nell\'eliminazione della sessione:', error);
       }
     };
+
+
+    const fetchPoms = async () => {
+
+
+      try {
+        const token = sessionStorage.getItem('token');
+        const username = localStorage.getItem('username');
+        const response = await axios.get('/api/poms', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+          params: { username: username }
+        });
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        // Filtra solo le sessioni future o presenti
+        this.poms = response.data.filter(pom => {
+          const sessionDate = new Date(pom.giorno);
+          sessionDate.setHours(0, 0, 0, 0);
+          return sessionDate >= today;
+        });
+
+        console.log('Sessioni Pomodoro recuperate e filtrate:', this.poms);
+      } catch (error) {
+        console.error('Errore durante il recupero delle sessioni Pomodoro:', error);
+      }
+    }
 
     const fetchEvents = async () => {
       try {
@@ -265,6 +328,9 @@ export default {
       navigateToAddPomodoro, 
       resumePomodoro, 
       discardPomodoro,
+      confirmDeleteActivity,
+      confirmDeleteEvent,
+      confirmDeletePomodoro
     };
   }
 };
@@ -273,7 +339,7 @@ export default {
 </script>
 
 <style scoped>
-.button-container {
+/*.button-container {
   margin-top: auto; 
   margin-bottom: 10px; 
 }
@@ -309,11 +375,141 @@ button:hover {
 }
 
 .content-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); 
+  grid-template-rows: repeat(2, 1fr);
+  gap: 20px; 
+  padding: 20px;
+}
+
+.section {
+  padding: 25px;
+  border: 1px solid #ddd; 
+  border-radius: 10px; 
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); 
+  background-color: rgba(255, 255, 255, 0.8); 
+  display: flex; 
+  flex-direction: column; 
+  justify-content: space-between;
+  min-height: 300px; 
+}
+
+.section:hover {
+  transform: scale(1.02); 
+}
+
+.activities-section {
+  background-color: rgba(249, 249, 249, 0.8); 
+}
+
+.events-section {
+  background-color: rgba(230, 247, 255, 0.8); 
+}
+
+.pomodoros-section,
+.pomodorosScaduti-section {
+  background-color: rgba(255, 230, 230, 0.8);
+}
+
+hr {
+  border: 0; 
+  height: 1px; 
+  background-color: #ddd; 
+  margin: 10px 0; 
+}
+.item-container {
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid #ddd; 
+  border-radius: 8px; 
+  padding: 15px; 
+  margin-bottom: 15px; 
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  position: relative; 
+}
+
+.delete-btn {
+  position: absolute; 
+  bottom: 10px;
+  right: 10px; 
+  background: none;
+  border: none; 
+  cursor: pointer; 
+  font-size: 1.2em;
+  color: #e74c3c; 
+}
+
+.delete-btn:hover {
+  color: #c0392b; 
+}
+
+
+
+
+.activities-section {
+  background-color: #f9f9f9;
+}
+
+.events-section {
+  background-color: #e6f7ff;
+}
+
+.pomodoros-section {
+  background-color: #ffe6e6;
+}
+
+.pomodorosScaduti-section {
+  background-color: #ffd1d1;
+  flex: 1.5; 
+
+}
+
+
+
+
+@media (max-width: 768px) {
+  .content-container {
+    grid-template-columns: 1fr; 
+    grid-template-rows: auto auto auto auto; 
+  }
+
+  .section {
+    min-width: auto; 
+    margin-right: 0; 
+    margin-bottom: 20px; 
+  }
+  .main-title {
+  margin-top: 20px; 
+}
+}
+*/
+
+
+
+
+.button-container {
+  margin-top: auto; 
+  margin-bottom: 10px; 
+}
+
+button {
+  margin-right: 10px;
+  padding: 8px 16px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+.content-container {
   display: flex;
   justify-content: space-between;
   gap: 40px;
   padding: 20px;
-  margin-left: -250px;
 }
 
 .activities-section {
@@ -409,6 +605,7 @@ hr {
   margin-top: 20px; 
 }
 }
+
 
 
 </style>
