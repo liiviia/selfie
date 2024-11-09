@@ -1,4 +1,6 @@
 const Pom = require('../models/pom');
+const User = require('../models/User');
+const notificationPom = require('../models/notificationPom');
 
 // Crea una nuova sessione Pomodoro
 exports.createPom = async (req, res) => {
@@ -23,6 +25,91 @@ exports.createPom = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+exports.sendNotificationPom = async (req, res) => {
+  const { username, tempoStudio, tempoPausa, ripetizioni, destinatario, giorno } = req.body;
+
+  // Verifica se i destinatari e i dati necessari sono presenti
+  if (!destinatario || destinatario.length === 0) {
+    return res.status(400).json({ message: 'I destinatari sono necessari' });
+  }
+
+  try {
+    // Raccogliamo i nomi dei destinatari
+    const users = []; // Array per contenere gli utenti validi
+    for (const recipientId of destinatario) {
+      const user = await User.findById(recipientId);
+      if (user) {
+        users.push(user._id); // Aggiungi l'ID dell'utente all'array solo se trovato
+      }
+    }
+
+    // Se non ci sono destinatari validi, restituisci un errore
+    if (users.length === 0) {
+      return res.status(404).json({ message: 'Nessun destinatario valido trovato' });
+    }
+
+    // Crea la notifica
+    const newNotificationPom = new notificationPom({
+      username,
+      tempoStudio,
+      tempoPausa,
+      ripetizioni,
+      destinatario: users, // Usa gli ID degli utenti validi
+      giorno,
+    });
+
+    // Salva la notifica
+    await newNotificationPom.save();
+
+    res.status(200).json({ message: 'Notifica inviata con successo' });
+
+  } catch (error) {
+    console.error('Errore durante l\'invio della notifica pomodoro:', error);
+    res.status(500).json({ message: 'Errore durante l\'invio della notifica pomodoro' });
+  }
+};
+
+
+exports.getNotifichePom = async (req,res) =>{
+  
+  const userId = req.user.id; 
+  if (!userId) {return res.status(400).json({ message: 'userId mancante' }); }
+
+
+  try {
+    const notificationsPom = await notificationPom.find({ destinatario: userId }).sort({ createdAt: -1 }); 
+    res.status(200).json(notificationsPom);
+} catch (error) {
+    console.error('Errore durante il recupero delle notifiche:', error);
+    res.status(500).json({ message: 'Errore durante il recupero delle notifiche' });
+}
+
+};
+
+
+exports.rifiutaNotifica = async (req, res) => {
+  const notificationId = req.params.id;
+
+  try {
+    const deletedNotification = await notificationPom.findByIdAndDelete(notificationId);
+
+    if (!deletedNotification) {
+      return res.status(404).json({ message: 'Notifica non trovata' });
+    }
+
+    res.status(200).json({ message: 'Notifica eliminata con successo' });
+  } catch (error) {
+    console.error('Errore durante l\'eliminazione della notifica:', error);
+    res.status(500).json({ message: 'Errore durante l\'eliminazione della notifica' });
+  }
+};
+
+
+
+
+
+
 
 // Recupera tutte le sessioni Pomodoro di un utente
 exports.getPoms = async (req, res) => {

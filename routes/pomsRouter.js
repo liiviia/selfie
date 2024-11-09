@@ -17,6 +17,12 @@ router.get('/poms/incomplete', authenticateToken, pomController.getUncompletedPo
 
 router.delete('/pomRemove/:id', authenticateToken, pomController.deletePom) ;
 
+router.post('/sendNoticationPom', authenticateToken , pomController.sendNotificationPom);
+
+router.get('/getNotifichePom', authenticateToken, pomController.getNotifichePom);
+
+router.delete('/rifiutaNotifica/:id', authenticateToken , pomController.rifiutaNotifica);
+
 
 
 module.exports = router;
