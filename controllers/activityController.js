@@ -96,8 +96,8 @@ const getUpcomingActivities = async (username) => {
       { participants: username }
     ],
     deadline: {
-      $gte: today,  // maggiore o uguale a oggi
-      $lte: twoDaysLater  // minore o uguale a due giorni da oggi
+      $gte: today, 
+      $lte: twoDaysLater  
     }
   });
 };
@@ -252,6 +252,52 @@ exports.getActivitiesByDate = async (req, res) => {
   } catch (error) {
     console.error('Errore nel recupero delle attività:', error);
     res.status(500).json({ error: 'Errore nel recupero delle attività' });
+  }
+};
+
+exports.markCompleted = async (req, res) => {
+  const { id } = req.body; 
+  const user = req.user.username; 
+
+  try {
+    const activity = await Activity.findById(id);
+
+    if (!activity) {
+      return res.status(404).json({ error: 'Attività non trovata' });
+    }
+
+    if (activity.author !== user && !activity.participants.includes(user)) {
+      return res.status(403).json({ error: 'Non sei autorizzato a completare questa attività' });
+    }
+
+    activity.completed = true;
+    await activity.save();
+
+    res.json({ message: 'Attività completata con successo', activity });
+  } catch (error) {
+    console.error('Errore nel segnare l\'attività come completata:', error);
+    res.status(500).json({ error: 'Errore del server' });
+  }
+};
+
+exports.updateActivity = async (req, res) => {
+  const { id } = req.params;
+  const { completed } = req.body;
+
+  try {
+    const activity = await Activity.findById(id);
+
+    if (!activity) {
+      return res.status(404).json({ error: 'Attività non trovata' });
+    }
+
+    activity.completed = completed;
+    await activity.save();
+
+    res.status(200).json({ message: 'Attività aggiornata con successo', activity });
+  } catch (error) {
+    console.error('Errore durante l\'aggiornamento dell\'attività:', error);
+    res.status(500).json({ error: 'Errore del server' });
   }
 };
 

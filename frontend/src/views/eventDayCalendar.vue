@@ -5,7 +5,8 @@
       <div class="section activities-section">
         <h3>LE TUE ATTIVITÀ:</h3>
         <div v-if="activities.length > 0">
-          <div v-for="activity in activities" :key="activity._id" class="item-container">
+          <div v-for="activity in activities" :key="activity._id" class="item-container"
+          :class="{ completed: activity.completed }">
             <h4><span style="font-size: 0.9em;">Titolo:</span> {{ activity.title }}</h4>
             <p>Data: {{ formatDate(activity.deadline || activity.date) }}</p>
             <p>Descrizione: {{ activity.description }}</p>
@@ -13,6 +14,7 @@
               Attività di gruppo creata da: {{ activity.author }}<br>
               Gruppo composto da: {{ activity.participants.join(', ') }}
             </p>
+            <button @click="markAsCompleted(activity)" class="complete-btn">Completata</button>
             <button @click="confirmDeleteActivity(activity._id)" class="delete-btn">🗑️</button>
           </div>
         </div>
@@ -77,7 +79,7 @@
         <p>Cicli rimanenti: {{ session.studyCycles }}</p>
          <button @click="resumePomodoro(session)" class="action-button">Riprendi Sessione</button>
          <button @click="discardPomodoro(session)" class="action-button">
-          <span class="trash-icon">🗑️</span>Scarta
+          <span class="trash-icon">🗑️ </span>Scarta
          </button> 
       </div>
     </div>
@@ -85,14 +87,7 @@
   </div>
 
   </div>
-
-
-
-
-  </div>
-
-
- 
+  </div> 
 </template>
 
 
@@ -235,7 +230,9 @@ export default {
           headers: { Authorization: `Bearer ${token}` },
           params: { author, date }
         });
-        activities.value = Array.isArray(activityResponse.data) ? activityResponse.data : [activityResponse.data];
+        // Filtra le attività completate 
+        const allActivities = Array.isArray(activityResponse.data) ? activityResponse.data : [activityResponse.data];
+        activities.value = allActivities;
         console.log('Fetched activities:', activities.value);
 
         const pomodoroResponse = await axios.get('/api/poms/by-date', {
@@ -320,6 +317,48 @@ export default {
         : 'Data non valida';
     };
 
+    const markActivityComplete = async (activity) => {
+      try {
+        const token = sessionStorage.getItem('token');
+        const username = localStorage.getItem('username');
+
+        const response = await axios.post('/api/activities/mark-complete', {
+          id: activity._id,
+          username,
+          }, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+      console.log('Attività completata:', response.data);
+
+      activities.value = activities.value.filter(a => a._id !== activity._id);
+      } catch (error) {
+      console.error('Errore nel segnare l\'attività come completata:', error);
+    }
+  };
+
+  const markAsCompleted = async (activity) => {
+  try {
+    const token = sessionStorage.getItem('token');
+    await axios.put(`/api/activities/${activity._id}`, 
+      { completed: true }, 
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    // Trova l'indice dell'attività e aggiornala localmente
+    const index = activities.value.findIndex(a => a._id === activity._id);
+    if (index !== -1) {
+      activities.value[index].completed = true; 
+    }
+
+    console.log(`Attività "${activity.title}" completata!`, activities.value[index]);
+  } catch (error) {
+    console.error('Errore nel completare l\'attività:', error);
+  }
+};
+
+
+
     onMounted(() => {
       fetchEvents();
       fetchIncompleteSessions();
@@ -339,7 +378,9 @@ export default {
       discardPomodoro,
       confirmDeleteActivity,
       confirmDeleteEvent,
-      confirmDeletePomodoro
+      confirmDeletePomodoro,
+      markActivityComplete ,
+      markAsCompleted
     };
   }
 };
@@ -469,6 +510,38 @@ hr {
 }
 }
 
+.item-container {
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid #ddd; 
+  border-radius: 8px; 
+  padding: 15px; 
+  margin-bottom: 15px; 
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  position: relative; 
+  transition: border-color 0.3s ease; 
+}
 
+.item-container.completed {
+  border-color: green;
+  box-shadow: 0 2px 8px rgba(0, 128, 0, 0.5); 
+}
+
+.complete-btn {
+  background-color: #28a745; 
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.complete-btn:hover {
+  background-color: #218838; 
+}
+
+.complete-btn:before {
+  content: '✔️ '; 
+  margin-right: 8px; 
+}
 
 </style>
