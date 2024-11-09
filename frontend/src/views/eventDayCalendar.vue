@@ -180,6 +180,7 @@ export default {
         });
         console.log('Sessione Pomodoro eliminata');
         fetchPoms(); 
+        window.location.reload();
       } catch (error) {
         console.error('Errore nell\'eliminazione della sessione:', error);
       }
