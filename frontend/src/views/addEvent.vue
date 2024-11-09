@@ -37,13 +37,13 @@
           <option value="daily">Giornaliero</option>
           <option value="weekly">Settimanale</option>
           <option value="monthly">Mensile</option>
-          <option value="custom">Personalizzato</option>
+          <option value="custom">Personalizzato</option> 
         </select>
         <div v-if="newEvent.frequency === 'custom'">
           <label for="recurrencePattern">Pattern di Ripetizione:</label>
           <input type="text" v-model="newEvent.recurrencePattern" placeholder="Esempio: ogni martedì" />
         </div>
-        <div>
+        <div> 
           <label for="numberOfOccurrences">Numero di Ripetizioni:</label>
           <input type="number" v-model="newEvent.numberOfOccurrences" placeholder="Lascia vuoto per ripetere indefinitamente" />
         </div>

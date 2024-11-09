@@ -12,6 +12,9 @@ const eventSchema = new mongoose.Schema({
   date: {
     type: Date,
     required: true,
+  },date: {
+    type: Date,
+    required: true,
   },
   startTime: {
     type: String, // Formato: "HH:mm"
@@ -36,13 +39,13 @@ const eventSchema = new mongoose.Schema({
   },
   recurrencePattern: {
     type: String,
-    default: '', // Esempio: 'ogni martedì'
+    default: '', 
   },
   numberOfOccurrences: {
     type: Number,
     default: null, // null se ripeti indefinitamente
   },
-  notificationMechanism: {
+  notificatcionMechanism: {
     type: [String],
     enum: ['system', 'email', 'whatsapp', 'alert'],
     default: [],

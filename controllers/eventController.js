@@ -23,7 +23,6 @@ exports.createEvent = async (req, res) => {
       repeatNotification,
     } = req.body;
 
-    // Validazione di base
     if (!title || !date || !startTime || !author) {
       return res.status(400).json({ error: 'I campi titolo, data, ora di inizio e autore sono obbligatori.' });
     }
@@ -36,31 +35,98 @@ exports.createEvent = async (req, res) => {
       notificationMechanismArray = notificationMechanism.split(',');
     }
 
-    const newEvent = new Event({
-      title,
-      description,
-      date,
-      startTime,
-      duration,
-      isRecurring,
-      frequency,
-      recurrencePattern,
-      numberOfOccurrences,
-      location,
-      author,
-      notificationMechanism: notificationMechanismArray,
-      notificationTime,
-      repeatNotification,
-    });
+    const createAndSaveEvent = async (eventDate) => {
+      const newEvent = new Event({
+        title,
+        description,
+        date: eventDate,
+        startTime,
+        duration,
+        isRecurring,
+        frequency,
+        recurrencePattern,
+        numberOfOccurrences,
+        location,
+        author,
+        notificationMechanism: notificationMechanismArray,
+        notificationTime,
+        repeatNotification,
+      });
 
-    const savedEvent = await newEvent.save();
-    res.status(201).json(savedEvent);
+      const savedEvent = await newEvent.save();
+      return savedEvent;
+    };
+
+    if (isRecurring) {
+      const events = [];
+
+      let occurrences = numberOfOccurrences;
+      const startDate = new Date(date);
+
+      switch (frequency) {
+        case 'daily':
+          for (let i = 0; i < occurrences; i++) {
+            const newDate = new Date(startDate);
+            newDate.setDate(startDate.getDate() + i); 
+
+            const savedEvent = await createAndSaveEvent(newDate.toISOString());
+            events.push(savedEvent);
+          }
+          break;
+
+        case 'weekly':
+          for (let i = 0; i < occurrences; i++) {
+            const newDate = new Date(startDate);
+            newDate.setDate(startDate.getDate() + i * 7);
+
+            const savedEvent = await createAndSaveEvent(newDate.toISOString());
+            events.push(savedEvent);
+          }
+          break;
+
+        case 'monthly':
+          for (let i = 0; i < occurrences; i++) {
+            const newDate = new Date(startDate);
+            newDate.setMonth(startDate.getMonth() + i); 
+
+            const savedEvent = await createAndSaveEvent(newDate.toISOString());
+            events.push(savedEvent);
+          }
+          break;
+
+        default:
+          return res.status(400).json({ error: 'Frequenza non supportata' });
+      }
+
+      res.status(201).json(events);
+    } else {
+      const newEvent = new Event({
+        title,
+        description,
+        date,
+        startTime,
+        duration,
+        isRecurring,
+        frequency,
+        recurrencePattern,
+        numberOfOccurrences,
+        location,
+        author,
+        notificationMechanism: notificationMechanismArray,
+        notificationTime,
+        repeatNotification,
+      });
+
+      const savedEvent = await newEvent.save();
+      res.status(201).json(savedEvent);
+    }
 
   } catch (error) {
     console.error('Errore durante aggiunta evento:', error);
     res.status(500).json({ error: 'Errore durante aggiunta dell evento' });
   }
 };
+
 
 // Recupera tutti gli eventi di un autore
 exports.getEvents = async (req, res) => {
@@ -106,11 +172,11 @@ exports.getCurrentDayEvents = async (req, res) => {
     } 
 
     const currentDate = new Date();
-    currentDate.setHours(0, 0, 0, 0); // Imposta l'ora a mezzanotte
+    currentDate.setHours(0, 0, 0, 0); 
 
     const endOfDay = new Date(currentDate);
     endOfDay.setDate(currentDate.getDate() + 1);
-    endOfDay.setMilliseconds(endOfDay.getMilliseconds() - 1); // Fine della giornata
+    endOfDay.setMilliseconds(endOfDay.getMilliseconds() - 1); 
 
 
     const events = await Event.find({
