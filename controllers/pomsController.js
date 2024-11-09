@@ -29,37 +29,32 @@ exports.createPom = async (req, res) => {
 exports.sendNotificationPom = async (req, res) => {
   const { username, tempoStudio, tempoPausa, ripetizioni, destinatario, giorno } = req.body;
 
-  // Verifica se i destinatari e i dati necessari sono presenti
   if (!destinatario || destinatario.length === 0) {
     return res.status(400).json({ message: 'I destinatari sono necessari' });
   }
 
   try {
-    // Raccogliamo i nomi dei destinatari
-    const users = []; // Array per contenere gli utenti validi
+    const users = []; 
     for (const recipientId of destinatario) {
       const user = await User.findById(recipientId);
       if (user) {
-        users.push(user._id); // Aggiungi l'ID dell'utente all'array solo se trovato
+        users.push(user._id); 
       }
     }
 
-    // Se non ci sono destinatari validi, restituisci un errore
     if (users.length === 0) {
       return res.status(404).json({ message: 'Nessun destinatario valido trovato' });
     }
 
-    // Crea la notifica
     const newNotificationPom = new notificationPom({
       username,
       tempoStudio,
       tempoPausa,
       ripetizioni,
-      destinatario: users, // Usa gli ID degli utenti validi
+      destinatario: users, 
       giorno,
     });
 
-    // Salva la notifica
     await newNotificationPom.save();
 
     res.status(200).json({ message: 'Notifica inviata con successo' });
