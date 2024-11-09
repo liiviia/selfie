@@ -1,6 +1,24 @@
 <template>
    <div>
     <h2 class="main-title">Eventi, Attività e Pomodori per {{ formatDate(queryDate) }}</h2>
+     <div class="section events-section full-width">
+      <h3>I TUOI EVENTI:</h3>
+      <div v-if="events.length > 0">
+        <div v-for="event in events" :key="event._id" class="item-container">
+          <h4><span style="font-size: 0.9em;">Titolo:</span> {{ event.title }}</h4>
+          <p>Data: {{ formatDate(event.date) }}</p>
+          <p>Descrizione: {{ event.description }}</p>
+          <button @click="confirmDeleteEvent(event._id)" class="delete-btn">🗑️</button>
+        </div>
+      </div>
+      <p v-else>Nessun evento per questa data.</p>
+      <div class="button-container">
+        <button class="fixed-button" @click="navigateToAddEvent" style="background:#f4a460;">
+          Aggiungi evento
+        </button>
+      </div>
+    </div>
+
     <div class="content-container">
       <div class="section activities-section">
         <h3>LE TUE ATTIVITÀ:</h3>
@@ -14,41 +32,36 @@
               Attività di gruppo creata da: {{ activity.author }}<br>
               Gruppo composto da: {{ activity.participants.join(', ') }}
             </p>
-            <button @click="markAsCompleted(activity)" class="complete-btn">Completata</button>
+            <button v-if="!activity.completed" @click="markAsCompleted(activity)" class="complete-btn">Completata</button>
             <button @click="confirmDeleteActivity(activity._id)" class="delete-btn">🗑️</button>
           </div>
         </div>
         <p v-else>Nessuna attività per questa data.</p>
         <div class="button-container">
-           <button class="fixed-button" @click="navigateToAddActivity" style="background:#f4a460;">
+          <button class="fixed-button" @click="navigateToAddActivity" style="background:#f4a460;">
             Aggiungi attivita
-            </button>
+          </button>
         </div>
       </div>
       
-      <div class="section events-section">
-        <h3>I TUOI EVENTI:</h3>
-        <div v-if="events.length > 0">
-          <div v-for="event in events" :key="event._id" class="item-container">
-            <h4><span style="font-size: 0.9em;">Titolo:</span> {{ event.title }}</h4>
-            <p>Data: {{ formatDate(event.date) }}</p>
-            <p>Descrizione: {{ event.description }}</p>
-            <button @click="confirmDeleteEvent(event._id)" class="delete-btn">🗑️</button>
+      
+      <div class="content-container">
+       <div class="section overdue-activities-section">
+        <h3>ATTIVITÀ INCOMPLETE:</h3>
+        <div v-if="filteredOverdueActivities.length > 0">
+          <div v-for="activity in filteredOverdueActivities" :key="activity._id" class="item-container overdue">
+            <h4>Titolo: {{ activity.title }}</h4>
+            <p>Data scadenza: {{ formatDate(activity.deadline) }}</p>
+            <p>Descrizione: {{ activity.description }}</p>
+            <button @click="discardActivity(activity._id)" class="delete-btn">Scarta</button>
           </div>
         </div>
-        <p v-else>Nessun evento per questa data.</p>
-        <div class="button-container">
-          <button class="fixed-button" @click="navigateToAddEvent" style="background:#f4a460;">
-            Aggiungi evento
-            </button>
-        </div>
+        <p v-else>Nessuna attività incompleta trovata.</p>
       </div>
-      
-      
     </div>
+  </div>
 
-
-<div class="content-container">
+    <div class="content-container">
   <div class="section pomodoros-section">
         <h3>I TUOI POMODORI:</h3>
         <div v-if="pomodoros.length > 0">
@@ -88,6 +101,7 @@
 
   </div>
   </div> 
+
 </template>
 
 
@@ -104,6 +118,7 @@ export default {
     const activities = ref([]);
     const pomodoros = ref([]); 
     const incompleteSessions = ref([]);
+    const overdueActivities = ref([]); 
     const queryDate = computed(() => route.query.date);
 
     const confirmDeleteActivity = (id) => {
@@ -181,9 +196,24 @@ export default {
     };
 
 
-    const fetchPoms = async () => {
+    const fetchActivities = async () => {
+  try {
+    const token = sessionStorage.getItem('token');
+    const author = localStorage.getItem('username'); // Recupera l'autore dal localStorage
+    console.log('Fetching activities for:', { date: queryDate.value, author }); // Debug
+    const response = await axios.get('/api/activities/by-date', {
+      headers: { Authorization: `Bearer ${token}` },
+      params: { date: queryDate.value, author }, // Passa entrambi i parametri
+    });
+    activities.value = response.data;
+  } catch (error) {
+    console.error('Errore nel recupero delle attività:', error);
+  }
+};
 
 
+
+     const fetchPoms = async () => {
       try {
         const token = sessionStorage.getItem('token');
         const username = localStorage.getItem('username');
@@ -210,6 +240,7 @@ export default {
       }
     }
 
+
     const fetchEvents = async () => {
       try {
         const author = route.query.author;
@@ -226,7 +257,7 @@ export default {
         events.value = Array.isArray(response.data) ? response.data : [response.data];
         console.log('Fetched events:', events.value);
 
-        const activityResponse = await axios.get('/api/activities/by-date', {
+/*      const activityResponse = await axios.get('/api/activities/by-date', {
           headers: { Authorization: `Bearer ${token}` },
           params: { author, date }
         });
@@ -234,7 +265,7 @@ export default {
         const allActivities = Array.isArray(activityResponse.data) ? activityResponse.data : [activityResponse.data];
         activities.value = allActivities;
         console.log('Fetched activities:', activities.value);
-
+*/
         const pomodoroResponse = await axios.get('/api/poms/by-date', {
           headers: { Authorization: `Bearer ${token}` },
           params: { username, date }
@@ -317,7 +348,27 @@ export default {
         : 'Data non valida';
     };
 
-    const markActivityComplete = async (activity) => {
+
+    const fetchOverdueActivities = async () => {
+      try {
+        const token = sessionStorage.getItem('token');
+        const username = localStorage.getItem('username');
+        const response = await axios.get('/api/activities/overdue', {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { username },
+        });
+        overdueActivities.value = response.data;
+      } catch (error) {
+        console.error('Errore nel recupero delle attività scadute:', error);
+      }
+    };
+
+    const filteredOverdueActivities = computed(() =>
+      overdueActivities.value.filter(activity => activity.title && activity.deadline)
+    );
+
+
+    /*const markActivityComplete = async (activity) => {
       try {
         const token = sessionStorage.getItem('token');
         const username = localStorage.getItem('username');
@@ -335,25 +386,33 @@ export default {
       } catch (error) {
       console.error('Errore nel segnare l\'attività come completata:', error);
     }
-  };
+  };*/
 
-  const markAsCompleted = async (activity) => {
+      const markAsCompleted = async (activity) => {
+      try {
+        const token = sessionStorage.getItem('token');
+        await axios.put(`/api/activities/${activity._id}`, { completed: true }, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        activity.completed = true;
+        // Aggiorna la lista localmente
+        activities.value = activities.value.filter(a => a._id !== activity._id);
+        overdueActivities.value = overdueActivities.value.filter(a => a._id !== activity._id);
+      } catch (error) {
+        console.error('Errore nel completare l\'attività:', error);
+      }
+    };
+
+    const discardActivity = async (id) => {
   try {
     const token = sessionStorage.getItem('token');
-    await axios.put(`/api/activities/${activity._id}`, 
-      { completed: true }, 
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-
-    // Trova l'indice dell'attività e aggiornala localmente
-    const index = activities.value.findIndex(a => a._id === activity._id);
-    if (index !== -1) {
-      activities.value[index].completed = true; 
-    }
-
-    console.log(`Attività "${activity.title}" completata!`, activities.value[index]);
+    console.log('Discarding activity with ID:', id); 
+    await axios.delete(`/api/activitiesRemove/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    overdueActivities.value = overdueActivities.value.filter(a => a._id !== id);
   } catch (error) {
-    console.error('Errore nel completare l\'attività:', error);
+    console.error('Errore nello scartare l\'attività:', error);
   }
 };
 
@@ -361,6 +420,8 @@ export default {
 
     onMounted(() => {
       fetchEvents();
+      fetchActivities();
+      fetchOverdueActivities();
       fetchIncompleteSessions();
     });
 
@@ -369,6 +430,7 @@ export default {
       activities,
       pomodoros, 
       incompleteSessions, 
+      overdueActivities,
       formatDate,
       queryDate,
       navigateToAddEvent,
@@ -379,8 +441,10 @@ export default {
       confirmDeleteActivity,
       confirmDeleteEvent,
       confirmDeletePomodoro,
-      markActivityComplete ,
-      markAsCompleted
+      //markActivityComplete ,
+      markAsCompleted,
+      filteredOverdueActivities,
+      discardActivity
     };
   }
 };
@@ -389,6 +453,29 @@ export default {
 </script>
 
 <style scoped>
+.full-width {
+  width: 100%;
+  margin-bottom: 20px;
+  background-color: rgba(230, 247, 255, 0.8);
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 25px;
+}
+
+
+.center-container {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+.content-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 40px;
+  padding: 20px;
+}
 
 .button-container {
   margin-top: auto; 
@@ -409,13 +496,6 @@ button:hover {
   background-color: #45a049;
 }
 
-.content-container {
-  display: flex;
-  justify-content: space-between;
-  gap: 40px;
-  padding: 20px;
-}
-
 .activities-section {
   flex: 1.5; 
   background-color: #f9f9f9;
@@ -428,7 +508,6 @@ button:hover {
 
 .pomodoros-section {
   flex: 1.5; 
-  margin-left: 10px;
   background-color: #ffe6e6;
 }
 
@@ -520,6 +599,17 @@ hr {
   position: relative; 
   transition: border-color 0.3s ease; 
 }
+
+.item-container.overdue {
+  border-color: red;
+  background-color: #ffe6e6;
+}
+
+.item-container.incpom {
+  border-color: red;
+  background-color: #ffe6e6;
+}
+
 
 .item-container.completed {
   border-color: green;

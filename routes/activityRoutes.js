@@ -21,6 +21,8 @@ router.put('/activities/mark-complete', authenticateToken, activityController.ma
 
 router.put('/activities/:id', authenticateToken, activityController.updateActivity);
 
+router.get('/activities/overdue', authenticateToken, activityController.getOverdueActivities);
+
 router.delete('/activitiesRemove/:id', authenticateToken, activityController.deleteActivities) ;
 
 
