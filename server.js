@@ -10,6 +10,7 @@ const accountRoutes = require('./routes/accountRoutes');
 const activityRoutes = require('./routes/activityRoutes');
 const registerRoutes = require('./routes/registerRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
+const timeMachineRoutes = require('./routes/timeMachineRoutes');
 
 const { scheduleEmailReminders } = require('./cronTask'); 
 require('dotenv').config({ path: __dirname + '/.env' });
@@ -18,6 +19,9 @@ const app = express();
 const port = 3000;
 
 connectDB();
+
+let timeMachineDate = new Date(); 
+module.exports = { timeMachineDate };
 
 
 app.use(cors());
@@ -29,6 +33,7 @@ app.use('/api', eventRoutes);
 app.use('/api', activityRoutes);
 app.use('/api', registerRoutes);
 app.use('/api', accountRoutes); 
+app.use('/api', timeMachineRoutes);
 app.use('/api/notifications', notificationRoutes); 
 
 //app.use(express.static(path.join(__dirname, 'frontend/frontend/dist')));

@@ -1,7 +1,7 @@
 const Event = require('../models/Event');
 const { sendNotifEmail } = require('../services/emailService');
 const User = require('../models/User');
-
+const { getTimeMachineDate } = require('../controllers/timeMachineController'); 
 
 // Crea un nuovo evento
 exports.createEvent = async (req, res) => {
@@ -163,21 +163,22 @@ exports.getLastEvent = async (req, res) => {
 };
 
 
+
 exports.getCurrentDayEvents = async (req, res) => {
   try {
     const username = req.query.username;
 
     if (!username) {
       return res.status(400).json({ message: 'Username è necessario' });
-    } 
+    }
 
-    const currentDate = new Date();
+    const timeMachineDate = await getTimeMachineDate(); 
+    const currentDate = new Date(timeMachineDate);
     currentDate.setHours(0, 0, 0, 0); 
 
     const endOfDay = new Date(currentDate);
     endOfDay.setDate(currentDate.getDate() + 1);
-    endOfDay.setMilliseconds(endOfDay.getMilliseconds() - 1); 
-
+    endOfDay.setMilliseconds(endOfDay.getMilliseconds() - 1);
 
     const events = await Event.find({
       author: username,
@@ -190,6 +191,7 @@ exports.getCurrentDayEvents = async (req, res) => {
     res.status(500).json({ error: 'Errore nel recupero degli eventi del giorno corrente' });
   }
 };
+
 
 
 
