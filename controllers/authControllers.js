@@ -7,12 +7,13 @@ exports.login = async (req, res) => {
   try {
 
     const { username, password } = req.body;
+    
+    
 
     if(!username || !password){
       return res.status(400).json({message:'inserisci username e passwordd!'});
     }
 
-    //cerco user a db
     const user = await User.findOne({ username });
     if (!user) {
       return res.status(401).json({ message: 'Username o password errati' });

@@ -206,7 +206,6 @@ export default {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        // Filtra solo le sessioni future o presenti
         this.poms = response.data.filter(pom => {
           const sessionDate = new Date(pom.giorno);
           sessionDate.setHours(0, 0, 0, 0);

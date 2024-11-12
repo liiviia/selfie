@@ -51,7 +51,6 @@
 
 
 
-      <!-- Offcanvas Sidebar -->
       <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
         <div class="offcanvas-header">
           <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menu</h5>
@@ -89,7 +88,6 @@
             <li class="nav-item"><a class="nav-link" href="/pomSession">Sessioni Pomodoro</a></li>
             <!-- <li class="nav-item"><a class="nav-link" href="/accountUtente">Gestisci il tuo Account</a></li> --> 
           </ul>
-          <!-- Logout Button -->
           <button type="button" class="btn btn-dark mt-3" @click="logout">Logout</button>
         </div>
       </div>
@@ -216,7 +214,6 @@ import moment from 'moment-timezone';
 
 
       async toggleNotifications(){
-        // Mostra o nasconde il menu delle notifiche
         this.showNotifications = !this.showNotifications;
         if (this.showNotifications) {
           await this.checkDeadlines();
@@ -224,7 +221,7 @@ import moment from 'moment-timezone';
       },
   
 
-      async checkDeadlines() {    //notifiche con scadenza <= 2gg
+      async checkDeadlines() {    
         try {
           const token = sessionStorage.getItem('token');
           const username = localStorage.getItem('username');
@@ -232,10 +229,9 @@ import moment from 'moment-timezone';
             headers: {Authorization: `Bearer ${token}`},
             params:{username: username}
           });
-          this.notifications = response.data; // Salva le notifiche nella variabile
+          this.notifications = response.data; 
           console.log(this.notifications);
           console.log(response.data);
-          //alert('Email inviata con successo!');
         } catch (error) {
           console.error('Errore nel recupero delle notifiche:', error);
         } 
@@ -247,8 +243,8 @@ import moment from 'moment-timezone';
           const token = sessionStorage.getItem('token');
           const username = localStorage.getItem('username');
           const response = await axios.post('/api/activities/sendEmail', 
-            { username: username },  // Dati nel body della richiesta
-            {headers: { Authorization: `Bearer ${token}` }  // Headers separati
+            { username: username },  
+            {headers: { Authorization: `Bearer ${token}` }
             }
           );
           alert(response.data.message); 
@@ -257,9 +253,7 @@ import moment from 'moment-timezone';
           alert('Errore durante invio email');
         }
       }      
-      // mounted() {
-      //  this.checkDeadlines();
-      // }
+      
       
     }
     

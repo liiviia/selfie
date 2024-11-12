@@ -64,7 +64,6 @@ export default {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        // Filtra solo le sessioni future o presenti
         this.poms = response.data.filter(pom => {
           const sessionDate = new Date(pom.giorno);
           sessionDate.setHours(0, 0, 0, 0);
@@ -114,7 +113,7 @@ ul {
   border-bottom: 1px solid #ccc;
   padding-bottom: 10px;
   position: relative;
-  padding-right: 40px; /* Spazio per il pulsante */
+  padding-right: 40px; 
 }
 
 .pomodoro-item h2 {

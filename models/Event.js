@@ -17,11 +17,11 @@ const eventSchema = new mongoose.Schema({
     required: true,
   },
   startTime: {
-    type: String, // Formato: "HH:mm"
+    type: String, 
     required: true,
   },
   duration: {
-    type: Number, // Durata in minuti
+    type: Number, 
     required: true,
   },
   location: {
@@ -43,21 +43,27 @@ const eventSchema = new mongoose.Schema({
   },
   numberOfOccurrences: {
     type: Number,
-    default: null, // null se ripeti indefinitamente
+    default: null, 
   },
-  notificatcionMechanism: {
+  notificationMechanism: { 
     type: [String],
-    enum: ['system', 'email', 'whatsapp', 'alert'],
+    enum: ['system', 'email', 'alert'],
     default: [],
   },
   notificationTime: {
-    type: Number, // In minuti prima dell'evento
+    type: Number, 
     default: 0,
   },
   repeatNotification: {
-    type: Number, // In minuti per la ripetizione della notifica
+    type: Number, 
     default: 0,
   },
+  email: { 
+    type: String, 
+    unique: true, 
+    required: true 
+  },
+  
   author: {
     type: String,
     required: true,

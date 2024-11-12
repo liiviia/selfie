@@ -3,7 +3,6 @@ const { sendNotifEmail } = require('../services/emailService');
 const User = require('../models/User');
 const { getTimeMachineDate } = require('../controllers/timeMachineController'); 
 
-// Crea un nuovo evento
 exports.createEvent = async (req, res) => {
   try {
     const {
@@ -14,7 +13,7 @@ exports.createEvent = async (req, res) => {
       duration,
       isRecurring,
       frequency,
-      recurrencePattern,
+      email,
       numberOfOccurrences,
       location,
       author,
@@ -22,6 +21,7 @@ exports.createEvent = async (req, res) => {
       notificationTime,
       repeatNotification,
     } = req.body;
+    console.log(req.body);
 
     if (!title || !date || !startTime || !author) {
       return res.status(400).json({ error: 'I campi titolo, data, ora di inizio e autore sono obbligatori.' });
@@ -35,6 +35,10 @@ exports.createEvent = async (req, res) => {
       notificationMechanismArray = notificationMechanism.split(',');
     }
 
+    
+    console.log("NotificationMechanismArray" , notificationMechanismArray);
+
+     
     const createAndSaveEvent = async (eventDate) => {
       const newEvent = new Event({
         title,
@@ -44,7 +48,7 @@ exports.createEvent = async (req, res) => {
         duration,
         isRecurring,
         frequency,
-        recurrencePattern,
+        email,
         numberOfOccurrences,
         location,
         author,
@@ -108,7 +112,7 @@ exports.createEvent = async (req, res) => {
         duration,
         isRecurring,
         frequency,
-        recurrencePattern,
+        email,
         numberOfOccurrences,
         location,
         author,
@@ -118,6 +122,7 @@ exports.createEvent = async (req, res) => {
       });
 
       const savedEvent = await newEvent.save();
+      console.log("evento salvato:", savedEvent);
       res.status(201).json(savedEvent);
     }
 
@@ -128,7 +133,6 @@ exports.createEvent = async (req, res) => {
 };
 
 
-// Recupera tutti gli eventi di un autore
 exports.getEvents = async (req, res) => {
   try {
     const author = req.query.author;
@@ -145,7 +149,6 @@ exports.getEvents = async (req, res) => {
   }
 };
 
-// Recupera l'ultimo evento di un autore
 exports.getLastEvent = async (req, res) => {
   try {
     const author = req.query.author;

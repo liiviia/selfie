@@ -5,11 +5,11 @@ exports.getTimeMachineDate = (req, res) => {
     const timeMachineDate = timeMachineConfig.getTimeMachineDate();
 
     const localTime = moment(timeMachineDate).tz('Europe/Rome').format();
-    console.log("orario e data della time machine::::",localTime);
     console.log("-----------------");
-    
-    return localTime;
+
+    return res.send(localTime);  
 };
+
 
 
 exports.updateTimeMachineDate = (req, res) => {

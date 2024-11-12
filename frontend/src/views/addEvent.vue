@@ -37,12 +37,7 @@
           <option value="daily">Giornaliero</option>
           <option value="weekly">Settimanale</option>
           <option value="monthly">Mensile</option>
-          <option value="custom">Personalizzato</option> 
         </select>
-        <div v-if="newEvent.frequency === 'custom'">
-          <label for="recurrencePattern">Pattern di Ripetizione:</label>
-          <input type="text" v-model="newEvent.recurrencePattern" placeholder="Esempio: ogni martedì" />
-        </div>
         <div> 
           <label for="numberOfOccurrences">Numero di Ripetizioni:</label>
           <input type="number" v-model="newEvent.numberOfOccurrences" placeholder="Lascia vuoto per ripetere indefinitamente" />
@@ -51,9 +46,7 @@
       <div>
         <label>Meccanismo di Notifica:</label>
         <div>
-          <input type="checkbox" value="system" v-model="newEvent.notificationMechanism" /> Sistema
           <input type="checkbox" value="email" v-model="newEvent.notificationMechanism" /> Email
-          <input type="checkbox" value="whatsapp" v-model="newEvent.notificationMechanism" /> WhatsApp
           <input type="checkbox" value="alert" v-model="newEvent.notificationMechanism" /> Alert
         </div>
         <div>
@@ -77,7 +70,7 @@
 </template>
 
 <script>
-import { ref, onMounted, getCurrentInstance } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
 import NotificationManager from '../components/NotificationManager.vue';
@@ -88,9 +81,9 @@ export default {
   },
   
   setup() {
-    const { proxy } = getCurrentInstance(); // Ottieni il contesto corrente (proxy)
     const route = useRoute();
     const router=useRouter();
+    const email = localStorage.getItem('email');
     const newEvent = ref({
       title: '',
       description: '',
@@ -100,7 +93,7 @@ export default {
       location: '',
       isRecurring: false,
       frequency: 'one-time',
-      recurrencePattern: '',
+      email:email,
       numberOfOccurrences: null,
       notificationMechanism: [],
       notificationTime: 0,
@@ -110,9 +103,7 @@ export default {
 
     onMounted(() => {
 
-      //PERMESSO NOTIFICHE
-      // const notificationManager=proxy.$refs.notificationManager;
-      //   notificationManager.requestNotificationPermission();
+     
       if (route.query.date) {
         newEvent.value.date = route.query.date;
       }
@@ -121,15 +112,12 @@ export default {
     
     const message = ref('');
 
-    //crea evento
     const createEvent = async () => {
       try {
         const token = sessionStorage.getItem('token');
-        ///////////
-        const notificationManager = proxy.$refs.notificationManager;
-        const emaill = localStorage.getItem('email');
-        notificationManager.scheduleNotification(newEvent.value, emaill);
-
+       
+        console.log("chiamata a scheduler");
+        console.log("notitiche", newEvent.value.notificationMechanism);
         const response = await axios.post('/api/events', newEvent.value, {
           headers: {
             Authorization: `Bearer ${token}`
@@ -146,7 +134,7 @@ export default {
           location: '',
           isRecurring: false,
           frequency: 'one-time',
-          recurrencePattern: '',
+          email: '',
           numberOfOccurrences: null,
           notificationMechanism: [],
           notificationTime: 0,
@@ -155,6 +143,7 @@ export default {
         };
 
         message.value = 'Evento creato con successo!';
+        console.log("evento creato", response.data);
         setTimeout(() => {
           message.value = '';
           router.push('/homePrincipale'); ////
@@ -183,12 +172,12 @@ export default {
   background-color: #15172b;
   border-radius: 12px;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); 
-  transition: transform 0.3s ease; /* transizione */
+  transition: transform 0.3s ease; 
   box-sizing: border-box;
 }
 
 .event-form:hover {
-  transform: translateY(-5px); /* animazione al passaggio */
+  transform: translateY(-5px); 
 }
 
 .event-form h2 {
@@ -229,7 +218,7 @@ export default {
 .event-form textarea:focus,
 .event-form select:focus {
   border-color: #007bff;
-  box-shadow: 0 0 8px rgba(0, 123, 255, 0.25); /* effetto focus */
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.25); 
   outline: none;
 }
 

@@ -3,7 +3,6 @@ const User = require('../models/User');
 const { sendReminderEmail } = require('../services/emailService');
 const { getTimeMachineDate } = require('../controllers/timeMachineController'); 
 
-// Crea una nuova attività
 exports.createActivity = async (req, res) => {
   try {
     const { title, description, deadline, author, email, completed, type , participants } = req.body;
@@ -28,9 +27,7 @@ exports.createActivity = async (req, res) => {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
 
-    // if (new Date(deadline).setHours(0, 0, 0, 0) === tomorrow.setHours(0, 0, 0, 0)) {
-    //   sendReminderEmail(email, title, deadline); 
-    // }
+    
 
     res.status(201).json(savedActivity);
   } catch (error) {
@@ -39,7 +36,6 @@ exports.createActivity = async (req, res) => {
   }
 };
 
-// Recupera tutte le attività di un utente
 exports.getActivities = async (req, res) => {
   try {
     const username = req.query.username;
@@ -104,7 +100,6 @@ const getUpcomingActivities = async (username) => {
   });
 };
 
-// attivita tra due gg
 
 
 exports.getLastActivity2days = async (req, res) => {

@@ -11,39 +11,62 @@ const activityRoutes = require('./routes/activityRoutes');
 const registerRoutes = require('./routes/registerRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const timeMachineRoutes = require('./routes/timeMachineRoutes');
+const timeMachineConfig = require('./timeMachineConfig');
+const moment = require('moment-timezone');
+const { startNotificationMonitoring } = require('./controllers/notificheEventi');
+const { initializeWebSocket } = require('./websocketServer');
+const http = require('http');
+const socketIo = require('socket.io');
 
-const { scheduleEmailReminders } = require('./cronTask'); 
+const { scheduleEmailReminders } = require('./cronTask');
 require('dotenv').config({ path: __dirname + '/.env' });
 
 const app = express();
 const port = 3000;
 
+const server = http.createServer(app);
+initializeWebSocket(server);
+
+
+
+app.use(cors({
+  origin: 'http://localhost:8080',
+  methods: ['GET', 'POST'],
+  credentials: true,
+}));
+
+
 connectDB();
 
-let timeMachineDate = new Date(); 
-module.exports = { timeMachineDate };
+const incrementTimeMachine = () => {
+  const currentTime = moment(timeMachineConfig.getTimeMachineDate()).tz('Europe/Rome');
+  const updatedTime = currentTime.add(1, 'seconds').toDate();
+  timeMachineConfig.setTimeMachineDate(updatedTime);
+};
 
+setInterval(incrementTimeMachine, 1000);
 
-app.use(cors());
-app.use(express.json());
+startNotificationMonitoring();
+
+app.use(express.json());  
 app.use('/api/auth', authRoutes);
 app.use('/api', noteRoutes);
 app.use('/api', pomsRoutes);
 app.use('/api', eventRoutes);
 app.use('/api', activityRoutes);
 app.use('/api', registerRoutes);
-app.use('/api', accountRoutes); 
+app.use('/api', accountRoutes);
 app.use('/api', timeMachineRoutes);
-app.use('/api/notifications', notificationRoutes); 
+app.use('/api/notifications', notificationRoutes);
 
-//app.use(express.static(path.join(__dirname, 'frontend/frontend/dist')));
+app.use(express.static(path.join(__dirname, 'frontend/frontend/dist')));
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'frontend/frontend/dist', 'index.html'));
 });
 
-scheduleEmailReminders(); 
+scheduleEmailReminders();
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });

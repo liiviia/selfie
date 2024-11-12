@@ -3,7 +3,6 @@ const User = require('../models/User');
 const notificationPom = require('../models/notificationPom');
 const { getTimeMachineDate } = require('../controllers/timeMachineController'); 
 
-// Crea una nuova sessione Pomodoro
 exports.createPom = async (req, res) => {
   try {
     const { username, tempoStudio, tempoPausa, ripetizioni, giorno, cicliRimanenti, remainingTime, isStudyPhase, studyCycles } = req.body;
@@ -107,7 +106,6 @@ exports.rifiutaNotifica = async (req, res) => {
 
 
 
-// Recupera tutte le sessioni Pomodoro di un utente
 exports.getPoms = async (req, res) => {
   try {
     const username = req.query.username;
@@ -170,7 +168,6 @@ exports.getPomodorosByDate = async (req, res) => {
   }
 };
 
-// Salva Pomodoro incompleta
 exports.saveUncompletedPom = async (req, res) => {
   try {
     const { username, giorno, remainingTime, isStudyPhase, studyCycles } = req.body;
@@ -197,7 +194,6 @@ exports.saveUncompletedPom = async (req, res) => {
   }
 };
 
-// Recupera Pomodoro incompleta
 exports.getUncompletedPomodoros = async (req, res) => {
   
   try {

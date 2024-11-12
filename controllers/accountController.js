@@ -2,7 +2,6 @@ const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
 
-// Configurazione del trasporto email
 const transporter = nodemailer.createTransport({
   host: 'smtp.office365.com',
   port: 587,
@@ -13,7 +12,6 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Funzione per l'aggiornamento della password
 exports.updatePassword = async (req, res) => {
   const { username, currentPassword, newPassword } = req.body;
 
@@ -38,7 +36,6 @@ exports.updatePassword = async (req, res) => {
   }
 };
 
-// Funzione per eliminare l'account
 exports.deleteAccount = async (req, res) => {
   const { username } = req.body;
 
@@ -71,10 +68,9 @@ exports.deleteAccount = async (req, res) => {
 };
 
 
-// Controller per ottenere tutti gli utenti
 exports.getAllUsers = async (req, res) => {
   try {
-    const users = await User.find({}, 'username'); // Ritorna solo il campo username
+    const users = await User.find({}, 'username'); 
     res.status(200).json(users);
   } catch (error) {
     res.status(500).json({ message: 'Errore nel recupero degli utenti' });
