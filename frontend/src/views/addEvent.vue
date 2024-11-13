@@ -137,12 +137,12 @@ export default {
       try {
         const token = sessionStorage.getItem('token');
        
-        console.log("chiamata a scheduler");
-        console.log("notitiche", newEvent.value.notificationMechanism);
-        ///////////
-        const notificationManager = proxy.$refs.notificationManager;
-        const emaill = localStorage.getItem('email');
-        notificationManager.scheduleNotification(newEvent.value, emaill);
+        // console.log("chiamata a scheduler");
+        // console.log("notitiche", newEvent.value.notificationMechanism);
+        // ///////////
+        // const notificationManager = proxy.$refs.notificationManager;
+        // const emaill = localStorage.getItem('email');
+        // notificationManager.scheduleNotification(newEvent.value, emaill);
 
         //aggiunge i partecipanti selezionati
         newEvent.value.participants=selectedParticipants.value;
