@@ -44,7 +44,6 @@
   </div>
 
 
-                   <!--MODAL VEDI NOTIFIHCE-->                     <!--MODAL VEDI NOTIFIHCE-->
 
                    <button class="fixed-button" @click="openNotificationModal" style="background:#f4a460; margin-bottom: 50px;">
                   Vedi Notifiche
@@ -91,7 +90,6 @@
 
 
 
-    <!--MODAL AIUTO A STUDIARE-->    <!--MODAL AIUTO A STUDIARE-->  <!--MODAL AIUTO A STUDIARE--> 
    <button class="fixed-button" @click="openHelpStudy" style="background:#f4a460; margin-bottom: 50px;">
                   Non sai come studiare?
                     </button>
@@ -131,7 +129,6 @@
                   
     
 
-                 <!--MODAL INVIA NOTIFICA --> <!--MODAL INVIA NOTIFICA --><!--MODAL INVIA NOTIFICA -->
   <button class="fixed-button" @click="openModal" style="background:#f4a460;">
   <i class="fas fa-paper-plane"></i>
 </button>
@@ -178,7 +175,6 @@
 import { ref, onMounted,  onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
-//import { construct } from 'core-js/fn/reflect';
 
 export default {
   setup() {
@@ -359,7 +355,6 @@ export default {
           },
           params: { username: username }
         });
-        //console.log(response.data);
         if (response.data) {
           notificationsPom.value = response.data;
           console.log("no:",notificationsPom);

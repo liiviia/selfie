@@ -9,19 +9,7 @@
         
       </div>
 
-        <div v-if="showTimeMachine" class="time-machine-control d-none d-md-flex ms-3">
-          <div>
-            <label for="date">Data:</label>
-            <input type="date" v-model="timeMachineDate">
-            <label for="time">Ora:</label>
-            <input type="time" v-model="timeMachineTime">
-            <button @click="setTimeMachine">Imposta</button>
-            <button @click="resetTimeMachine">Reset</button>
-          </div>
-          <div>
-            <p>Orologio: {{ simulatedTime }}</p>
-          </div>
-        </div>
+        
 
       <div class="d-flex ms-auto align-items-center">
         <a class="navbar-brand me-4" href="/homePrincipale">
@@ -52,7 +40,17 @@
 
       </div>
 
-      <!-- Offcanvas Sidebar -->
+
+
+      <div class="d-flex ms-auto align-items-center time-machine-form">
+  <input type="date" v-model="selectedDate" class="form-control form-control-sm me-2" />
+  <input type="time" v-model="selectedTime" class="form-control form-control-sm me-2" />
+  <button @click="activateTimeMachine" class="btn btn-sm btn-primary">cambia orario</button>
+  <button @click="resetTimeMachine" class="btn-sm btn-primary">reset time machine</button>
+</div>
+
+
+
       <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
         <div class="offcanvas-header">
           <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menu</h5>
@@ -71,7 +69,7 @@
               </a>
               <ul class="dropdown-menu" aria-labelledby="eventDropdown">
                 <li><a class="dropdown-item" href="/addEvent">Aggiungi evento</a></li>
-             <!--   <li><a class="dropdown-item" href="/eventsE">Lista eventi</a></li>-->
+                <li><a class="dropdown-item" href="/eventsE">Lista eventi</a></li>
               </ul>
             </li>
   
@@ -81,16 +79,15 @@
               </a>
               <ul class="dropdown-menu" aria-labelledby="activityDropdown">
                 <li><a class="dropdown-item" href="/addActivities">Aggiungi attività</a></li>
-              <!--  <li><a class="dropdown-item" href="/activities">Lista attività</a></li> -->
+               <li><a class="dropdown-item" href="/activities">Lista attività</a></li> 
               </ul>
             </li>
   
             <li class="nav-item"><a class="nav-link" href="/calendarEvent">Calendario</a></li>
             <li class="nav-item"><a class="nav-link" href="/pomodoroTempo">Pomodoro</a></li>
-          <!--  <li class="nav-item"><a class="nav-link" href="/pomSession">Sessioni Pomodoro</a></li>-->
+            <li class="nav-item"><a class="nav-link" href="/pomSession">Sessioni Pomodoro</a></li>
             <!-- <li class="nav-item"><a class="nav-link" href="/accountUtente">Gestisci il tuo Account</a></li> --> 
           </ul>
-          <!-- Logout Button -->
           <button type="button" class="btn btn-dark mt-3" @click="logout">Logout</button>
         </div>
       </div>
@@ -101,18 +98,17 @@
 <script>
 
 import axios from 'axios';
+import moment from 'moment-timezone';
+
 
   export default {
     data() {
       return {
         username: localStorage.getItem('username') || 'Guest',
-        timeMachineDate: '',  
-        timeMachineTime: '',  
-        simulatedTime: '--:--:--', 
-        intervalId: null, 
-        currentSimulatedTime: null,
         showNotifications: false,
-        notifications: [] 
+        notifications: [] ,
+        timeMachineDate: '',  
+        timeMachineTime: ''  
       };
     }, 
     computed:{
@@ -132,40 +128,80 @@ import axios from 'axios';
         };
         return routeNameMap[this.$route.path] || ''; 
       },
-      showTimeMachine() {
-        const routesWithTimeMachine = [
-          '/todo',              
-          '/calendarEvent',      
-          '/eventsE',         
-          '/activities',         
-          '/pomSession'          
-        ];
-        return routesWithTimeMachine.includes(this.$route.path);
-      }
+     
     },
+
+    mounted() {
+  this.fetchData();  
+},
+
+
     methods:{
-      setTimeMachine() {
-        if (this.timeMachineDate && this.timeMachineTime) {
-          const newDateTime = new Date(`${this.timeMachineDate}T${this.timeMachineTime}`);
-          this.currentSimulatedTime = newDateTime;
-          this.simulatedTime = this.currentSimulatedTime.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-          this.startTimeFlow();
-        }
-      },
-      resetTimeMachine() {
-        clearInterval(this.intervalId);
-        this.simulatedTime = '--:--:--'; 
-        this.currentSimulatedTime = null;
-      },
-      startTimeFlow() {
-        clearInterval(this.intervalId);
-        this.intervalId = setInterval(() => {
-          if (this.currentSimulatedTime) {
-            this.currentSimulatedTime.setSeconds(this.currentSimulatedTime.getSeconds() + 1);
-            this.simulatedTime = this.currentSimulatedTime.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-          }
-        }, 1000); 
-      },
+
+
+      async resetTimeMachine() {
+    try {
+        const token = sessionStorage.getItem('token'); 
+        const response = await axios.post('/api/time-machine/reset', {}, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+
+        this.selectedDate = ''; 
+        this.selectedTime = ''; 
+
+        alert('Time Machine resettata alla data di sistema!');
+        console.log(response.data);
+        this.fetchData(); 
+    } catch (error) {
+        console.error('Errore nel reset della Time Machine:', error);
+        alert('Si è verificato un errore durante il reset della Time Machine');
+    }
+},
+
+
+
+      async fetchData() {
+    try {
+        const response = await axios.get('/api/getTime-machine'); 
+        console.log("get time machine", response.data);
+
+        const localDate = moment(response.data.date).tz('Europe/Rome', true).format();
+        console.log("Data convertita nel fuso orario locale:", localDate);
+    } catch (error) {
+        console.error('Errore nella richiesta GET:', error);
+    }
+},
+
+
+
+  async activateTimeMachine() {
+    if (!this.selectedDate || !this.selectedTime) {
+        alert('Per favore seleziona una data e un\'ora!');
+        return;
+    }
+
+    const timeMachineData = {
+        date: moment(`${this.selectedDate}T${this.selectedTime}:00`).tz('Europe/Rome').format()
+    };
+
+    try {
+        const token = sessionStorage.getItem('token'); 
+        const response = await axios.post('/api/updateTime-machine', timeMachineData, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+
+        alert('Time Machine attivata con successo!');
+        console.log(response.data);
+        this.fetchData();
+    } catch (error) {
+        console.error('Errore nell\'attivazione della Time Machine:', error);
+        alert('Si è verificato un errore durante l\'attivazione della Time Machine');
+    }
+},
+
+
+      
+     
 
 
       logout() {
@@ -178,7 +214,6 @@ import axios from 'axios';
 
 
       async toggleNotifications(){
-        // Mostra o nasconde il menu delle notifiche
         this.showNotifications = !this.showNotifications;
         if (this.showNotifications) {
           await this.checkDeadlines();
@@ -186,7 +221,7 @@ import axios from 'axios';
       },
   
 
-      async checkDeadlines() {    //notifiche con scadenza <= 2gg
+      async checkDeadlines() {    
         try {
           const token = sessionStorage.getItem('token');
           const username = localStorage.getItem('username');
@@ -194,10 +229,9 @@ import axios from 'axios';
             headers: {Authorization: `Bearer ${token}`},
             params:{username: username}
           });
-          this.notifications = response.data; // Salva le notifiche nella variabile
+          this.notifications = response.data; 
           console.log(this.notifications);
           console.log(response.data);
-          //alert('Email inviata con successo!');
         } catch (error) {
           console.error('Errore nel recupero delle notifiche:', error);
         } 
@@ -209,8 +243,8 @@ import axios from 'axios';
           const token = sessionStorage.getItem('token');
           const username = localStorage.getItem('username');
           const response = await axios.post('/api/activities/sendEmail', 
-            { username: username },  // Dati nel body della richiesta
-            {headers: { Authorization: `Bearer ${token}` }  // Headers separati
+            { username: username },  
+            {headers: { Authorization: `Bearer ${token}` }
             }
           );
           alert(response.data.message); 
@@ -219,17 +253,44 @@ import axios from 'axios';
           alert('Errore durante invio email');
         }
       }      
-      // mounted() {
-      //  this.checkDeadlines();
-      // }
+      
       
     }
+    
     
   };
 
 </script>
 
 <style scoped>
+
+.time-machine-form input,
+.time-machine-form button {
+  width: 150px;
+}
+
+
+.form-control-sm {
+  font-size: 0.8rem; 
+  padding: 0.375rem 0.75rem; 
+}
+
+.btn-sm {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.8rem; 
+}
+
+
+.form-control-sm {
+  font-size: 0.8rem; 
+  padding: 0.375rem 0.75rem; 
+}
+
+.btn-sm {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.8rem; 
+}
+
 .carousel-item {
   background-color: #f0f0f0;
   border-radius: 10px;
@@ -273,33 +334,7 @@ import axios from 'axios';
 }
 
 
-.time-machine-control {
-  display: flex;
-  align-items: center;
-}
 
-.time-machine-control input {
-  margin-right: 10px;
-  padding: 5px;
-  border-radius: 8px; 
-  border: 1px solid #ccc; 
-  outline: none;
-}
-
-.time-machine-control button {
-  margin-right: 10px;
-  background-color: #007BFF;
-  color: white;
-  border: none;
-  padding: 8px 15px;
-  font-size: 0.9em;
-  border-radius: 10px;
-  cursor: pointer;
-}
-
-.time-machine-control button:hover {
-  background-color: #0056b3;
-}
 
 .notifications-dropdown {
   position: absolute;

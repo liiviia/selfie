@@ -17,11 +17,10 @@ module.exports = {
     },
   },
 
-  // aggiunto per warning flag vue
   configureWebpack: {
     plugins: [
       new webpack.DefinePlugin({
-        __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: JSON.stringify(false), // O true se ti servono dettagli di errore
+        __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: JSON.stringify(false), 
       })
     ]
   }

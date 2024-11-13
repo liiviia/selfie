@@ -1,8 +1,8 @@
 const Activity = require('../models/Activity');
 const User = require('../models/User');
 const { sendReminderEmail } = require('../services/emailService');
+const { getTimeMachineDate } = require('../controllers/timeMachineController'); 
 
-// Crea una nuova attività
 exports.createActivity = async (req, res) => {
   try {
     const { title, description, deadline, author, email, completed, type , participants } = req.body;
@@ -27,9 +27,7 @@ exports.createActivity = async (req, res) => {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
 
-    // if (new Date(deadline).setHours(0, 0, 0, 0) === tomorrow.setHours(0, 0, 0, 0)) {
-    //   sendReminderEmail(email, title, deadline); 
-    // }
+    
 
     res.status(201).json(savedActivity);
   } catch (error) {
@@ -38,7 +36,6 @@ exports.createActivity = async (req, res) => {
   }
 };
 
-// Recupera tutte le attività di un utente
 exports.getActivities = async (req, res) => {
   try {
     const username = req.query.username;
@@ -86,7 +83,8 @@ exports.getLastActivity = async (req, res) => {
 
 
 const getUpcomingActivities = async (username) => {
-  const today = new Date();
+  const timeMachineDate = getTimeMachineDate(); 
+  const today = new Date(timeMachineDate);  
   const twoDaysLater = new Date(today);
   twoDaysLater.setDate(today.getDate() + 2);
 
@@ -96,34 +94,34 @@ const getUpcomingActivities = async (username) => {
       { participants: username }
     ],
     deadline: {
-      $gte: today,  // maggiore o uguale a oggi
-      $lte: twoDaysLater  // minore o uguale a due giorni da oggi
+      $gte: today,  
+      $lte: twoDaysLater  
     }
   });
 };
 
-// attivita tra due gg
+
 
 exports.getLastActivity2days = async (req, res) => {
-  const today = new Date();
-  const twoDaysLater = new Date(today);
-  twoDaysLater.setDate(today.getDate() + 2);
-
   try {
+    const timeMachineDate = await getTimeMachineDate(); 
+    const today = new Date(timeMachineDate);  
+    const twoDaysLater = new Date(today);
+    twoDaysLater.setDate(today.getDate() + 2);
+
     const user = req.query.username;
     if (!user) {
       return res.status(400).json({ message: 'Utente non trovato' });
     }
 
-    // Trova attività con scadenza entro i prossimi 2 giorni
     const upcomingActivities = await Activity.find({
       $or: [
         { author: user },
         { participants: user }
       ],
       deadline: {
-        $gte: today,  // maggiore o uguale a oggi
-        $lte: twoDaysLater  // minore o uguale a due giorni da oggi
+        $gte: today,  
+        $lte: twoDaysLater  
       }
     });
  
@@ -137,7 +135,8 @@ exports.getLastActivity2days = async (req, res) => {
 
 
 
-// Invia l'email con le attività imminenti
+
+
 exports.sendEmailWithActivities = async (req, res) => {
   try {
     const { username } = req.body;
@@ -151,8 +150,8 @@ exports.sendEmailWithActivities = async (req, res) => {
       return res.status(404).json({ message: 'Utente non trovato' });
     }
 
-
-    const today = new Date();
+    const timeMachineDate = await getTimeMachineDate(); 
+    const today = new Date(timeMachineDate);
     const twoDaysLater = new Date(today);
     twoDaysLater.setDate(today.getDate() + 2);
 
@@ -169,9 +168,7 @@ exports.sendEmailWithActivities = async (req, res) => {
         return participantsEmails.map(participant => participant.email);
       }));
 
-
       const uniqueEmails = [...new Set(emails.flat())];
-
 
       await sendReminderEmail(uniqueEmails, upcomingActivities);
       res.status(200).json({ message: 'Email inviata con successo a tutti i partecipanti' });
@@ -186,6 +183,7 @@ exports.sendEmailWithActivities = async (req, res) => {
 };
 
 
+
 exports.getCurrentDayActivities = async (req, res) => {
   try {
     const username = req.query.username;
@@ -194,18 +192,18 @@ exports.getCurrentDayActivities = async (req, res) => {
       return res.status(400).json({ message: 'Username è necessario' });
     }
 
-    const currentDate = new Date();
+    const timeMachineDate = await getTimeMachineDate(); 
+    const currentDate = new Date(timeMachineDate);
     currentDate.setHours(0, 0, 0, 0);
 
     const endOfDay = new Date(currentDate);
     endOfDay.setDate(currentDate.getDate() + 1);
     endOfDay.setMilliseconds(endOfDay.getMilliseconds() - 1);
 
-
     const activities = await Activity.find({
       $or: [
-        { author: username, deadline: { $gte: currentDate, $lte: endOfDay } }, 
-        { participants: username, deadline: { $gte: currentDate, $lte: endOfDay } } 
+        { author: username, deadline: { $gte: currentDate, $lte: endOfDay } },
+        { participants: username, deadline: { $gte: currentDate, $lte: endOfDay } }
       ]
     });
 
@@ -219,6 +217,7 @@ exports.getCurrentDayActivities = async (req, res) => {
     res.status(500).json({ error: 'Errore nel recupero delle attività del giorno corrente' });
   }
 };
+
 
 
 

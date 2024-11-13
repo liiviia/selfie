@@ -38,9 +38,8 @@
     color: #ffffff;
   }
 
-  /* Aggiungi margine al contenuto della pagina */
 .container {
-  padding-bottom: 20px; /* Regola questo valore in base all'altezza del footer */
+  padding-bottom: 20px; 
 }
   </style>
   

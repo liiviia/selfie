@@ -56,7 +56,6 @@ exports.register = async (req, res) => {
 
     console.log("registrato") ;
 
-    //await sendConfirmationEmail(email, username);
 
     res.status(201).json(savedUser);
   } catch (error) {

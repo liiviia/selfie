@@ -69,7 +69,6 @@ export default {
           },
           params: { username: username }
         });
-        // Filtraggio delle attività scadute
         const currentDate = new Date();
         this.activities = response.data.filter(activity => 
           new Date(activity.deadline) >= currentDate
@@ -80,7 +79,6 @@ export default {
       }
     },
 
-    // Funzione per formattare la data
     formatDate(date) {
       return new Date(date).toLocaleDateString();
     },

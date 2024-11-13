@@ -1,7 +1,5 @@
-// controllers/notificationController.js
 const Notification = require('../models/Notification');
 const User = require('../models/User');
-//const notificationService = require('../services/NotificationService');
 
 exports.sendNotification = async (req, res) => {
    const { recipients, message, username } = req.body;
@@ -36,7 +34,6 @@ exports.sendNotification = async (req, res) => {
   }
 };
 
-//notifiche dell utente
 exports.getNotificationsForUser = async (req, res) => {
     const userId = req.user.id; 
     if (!userId) {return res.status(400).json({ message: 'userId mancante' }); }

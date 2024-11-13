@@ -1,6 +1,6 @@
 
 const nodemailer = require('nodemailer');
-require('dotenv').config(); //per variabili d'ambiente
+require('dotenv').config(); 
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -24,7 +24,6 @@ const sendMail=(mailOptions)=>{
 };
 
 
-//mail per attività in scadenza nei prossimi 2 giorni
 const sendReminderEmail = (email, activities) => {
 
   let emailContent = 'Ciao! Ecco le attività in scadenza nei prossimi 2 giorni:\n\n';
@@ -43,12 +42,11 @@ const sendReminderEmail = (email, activities) => {
 };
 
 
-//mail per evento notifica in creazione
 const sendNotifEmail = (recipientEmail, eventDetails) => {
   const mailOptions = {
     from: '"Servizio Sito SELFIE"<appp4905@gmail.com>',
     to: recipientEmail,
-    subject: 'Evento: Evento creato',
+    subject: 'NON DIMENTICARTI L EVENTO:',
     html: `
        <div style="font-family: Arial, sans-serif;">
         <h2 style="color: #2c3e50;">L'evento "${eventDetails.title}" è stato creato !</h2>

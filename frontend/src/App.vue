@@ -5,7 +5,9 @@
     <div class="container">
       <router-view/>
     </div>
-    
+
+    <Notifiche />     
+
     <AppFooter v-if="!isLoginPage"/>
   </div>
 </template>
@@ -13,21 +15,22 @@
 <script>
 import AppFooter from './components/AppFooter.vue';
 import Nav from './components/NavigationBar.vue';
+import Notifiche from './components/NotificationComponent.vue'; 
 
 export default {
   name: 'App', 
   components: {
     Nav,
     AppFooter,
+    Notifiche,
   },
-  computed:{
-    isLoginPage(){
+  computed: {
+    isLoginPage() {
       return this.$route.path === '/';
     }
   },
 }; 
 </script>
-
 <style>
 
 html, body {

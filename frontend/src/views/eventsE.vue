@@ -20,7 +20,6 @@
 
 <script>
 import axios from 'axios';
-import { EventBus } from '@/EventBus'; 
 
 export default {
   data() {
@@ -62,9 +61,7 @@ export default {
           params: { author: username }
         });
         
-        this.events = response.data.filter(event => 
-          new Date(event.date) >= this.currentDate
-        );
+       this.events = response.data;
       } catch (error) {
         console.error('Errore nel recupero degli eventi:', error);
       }
@@ -95,27 +92,10 @@ export default {
   mounted() {
     this.fetchEvents();
 
-      EventBus.on('timeMachineSet', (simulatedTime) => {
-      this.currentDate = simulatedTime;
-      this.fetchEvents(); 
-    });
-
-     EventBus.on('timeMachineUpdate', (simulatedTime) => {
-      this.currentDate = simulatedTime;
-      this.fetchEvents(); 
-    });
-
-    EventBus.on('timeMachineReset', () => {
-      this.currentDate = new Date();
-      this.fetchEvents();
-    });
+     
   },
 
-  beforeUnmount() {
-    EventBus.off('timeMachineSet');
-    EventBus.off('timeMachineUpdate');
-    EventBus.off('timeMachineReset');
-  }
+  
 };
 </script>
 

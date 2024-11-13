@@ -41,12 +41,7 @@
       </div>
     </div>
 
-    <!-- Navbar -->
-    <!-- <nav class="navbar navbar-light bg-white">
-      <div class="container-fluid d-flex justify-content-center align-items-center">
-        <h5 class="welcome-message">Benvenuto {{ username ? ', ' + username : ', loggati o registrati !' }}!</h5>
-      </div>
-    </nav> -->
+   
     
   </div>
 </template>
@@ -80,15 +75,15 @@ export default {
         '/pomSession': 'Sessioni Pomodoro',
         '/accountUtente': 'Gestisci il tuo Account',
       };
-      return routeNameMap[this.$route.path] || ''; // Mostra il nome della pagina corrente
+      return routeNameMap[this.$route.path] || ''; 
     },
     showTimeMachine() {
       const routesWithTimeMachine = [
         'eventDayCalendar', 
-        '/calendarEvent',      // Calendario
-        '/eventsE',            // Lista Eventi
-        '/activities',         // Lista Attività
-        '/pomSession'          // Sessioni Pomodoro
+        '/calendarEvent',      
+        '/eventsE',            
+        '/activities',         
+        '/pomSession'          
       ];
       return routesWithTimeMachine.includes(this.$route.path);
     }
@@ -107,7 +102,7 @@ export default {
       const navbarCollapse = document.getElementById('navbarToggleExternalContent');
       if (navbarCollapse) {
         const bsCollapse = Collapse.getOrCreateInstance(navbarCollapse);
-        bsCollapse.toggle(); // Alterna apertura/chiusura
+        bsCollapse.toggle(); 
       }
     },
     logout() {

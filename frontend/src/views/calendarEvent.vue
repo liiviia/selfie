@@ -49,7 +49,6 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
-import { EventBus } from '@/EventBus';
 
 export default {
   setup() {
@@ -162,7 +161,7 @@ export default {
       .filter(event => {
         const eventDate = new Date(event.date);
         eventDate.setHours(0, 0, 0, 0);
-        return eventDate >= today; // Mantiene solo gli eventi non scaduti
+        return eventDate >= today;
       })
       .forEach(event => {
         const eventDate = new Date(event.date);
@@ -174,7 +173,7 @@ export default {
       .filter(activity => {
         const activityDate = new Date(activity.deadline);
         activityDate.setHours(0, 0, 0, 0);
-        return activityDate >= today; // Mantiene solo le attività non scadute
+        return activityDate >= today; 
       })
       .forEach(activity => {
         const activityDate = new Date(activity.deadline);
@@ -186,7 +185,7 @@ export default {
       .filter(pomodoro => {
         const pomodoroDate = new Date(pomodoro.giorno);
         pomodoroDate.setHours(0, 0, 0, 0);
-        return pomodoroDate >= today; // Mantiene solo i pomodori non scaduti
+        return pomodoroDate >= today; 
       })
       .forEach(pomodoro => {
         const pomodoroDate = new Date(pomodoro.giorno);
@@ -231,24 +230,15 @@ export default {
       });
     }
 
-    onMounted(async () => {
+   onMounted(async () => {
       await fetchEvents();
       updateCalendarDays();
 
-      EventBus.on('timeMachineSet', (simulatedTime) => {
-        currentDate.value = simulatedTime;
-        updateCalendarDays();
-      });
+      
 
-      EventBus.on('timeMachineUpdate', (simulatedTime) => {
-        currentDate.value = simulatedTime;
-        updateCalendarDays();
-      });
+      
 
-      EventBus.on('timeMachineReset', () => {
-        currentDate.value = new Date();
-        updateCalendarDays();
-      });
+  
     });
 
     watch(currentDate, async () => {
@@ -266,11 +256,7 @@ export default {
       selectDate,
     };
   }, 
-  beforeUnmount() {
-    EventBus.off('timeMachineSet');
-    EventBus.off('timeMachineUpdate');
-    EventBus.off('timeMachineReset');
-  }
+
 };
 </script>
 

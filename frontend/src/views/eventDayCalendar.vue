@@ -31,6 +31,9 @@
             <h4><span style="font-size: 0.9em;">Titolo:</span> {{ event.title }}</h4>
             <p>Data: {{ formatDate(event.date) }}</p>
             <p>Descrizione: {{ event.description }}</p>
+            <p>ora inizio: {{ event.startTime }}</p>
+            <p>durata evento: {{ event.duration }} minuti</p>
+            <p>luogo evento: {{ event.location }}</p>
             <button @click="confirmDeleteEvent(event._id)" class="delete-btn">🗑️</button>
           </div>
         </div>
@@ -203,7 +206,6 @@ export default {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        // Filtra solo le sessioni future o presenti
         this.poms = response.data.filter(pom => {
           const sessionDate = new Date(pom.giorno);
           sessionDate.setHours(0, 0, 0, 0);
