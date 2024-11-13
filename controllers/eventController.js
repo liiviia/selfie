@@ -21,6 +21,7 @@ exports.createEvent = async (req, res) => {
       notificationMechanism,
       notificationTime,
       repeatNotification,
+      participants,
     } = req.body;
 
     // Validazione di base
@@ -51,6 +52,7 @@ exports.createEvent = async (req, res) => {
       notificationMechanism: notificationMechanismArray,
       notificationTime,
       repeatNotification,
+      participants,
     });
 
     const savedEvent = await newEvent.save();

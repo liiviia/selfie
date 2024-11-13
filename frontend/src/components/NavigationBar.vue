@@ -71,7 +71,7 @@
               </a>
               <ul class="dropdown-menu" aria-labelledby="eventDropdown">
                 <li><a class="dropdown-item" href="/addEvent">Aggiungi evento</a></li>
-             <!--   <li><a class="dropdown-item" href="/eventsE">Lista eventi</a></li>-->
+                <li><a class="dropdown-item" href="/eventsE">Lista eventi</a></li>
               </ul>
             </li>
   
@@ -81,7 +81,7 @@
               </a>
               <ul class="dropdown-menu" aria-labelledby="activityDropdown">
                 <li><a class="dropdown-item" href="/addActivities">Aggiungi attività</a></li>
-              <!--  <li><a class="dropdown-item" href="/activities">Lista attività</a></li> -->
+                <li><a class="dropdown-item" href="/activities">Lista attività</a></li> 
               </ul>
             </li>
   
