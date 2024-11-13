@@ -62,6 +62,21 @@
         <label for="author">Autore:</label>
         <input type="text" v-model="newEvent.author" required />
       </div>
+
+      <div>
+        <label>Aggiungere altri partecipanti?</label>
+        <input type="checkbox" v-model="newEvent.altri" />
+      </div>
+      
+      <div v-if="newEvent.altri">
+        <label for="participants">Partecipanti</label>
+        <select v-model="selectedParticipants" multiple>
+          <option v-for="user in users" :key="user._id" :value="user._id">
+            {{ user.username }}
+          </option>
+        </select>
+      </div>
+
       <button type="submit">Crea Evento</button>
     </form>
     <NotificationManager ref="notificationManager" />
@@ -98,7 +113,8 @@ export default {
       notificationMechanism: [],
       notificationTime: 0,
       repeatNotification: 0,
-      author: localStorage.getItem('username') || 'Guest'
+      author: localStorage.getItem('username') || 'Guest',
+      altri:false,
     });
 
     onMounted(() => {
@@ -107,10 +123,15 @@ export default {
       if (route.query.date) {
         newEvent.value.date = route.query.date;
       }
+      fetchUsers(); // Carica gli utenti quando il componente viene montato
+
     });
 
     
     const message = ref('');
+    const selectedParticipants = ref([]);
+    const users = ref([]);
+    
 
     const createEvent = async () => {
       try {
@@ -118,6 +139,14 @@ export default {
        
         console.log("chiamata a scheduler");
         console.log("notitiche", newEvent.value.notificationMechanism);
+        ///////////
+        const notificationManager = proxy.$refs.notificationManager;
+        const emaill = localStorage.getItem('email');
+        notificationManager.scheduleNotification(newEvent.value, emaill);
+
+        //aggiunge i partecipanti selezionati
+        newEvent.value.participants=selectedParticipants.value;
+
         const response = await axios.post('/api/events', newEvent.value, {
           headers: {
             Authorization: `Bearer ${token}`
@@ -139,8 +168,12 @@ export default {
           notificationMechanism: [],
           notificationTime: 0,
           repeatNotification: 0,
-          author: localStorage.getItem('username') || 'Guest'
+          author: localStorage.getItem('username') || 'Guest',
+          participants: selectedParticipants,
+          altri:false,
         };
+
+        selectedParticipants.value = [];
 
         message.value = 'Evento creato con successo!';
         console.log("evento creato", response.data);
@@ -155,12 +188,27 @@ export default {
       }
     };
 
+    const fetchUsers = async () => {
+      try {
+        const token = sessionStorage.getItem('token');
+        const response = await axios.get('/api/users', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        users.value = response.data; 
+      } catch (error) {
+        console.error('Errore nel recupero degli utenti:', error);
+      }
+    };
+
     return {
       newEvent,
+      selectedParticipants,
+      users,
       message,
       createEvent
     };
-  }
+  },
+
 };
 </script>
 
