@@ -1,6 +1,7 @@
 <template>
   <div id="App">
-    <Nav v-if="!isLoginPage" />
+    <!-- Navbar visibile solo se non sei nella pagina di login o registrazione -->
+    <Nav v-if="!isLoginPage && !isRegisterPage" />
     
     <div class="container">
       <router-view/>
@@ -8,7 +9,8 @@
 
     <Notifiche />     
 
-    <AppFooter v-if="!isLoginPage"/>
+    <!-- Footer visibile solo se non sei nella pagina di login o registrazione -->
+    <AppFooter v-if="!isLoginPage && !isRegisterPage"/>
   </div>
 </template>
 
@@ -27,12 +29,15 @@ export default {
   computed: {
     isLoginPage() {
       return this.$route.path === '/';
+    },
+    isRegisterPage() {
+      return this.$route.path === '/registratiAccedi';  
     }
   },
 }; 
 </script>
-<style>
 
+<style>
 html, body {
   height: 100%;
   margin: 0;
@@ -54,5 +59,4 @@ html, body {
 .container {
   flex: 1; 
 }
-
 </style>

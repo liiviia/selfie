@@ -207,7 +207,7 @@ exports.getUncompletedPomodoros = async (req, res) => {
     if (pomodoro) {
       res.status(200).json(pomodoro);
     } else {
-      res.status(404).json({ message: 'Nessuna sessione incompleta trovata' });
+      res.status(200).json({ message: 'Nessuna sessione incompleta trovata' });
     }
   } catch (error) {
     console.error('Errore nel recupero delle sessioni incompleta:', error);

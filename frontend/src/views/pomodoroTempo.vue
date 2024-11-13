@@ -134,7 +134,7 @@
                   
     
 
-  <button class="fixed-button" @click="openModal" style="background:#f4a460;">
+  <button class="fixed-button" @click="openModal"  style="background:#f4a460;">
   <i class="fas fa-paper-plane"></i>
 </button>
 
@@ -212,6 +212,10 @@ export default {
 
 
   onMounted(() => {
+
+    getUsers();
+
+    
     if (route.query.date) {
       newPom.value.giorno = new Date(route.query.date).toISOString().split('T')[0]; // Assegna la data passata
     } else {
@@ -282,6 +286,7 @@ export default {
 
     const getUsers = async () => {
       try {
+        console.log("ciao");
         const username = localStorage.getItem('username');
         const token = sessionStorage.getItem('token');
         const response = await axios.get('/api/users', {

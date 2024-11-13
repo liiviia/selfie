@@ -1,7 +1,8 @@
 const Activity = require('../models/Activity');
 const User = require('../models/User');
 const { sendReminderEmail } = require('../services/emailService');
-const { getTimeMachineDate } = require('../controllers/timeMachineController'); 
+const timeMachineConfig = require('../timeMachineConfig');
+
 
 exports.createActivity = async (req, res) => {
   try {
@@ -330,6 +331,7 @@ exports.updateActivity = async (req, res) => {
   }
 };
 
+
 exports.getOverdueActivities = async (req, res) => {
   try {
     const username = req.query.username;
@@ -337,7 +339,8 @@ exports.getOverdueActivities = async (req, res) => {
       return res.status(400).json({ message: 'Username è necessario' });
     }
 
-    const today = new Date().setHours(0, 0, 0, 0);
+    const today = new Date(timeMachineConfig.getTimeMachineDate().getTime() - (new Date().getTimezoneOffset() * 60000));
+    console.log("attivita per:", today);
 
     const overdueActivities = await Activity.find({
       completed: false,
@@ -354,6 +357,7 @@ exports.getOverdueActivities = async (req, res) => {
     res.status(500).json({ error: 'Errore del server' });
   }
 };
+
 
 
 

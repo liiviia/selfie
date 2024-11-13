@@ -398,6 +398,7 @@ export default {
         // Aggiorna la lista localmente
         activities.value = activities.value.filter(a => a._id !== activity._id);
         overdueActivities.value = overdueActivities.value.filter(a => a._id !== activity._id);
+        window.location.reload();
       } catch (error) {
         console.error('Errore nel completare l\'attività:', error);
       }
