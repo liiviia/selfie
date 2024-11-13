@@ -8,7 +8,8 @@ const pomSchema = new mongoose.Schema({
     giorno: {type: Date, required: true},
     remainingTime: { type: Number, default: 0 },   
     isStudyPhase: { type: Boolean, default: true }, 
-    studyCycles: { type: Number, default: 0 }      
+    studyCycles: { type: Number, default: 0 }, 
+    ripetizioni: { type: Number },
 }, { timestamps: true });
 
 

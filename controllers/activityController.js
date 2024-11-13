@@ -135,9 +135,8 @@ exports.getLastActivity2days = async (req, res) => {
 
 
 
-
-
-exports.sendEmailWithActivities = async (req, res) => {
+// Invia l'email con le attività imminenti
+/*exports.sendEmailWithActivities = async (req, res) => {
   try {
     const { username } = req.body;
 
@@ -176,6 +175,41 @@ exports.sendEmailWithActivities = async (req, res) => {
       res.status(200).json({ message: 'Nessuna attività imminente da inviare via email' });
     }
 
+  } catch (error) {
+    console.error('Errore durante invio email:', error);
+    res.status(500).json({ message: 'Errore del server durante l\'invio dell\'email' });
+  }
+};*/
+// Modificata x inviare una volta
+exports.sendEmailWithActivities = async (req, res) => {
+  try {
+    const { username } = req.body;
+    if (!username) {
+      return res.status(400).json({ message: 'Username è necessario' });
+    }
+
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(404).json({ message: 'Utente non trovato' });
+    }
+
+    const today = new Date();
+    const twoDaysLater = new Date();
+    twoDaysLater.setDate(today.getDate() + 2);
+
+    const activities = await getUpcomingActivities(username);
+
+    if (activities.length > 0) {
+      const participantIds = activities.flatMap(activity => activity.participants);
+      const participantEmails = await User.find({ _id: { $in: participantIds } }, 'email');
+
+      const uniqueEmails = [...new Set(participantEmails.map(u => u.email))];
+
+      await sendReminderEmail(uniqueEmails, activities);
+      res.status(200).json({ message: 'Email inviata con successo' });
+    } else {
+      res.status(200).json({ message: 'Nessuna attività imminente' });
+    }
   } catch (error) {
     console.error('Errore durante invio email:', error);
     res.status(500).json({ message: 'Errore del server durante l\'invio dell\'email' });
@@ -224,33 +258,100 @@ exports.getCurrentDayActivities = async (req, res) => {
 exports.getActivitiesByDate = async (req, res) => {
   try {
     const { author, date } = req.query;
+
     if (!author || !date) {
-      return res.status(400).json({ message: 'Autore e data sono necessari' });
+      return res.status(400).json({ message: 'Autore e data sono necessari' }); // Parametri mancanti
     }
 
-    const startDate = new Date(date);
-    startDate.setHours(0, 0, 0, 0);
-    const endDate = new Date(date);
-    endDate.setHours(23, 59, 59, 999);
-
+    const startDate = new Date(date).setHours(0, 0, 0, 0);
+    const endDate = new Date(date).setHours(23, 59, 59, 999);
 
     const activities = await Activity.find({
       $or: [
-        { author, deadline: { $gte: startDate, $lte: endDate } }, 
-        { participants: author, deadline: { $gte: startDate, $lte: endDate } } 
-      ]
+        { author, deadline: { $gte: startDate, $lte: endDate } },
+        { participants: author, deadline: { $gte: startDate, $lte: endDate } },
+      ],
     });
 
-
-    const formattedActivities = activities.map(activity => ({
-      ...activity.toObject(),
-      deadline: activity.deadline.toISOString()
-    }));
-
-    res.json(formattedActivities);
+    res.status(200).json(activities);
   } catch (error) {
     console.error('Errore nel recupero delle attività:', error);
-    res.status(500).json({ error: 'Errore nel recupero delle attività' });
+    res.status(500).json({ error: 'Errore del server durante il recupero delle attività' });
+  }
+};
+
+
+
+
+exports.markCompleted = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = req.user.username;
+
+    const activity = await Activity.findById(id);
+
+    if (!activity) {
+      return res.status(404).json({ error: 'Attività non trovata' });
+    }
+
+    if (activity.author !== user && !activity.participants.includes(user)) {
+      return res.status(403).json({ error: 'Non sei autorizzato a completare questa attività' });
+    }
+
+    activity.completed = true;
+    await activity.save();
+
+    res.status(200).json({ message: 'Attività completata con successo', activity });
+  } catch (error) {
+    console.error('Errore nel completare l\'attività:', error);
+    res.status(500).json({ error: 'Errore del server' });
+  }
+};
+
+
+exports.updateActivity = async (req, res) => {
+  const { id } = req.params;
+  const { completed } = req.body;
+
+  try {
+    const activity = await Activity.findById(id);
+
+    if (!activity) {
+      return res.status(404).json({ error: 'Attività non trovata' });
+    }
+
+    activity.completed = completed;
+    await activity.save();
+
+    res.status(200).json({ message: 'Attività aggiornata con successo', activity });
+  } catch (error) {
+    console.error('Errore durante l\'aggiornamento dell\'attività:', error);
+    res.status(500).json({ error: 'Errore del server' });
+  }
+};
+
+exports.getOverdueActivities = async (req, res) => {
+  try {
+    const username = req.query.username;
+    if (!username) {
+      return res.status(400).json({ message: 'Username è necessario' });
+    }
+
+    const today = new Date().setHours(0, 0, 0, 0);
+
+    const overdueActivities = await Activity.find({
+      completed: false,
+      deadline: { $lt: today },
+      $or: [
+        { author: username },
+        { participants: username },
+      ],
+    });
+
+    res.status(200).json(overdueActivities);
+  } catch (error) {
+    console.error('Errore nel recupero delle attività scadute:', error);
+    res.status(500).json({ error: 'Errore del server' });
   }
 };
 
@@ -259,7 +360,6 @@ exports.getActivitiesByDate = async (req, res) => {
 exports.deleteActivities = async (req, res) => {
   try {
     const activityID = req.params.id;
-    const username = req.query.username; 
 
     const activity = await Activity.findById(activityID);
 
@@ -267,17 +367,8 @@ exports.deleteActivities = async (req, res) => {
       return res.status(404).json({ message: 'Attività non trovata' });
     }
 
-    
-    if (activity.author === username) {
-      await Activity.findByIdAndDelete(activityID);
-      return res.json({ message: 'Attività eliminata con successo' });
-    } else if (activity.participants.includes(username)) {
-      activity.participants = activity.participants.filter(participant => participant !== username);
-      await activity.save();
-      return res.json({ message: 'Partecipazione rimossa con successo' });
-    } else {
-      return res.status(403).json({ message: 'Non sei autorizzato a eliminare questa attività' });
-    }
+    await Activity.findByIdAndDelete(activityID);
+    res.json({ message: 'Attività eliminata con successo' });
   } catch (error) {
     console.error('Errore nella cancellazione della attività:', error);
     res.status(500).send('Errore nella cancellazione della attività');

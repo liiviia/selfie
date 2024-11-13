@@ -17,6 +17,12 @@ router.get('/activities/current-day', authenticateToken, activityController.getC
 
 router.get('/activities/by-date', authenticateToken, activityController.getActivitiesByDate);
 
+router.put('/activities/mark-complete', authenticateToken, activityController.markCompleted);
+
+router.put('/activities/:id', authenticateToken, activityController.updateActivity);
+
+router.get('/activities/overdue', authenticateToken, activityController.getOverdueActivities);
+
 router.delete('/activitiesRemove/:id', authenticateToken, activityController.deleteActivities) ;
 
 
