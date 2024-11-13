@@ -1,12 +1,5 @@
 <template>
-    <div>
-      <h2>Notifiche</h2>
-      <ul>
-        <li v-for="alert in alerts" :key="alert.title">
-          <strong>{{ alert.title }}</strong> - {{ alert.date }} at {{ alert.startTime }}
-        </li>
-      </ul>
-    </div>
+    
   </template>
   
   <script>
