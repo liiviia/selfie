@@ -20,6 +20,7 @@ exports.createEvent = async (req, res) => {
       notificationMechanism,
       notificationTime,
       repeatNotification,
+      participants,
     } = req.body;
     console.log(req.body);
 
@@ -35,9 +36,7 @@ exports.createEvent = async (req, res) => {
       notificationMechanismArray = notificationMechanism.split(',');
     }
 
-    
     console.log("NotificationMechanismArray" , notificationMechanismArray);
-
      
     const createAndSaveEvent = async (eventDate) => {
       const newEvent = new Event({
@@ -55,6 +54,7 @@ exports.createEvent = async (req, res) => {
         notificationMechanism: notificationMechanismArray,
         notificationTime,
         repeatNotification,
+        participants,
       });
 
       const savedEvent = await newEvent.save();
