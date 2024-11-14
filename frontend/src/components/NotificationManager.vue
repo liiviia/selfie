@@ -37,41 +37,41 @@ export default {
 
 
 
-    async sendEmailNotification(event, emailRicevente) {
-  try {
-    const token = sessionStorage.getItem('token');
-    
-    const sendEmail = async () => {
-      try {
-        await axios.post('/api/events/email', {
-          emailRicevente,
-          eventDetails: event
-        }, {
-          headers: {
-            Authorization: `Bearer ${token}`  
-          }
-        });
-        console.log('Notifica email inviata con successo');
-      } catch (error) {
-        console.error('Errore durante invio della notifica email:', error);
-      }
-    };
+  async sendEmailNotification(event, emailRicevente) {
+    try {
+      const token = sessionStorage.getItem('token');
+      
+      const sendEmail = async () => {
+        try {
+          await axios.post('/api/events/email', {
+            emailRicevente,
+            eventDetails: event
+          }, {
+            headers: {
+              Authorization: `Bearer ${token}`  
+            }
+          });
+          console.log('Notifica email inviata con successo');
+        } catch (error) {
+          console.error('Errore durante invio della notifica email:', error);
+        }
+      };
 
-    await sendEmail();
+      await sendEmail();
 
-  } catch (error) {
-    console.error('Errore durante il processo di invio delle notifiche email:', error);
-  }
-},
+    } catch (error) {
+      console.error('Errore durante il processo di invio delle notifiche email:', error);
+    }
+  },
 
 
-sendAlertNotification(event) {
-  if (this.notifiedEvents.has(event.id)) {
-    return;
-  }
-  window.alert(`Nuovo Evento: ${event.title}\nInizio alle ${event.startTime} del giorno ${event.date}`);
-  this.notifiedEvents.add(event.id);
-},
+  sendAlertNotification(event) {
+    if (this.notifiedEvents.has(event.id)) {
+      return;
+    }
+    window.alert(`Nuovo Evento: ${event.title}\nInizio alle ${event.startTime} del giorno ${event.date}`);
+    this.notifiedEvents.add(event.id);
+  },
 
 
 
@@ -89,11 +89,11 @@ sendAlertNotification(event) {
         
         this.events = response.data;
         
-        this.events.forEach(event => {
-          const emailRicevente = localStorage.getItem('email');
-          console.log("Eventi trovati");
-       console.log(event,emailRicevente);
-        });
+        // this.events.forEach(event => {
+        //   const emailRicevente = localStorage.getItem('email');
+        //   //console.log("Eventi trovati");
+        //   console.log(event,emailRicevente);
+        // });
       } catch (error) {
         console.error('Errore nel recupero degli eventi:', error);
       }
@@ -172,7 +172,7 @@ sendAlertNotification(event) {
       try {
         const response = await axios.get('/api/getTime-machine');
         this.timeMachineDate = new Date(response.data);
-        console.log("Time Machine Date Updated:", this.timeMachineDate);
+        //console.log("Time Machine Date Updated:", this.timeMachineDate);
       } catch (error) {
         console.error('Errore nel recupero della Time Machine:', error);
       }
@@ -182,7 +182,7 @@ sendAlertNotification(event) {
   watch: {
     timeMachineDate(newDate, oldDate) {
       if (newDate !== oldDate) {
-        console.log("La data della Time Machine è cambiata!");
+        //console.log("La data della Time Machine è cambiata!");
         this.fetchEvents(); 
       }
     }
