@@ -23,6 +23,8 @@ router.get('/getNotifichePom', authenticateToken, pomController.getNotifichePom)
 
 router.delete('/rifiutaNotifica/:id', authenticateToken , pomController.rifiutaNotifica);
 
+router.post('/iniziaPomodoro/:id' , authenticateToken , pomController.iniziaPomodoro);
+
 
 
 module.exports = router;

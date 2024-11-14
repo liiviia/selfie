@@ -62,25 +62,35 @@
   </div>
 
     <div class="content-container">
-  <div class="section pomodoros-section">
-        <h3>I TUOI POMODORI:</h3>
-        <div v-if="pomodoros.length > 0">
-          <div v-for="pomodoro in pomodoros" :key="pomodoro._id" class="item-container">
-            <h4>Pomodoro Sessione</h4>
-            <p>Data: {{ formatDate(pomodoro.giorno) }}</p>
-            <p>Tempo di studio: {{ pomodoro.tempoStudio }} minuti</p>
-            <p>Tempo di pausa: {{ pomodoro.tempoPausa }} minuti</p>
-            <p>Ripetizioni: {{ pomodoro.ripetizioni }}</p>
-            <button @click="confirmDeletePomodoro(pomodoro._id)" class="delete-btn">🗑️</button>
-          </div>
-        </div>
-        <p v-else>Nessun pomodoro per questa data.</p>
-        <div class="button-container">
-          <button class="fixed-button" @click="navigateToAddPomodoro" style="background:#f4a460;">
-            Aggiungi pomodoro
-            </button>
-        </div>
+      <div class="section pomodoros-section">
+    <h3>I TUOI POMODORI:</h3>
+    <div v-if="pomodoros.length > 0">
+      <div v-for="pomodoro in pomodoros" :key="pomodoro._id" class="item-container">
+        <h4>Pomodoro Sessione</h4>
+        <p>Data: {{ formatDate(pomodoro.giorno) }}</p>
+        <p>Tempo di studio: {{ pomodoro.tempoStudio }} minuti</p>
+        <p>Tempo di pausa: {{ pomodoro.tempoPausa }} minuti</p>
+        <p>Ripetizioni: {{ pomodoro.ripetizioni }}</p>
+        <button @click="confirmDeletePomodoro(pomodoro._id)" class="delete-btn">🗑️</button>
+        
+        <button
+  v-if="isSameDay(queryDate, timeMachine) && !pomodoro.isStarted"
+  @click="iniziaPomodoro(pomodoro._id,  pomodoro.remainingTime, pomodoro.giorno, pomodoro.tempoStudio, pomodoro.tempoPausa, pomodoro.ripetizioni)"
+>
+  Inizia il pomodoro
+</button>
+
+<p v-else-if="pomodoro.isStarted">Pomodoro già avviato</p>
+
       </div>
+    </div>
+    <p v-else>Nessun pomodoro per questa data.</p>
+    <div class="button-container">
+      <button class="fixed-button" @click="navigateToAddPomodoro" style="background:#f4a460;">
+        Aggiungi pomodoro
+      </button>
+    </div>
+  </div>
 
 
       <div class="section pomodorosScaduti-section">
@@ -120,6 +130,7 @@ export default {
     const incompleteSessions = ref([]);
     const overdueActivities = ref([]); 
     const queryDate = computed(() => route.query.date);
+    const timeMachine = ref();
 
     const confirmDeleteActivity = (id) => {
       if (confirm("Sicuro di voler eliminare questa Attività?")) {
@@ -133,7 +144,7 @@ export default {
       router.push({ path: '/addEvent', query: { date: queryDate.value } });
     };
     const navigateToAddPomodoro = () => {
-      router.push({ path: '/pomodoroTempo', query: { date: queryDate.value } });
+      router.push({ path: '/pomodoroTempo', query: { date: queryDate.value,nonFare: 'false' } });
     };
 
     const deleteActivities = async (id) => {
@@ -196,15 +207,63 @@ export default {
       }
     };
 
+    const iniziaPomodoro = async (id, remainingTime, date, tempoStudio, tempoPausa, ripetizioni) => {
+  try {
+    const token = sessionStorage.getItem('token');
+    console.log("token pom", token);
+    const response = await axios.post(`/api/iniziaPomodoro/${id}`, {
+      date },
+      {
+      headers: {
+         Authorization: `Bearer ${token}` 
+        }
+    });
+
+    if (response.data.success) {
+      router.push({
+        path: '/pomodoroTempo',
+        query: {
+          date: date,
+          remainingTime: remainingTime,
+          isStudyPhase: true,
+          tempoStudio: tempoStudio,
+          tempoPausa: tempoPausa,
+          ripetizioni: ripetizioni,
+          nuovo: true,
+          nonFare: true
+        }
+      });
+    } else {
+      console.log(response.data.message); 
+    }
+  } catch (error) {
+    console.error('Errore durante l\'avvio del pomodoro:', error);
+  }
+};
+
+
+
+    const isSameDay = (date1, date2) => {
+      const d1 = new Date(date1);
+        const d2 = new Date(date2);
+       // console.log("query date:", date1 , "time machine date:" , date2);
+        return (
+            d1.getFullYear() === d2.getFullYear() &&
+            d1.getMonth() === d2.getMonth() &&
+            d1.getDate() === d2.getDate()
+        );
+
+    };
+
 
     const fetchActivities = async () => {
   try {
     const token = sessionStorage.getItem('token');
-    const author = localStorage.getItem('username'); // Recupera l'autore dal localStorage
-    console.log('Fetching activities for:', { date: queryDate.value, author }); // Debug
+    const author = localStorage.getItem('username'); 
+    console.log('Fetching activities for:', { date: queryDate.value, author }); 
     const response = await axios.get('/api/activities/by-date', {
       headers: { Authorization: `Bearer ${token}` },
-      params: { date: queryDate.value, author }, // Passa entrambi i parametri
+      params: { date: queryDate.value, author }, 
     });
     activities.value = response.data;
   } catch (error) {
@@ -307,6 +366,7 @@ export default {
     const plainSession = JSON.parse(JSON.stringify(session));
 
     console.log("Sessione passata a pomodoroTempo:", plainSession);
+    const nuovo = false;
 
     router.push({
       path: '/pomodoroTempo',
@@ -318,6 +378,8 @@ export default {
         tempoStudio: plainSession.tempoStudio, 
         tempoPausa: plainSession.tempoPausa,   
         ripetizioni: plainSession.ripetizioni, 
+        nuovo: nuovo,
+        nonFare:true,
     },
   });
     };
@@ -417,14 +479,24 @@ export default {
   }
 };
 
+   const getTimeMachine = async () => {
 
+    try{
+    const response = await axios.get('/api/getTime-machine');
+    timeMachine.value = response.data
+    //console.log(" data time machine event day calendar",timeMachine);
+
+    } catch (error) {
+      console.log("errore recupero data time machine" , error);
+    }
+   };
 
     onMounted(() => {
       fetchEvents();
       fetchActivities();
       fetchOverdueActivities();
       fetchIncompleteSessions();
-    });
+      setInterval(getTimeMachine, 1000);    });
 
     return {
       events,
@@ -445,7 +517,10 @@ export default {
       //markActivityComplete ,
       markAsCompleted,
       filteredOverdueActivities,
-      discardActivity
+      discardActivity,
+      iniziaPomodoro,
+      timeMachine,
+      isSameDay
     };
   }
 };

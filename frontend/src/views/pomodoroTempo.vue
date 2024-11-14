@@ -213,15 +213,26 @@ export default {
 
   onMounted(() => {
 
+    if (route.query.date && !isNaN(new Date(route.query.date).getTime())) {
+  newPom.value.giorno = new Date(route.query.date).toISOString().split('T')[0];
+} else {
+  newPom.value.giorno = new Date().toISOString().split('T')[0];
+}
+
+
     getUsers();
 
-    
-    if (route.query.date) {
-      newPom.value.giorno = new Date(route.query.date).toISOString().split('T')[0]; // Assegna la data passata
-    } else {
-      newPom.value.giorno = new Date().toISOString().split('T')[0]; // Imposta la data corrente
-    }
 
+
+   // const params = new URLSearchParams(window.location.search); 
+    const query = route.query;
+    
+    if (Object.keys(query).length > 0 && route.query.nonFare === 'true'){
+
+
+  console.log(route.query.nuovo);
+  if(route.query.nuovo === 'false'){
+    console.log("non nuovo");
   newPom.value.tempoStudio = route.query.tempoStudio
     ? parseInt(route.query.tempoStudio)
     : newPom.value.tempoStudio;
@@ -266,6 +277,16 @@ export default {
       startBreakTimer(newPom.value.tempoPausa, studyCycles.value);
     }
   }
+
+}  
+  else {
+    console.log("Nuovo ciclo");
+    studyCycles.value = newPom.value.ripetizioni;
+    startNewCycle();
+  }
+
+}
+
 });
 
 
@@ -275,6 +296,33 @@ export default {
     onUnmounted(() => {
       clearInterval(timerInterval); 
     });
+
+    const startNewCycle = () => {
+  newPom.value.tempoStudio = route.query.tempoStudio ? parseInt(route.query.tempoStudio) : newPom.value.tempoStudio;
+  newPom.value.tempoPausa = route.query.tempoPausa ? parseInt(route.query.tempoPausa) : newPom.value.tempoPausa;
+  newPom.value.ripetizioni = route.query.ripetizioni ? parseInt(route.query.ripetizioni) : newPom.value.ripetizioni;
+  studyCycles.value = route.query.studyCycles ? parseInt(route.query.studyCycles) : newPom.value.ripetizioni;
+  remainingTime.value = route.query.remainingTime ? parseInt(route.query.remainingTime) : 0;
+  isStudyPhase.value = route.query.isStudyPhase === 'true';
+
+  
+  if (remainingTime.value > 0) {
+    document.getElementById('timerDisplay').textContent = formatTime(remainingTime.value);
+
+    if (isStudyPhase.value) {
+      console.log("study timer" , newPom.value.tempoStudio);
+      startStudyTimer(newPom.value.tempoStudio, studyCycles.value);
+    } else {
+      startBreakTimer(newPom.value.tempoPausa, studyCycles.value);
+    }
+  } else {
+    console.log("study timer" , newPom.value.tempoStudio);
+
+    startStudyTimer(newPom.value.tempoStudio, studyCycles.value);
+  }
+};
+
+
 
 
     const updateProgressBar = (totalTime) => {

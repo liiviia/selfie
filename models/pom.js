@@ -10,6 +10,7 @@ const pomSchema = new mongoose.Schema({
     isStudyPhase: { type: Boolean, default: true }, 
     studyCycles: { type: Number, default: 0 }, 
     ripetizioni: { type: Number },
+    isStarted: {type: Boolean, default: false},
 }, { timestamps: true });
 
 

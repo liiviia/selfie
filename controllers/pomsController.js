@@ -231,6 +231,33 @@ exports.deletePom = async (req, res) => {
     console.error('Errore nella cancellazione del pomodoro:', error);
     res.status(500).send('Errore nella cancellazione del pomodoro');
   }
-}
+};
+
+
+exports.iniziaPomodoro = async (req, res) => {
+  try {
+    const id  = req.params.id; 
+
+    const pomodoro = await Pom.findById(id);
+
+    if (!pomodoro) {
+      return res.status(404).json({ success: false, message: 'Pomodoro non trovato' });
+    }
+
+    if (!pomodoro.isStarted) {
+      pomodoro.isStarted = true;
+
+      await pomodoro.save();
+
+      return res.status(200).json({ success: true, message: 'Pomodoro avviato con successo' });
+    } else {
+      return res.status(400).json({ success: false, message: 'Questo pomodoro è già iniziato' });
+    }
+  } catch (error) {
+    console.error("Errore durante l'avvio del pomodoro:", error);
+    return res.status(500).json({ success: false, message: 'Errore interno del server' });
+  }
+};
+
 
     

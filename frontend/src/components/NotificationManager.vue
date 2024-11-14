@@ -112,7 +112,7 @@ sendAlertNotification(event) {
   try {
     console.log("Chiamata API iniziata...");
     const response = await axios.get('/api/getTime-machine');
-    console.log("Time machine data:", response.data);
+    //console.log("Time machine data:", response.data);
 
     const timeMachineNow = new Date(response.data).getTime();
     console.log("Time Machine Current Time:", timeMachineNow);
