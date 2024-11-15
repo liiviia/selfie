@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <button @click="generateICS">Esporta in ICS</button>
   <div class="calendar">
     <div class="calendar-header">
       <button @click="prevMonth">&lt;</button>
@@ -221,94 +222,94 @@ function closeUnavailableTimeModal() {
     }
 
     async function fetchEvents() {
-  try {
-    const username = localStorage.getItem('username');
-    const token = sessionStorage.getItem('token');
-    if (!username || !token) {
-      console.error('Username o token mancante. L\'utente potrebbe non essere autenticato.');
-      return;
+      try {
+        const username = localStorage.getItem('username');
+        const token = sessionStorage.getItem('token');
+        if (!username || !token) {
+          console.error('Username o token mancante. L\'utente potrebbe non essere autenticato.');
+          return;
+        }
+
+        const response = await axios.get(`/api/eventsGET`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+          params: { author: username }
+        });
+        const events = response.data;
+
+        const activityResponse = await axios.get(`/api/activitiesGET`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+          params: { username: username }
+        });
+        const activities = activityResponse.data;
+
+        const pomodoroResponse = await axios.get(`/api/poms`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+          params: { username: username }
+        });
+        const pomodoros = pomodoroResponse.data;
+
+        console.log("Risposta API Pomodori:", pomodoroResponse.data);
+
+        eventsMap.value = {};
+        activityMap.value = {};
+        pomodoroMap.value = {};
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        events
+          .filter(event => {
+            const eventDate = new Date(event.date);
+            eventDate.setHours(0, 0, 0, 0);
+            return eventDate >= today;
+          })
+          .forEach(event => {
+            const eventDate = new Date(event.date);
+            const dateString = formatDateToLocal(eventDate);
+            eventsMap.value[dateString] = true;
+          });
+
+        activities
+          .filter(activity => {
+            const activityDate = new Date(activity.deadline);
+            activityDate.setHours(0, 0, 0, 0);
+            return activityDate >= today; 
+          })
+          .forEach(activity => {
+            const activityDate = new Date(activity.deadline);
+            const dateString = formatDateToLocal(activityDate); 
+            activityMap.value[dateString] = true;
+          });
+
+        pomodoros
+          .filter(pomodoro => {
+            const pomodoroDate = new Date(pomodoro.giorno);
+            pomodoroDate.setHours(0, 0, 0, 0);
+            return pomodoroDate >= today; 
+          })
+          .forEach(pomodoro => {
+            const pomodoroDate = new Date(pomodoro.giorno);
+            const dateString = formatDateToLocal(pomodoroDate);
+            pomodoroMap.value[dateString] = true;
+          });
+
+        updateCalendarDays();
+      } catch (error) {
+        if (error.response) {
+          console.error('Errore nella risposta del server:', error.response.status, error.response.data);
+        } else if (error.request) {
+          console.error('Nessuna risposta ricevuta dal server:', error.request);
+        } else {
+          console.error('Errore durante l\'impostazione della richiesta:', error.message);
+        }
+      }
     }
-
-    const response = await axios.get(`/api/eventsGET`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      },
-      params: { author: username }
-    });
-    const events = response.data;
-
-    const activityResponse = await axios.get(`/api/activitiesGET`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      },
-      params: { username: username }
-    });
-    const activities = activityResponse.data;
-
-    const pomodoroResponse = await axios.get(`/api/poms`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      },
-      params: { username: username }
-    });
-    const pomodoros = pomodoroResponse.data;
-
-    console.log("Risposta API Pomodori:", pomodoroResponse.data);
-
-    eventsMap.value = {};
-    activityMap.value = {};
-    pomodoroMap.value = {};
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    events
-      .filter(event => {
-        const eventDate = new Date(event.date);
-        eventDate.setHours(0, 0, 0, 0);
-        return eventDate >= today;
-      })
-      .forEach(event => {
-        const eventDate = new Date(event.date);
-        const dateString = formatDateToLocal(eventDate);
-        eventsMap.value[dateString] = true;
-      });
-
-    activities
-      .filter(activity => {
-        const activityDate = new Date(activity.deadline);
-        activityDate.setHours(0, 0, 0, 0);
-        return activityDate >= today; 
-      })
-      .forEach(activity => {
-        const activityDate = new Date(activity.deadline);
-        const dateString = formatDateToLocal(activityDate); 
-        activityMap.value[dateString] = true;
-      });
-
-    pomodoros
-      .filter(pomodoro => {
-        const pomodoroDate = new Date(pomodoro.giorno);
-        pomodoroDate.setHours(0, 0, 0, 0);
-        return pomodoroDate >= today; 
-      })
-      .forEach(pomodoro => {
-        const pomodoroDate = new Date(pomodoro.giorno);
-        const dateString = formatDateToLocal(pomodoroDate);
-        pomodoroMap.value[dateString] = true;
-      });
-
-    updateCalendarDays();
-  } catch (error) {
-    if (error.response) {
-      console.error('Errore nella risposta del server:', error.response.status, error.response.data);
-    } else if (error.request) {
-      console.error('Nessuna risposta ricevuta dal server:', error.request);
-    } else {
-      console.error('Errore durante l\'impostazione della richiesta:', error.message);
-    }
-  }
-}
 
 
 function submitForm() {
@@ -420,15 +421,79 @@ async function addUnavailableTime(startHour, startMinute, endHour, endMinute, re
       });
     }
 
+
+    //genera file .ics
+    async function generateICS() {
+      const username = localStorage.getItem('username');
+      const token = sessionStorage.getItem('token');
+
+      const eventResponse = await axios.get(`/api/eventsGET`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        params: { author: username }
+      });
+      const events = eventResponse.data;
+
+      //console.log("eventss:",events);
+      let icsContent = "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//SELfie//Calendar//EN\n";
+
+      // eventi iCalendar
+      events.forEach(event => {
+        if (event.date) {
+          icsContent += "BEGIN:EVENT\r\n";
+          icsContent += `TITLE:${event.title}\r\n`;
+          icsContent += `DESCRIPTION:${event.description || "Nessuna descrizione"}\r\n`;
+          icsContent += `LOCATION:${event.location || "N/A"}\r\n`;
+          //icsContent += `DTSTART:${formatDateToICS(new Date(event.startDate))}\r\n`;
+          icsContent += `DATE:${formatDateToICS(new Date(event.date))}\r\n`;
+          icsContent += "CATEGORY:Evento\r\n";
+          icsContent += "END:EVENT\r\n";
+        }
+      });
+      //attivita
+      // Object.keys(activityMap.value).forEach(dateString => {
+      //   const activityDate = new Date(dateString);
+      //   icsContent += "BEGIN:VEVENT\n";
+      //   icsContent += `UID:${dateString}-activity@yourapp.com\n`;
+      //   icsContent += `DTSTAMP:${formatDateToICS(activityDate)}\n`;
+      //   icsContent += `DTSTART:${formatDateToICS(activityDate)}\n`;
+      //   icsContent += `SUMMARY:Attività\n`;
+      //   icsContent += "END:VEVENT\n";
+      // });
+      // //pomodoro
+      // Object.keys(pomodoroMap.value).forEach(dateString => {
+      //   const pomodoroDate = new Date(dateString);
+      //   icsContent += "BEGIN:VEVENT\n";
+      //   icsContent += `UID:${dateString}-pomodoro@yourapp.com\n`;
+      //   icsContent += `DTSTAMP:${formatDateToICS(pomodoroDate)}\n`;
+      //   icsContent += `DTSTART:${formatDateToICS(pomodoroDate)}\n`;
+      //   icsContent += `SUMMARY:Pomodoro\n`;
+      //   icsContent += "END:VEVENT\n";
+      // });
+
+      icsContent += "END:VCALENDAR";
+
+      // Crea un file blob e scaricalo
+      const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "calendar.ics";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // formatta la data in formato iCalendar
+    function formatDateToICS(date) {
+      return date.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+    }
+
+
    onMounted(async () => {
       await fetchEvents();
       updateCalendarDays();
-
-      
-
-      
-
-  
     });
 
     watch(currentDate, async () => {
@@ -444,6 +509,7 @@ async function addUnavailableTime(startHour, startMinute, endHour, endMinute, re
       prevMonth,
       nextMonth,
       selectDate,
+<<<<<<< HEAD
       openNotificationModal,
       openModal,
       closeNotificationModal,
@@ -455,6 +521,9 @@ async function addUnavailableTime(startHour, startMinute, endHour, endMinute, re
       VediNonDisponibile,
       unavailableTimes,
       eliminaUnavailableTime
+=======
+      generateICS,
+>>>>>>> origin/main
     };
   }, 
 
