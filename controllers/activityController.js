@@ -135,53 +135,6 @@ exports.getLastActivity2days = async (req, res) => {
 };
 
 
-
-// Invia l'email con le attività imminenti
-/*exports.sendEmailWithActivities = async (req, res) => {
-  try {
-    const { username } = req.body;
-
-    if (!username) {
-      return res.status(400).json({ message: 'Username è necessario' });
-    }
-
-    const user = await User.findOne({ username });
-    if (!user) {
-      return res.status(404).json({ message: 'Utente non trovato' });
-    }
-
-    const timeMachineDate = await getTimeMachineDate(); 
-    const today = new Date(timeMachineDate);
-    const twoDaysLater = new Date(today);
-    twoDaysLater.setDate(today.getDate() + 2);
-
-    const upcomingActivities = await Activity.find({
-      $or: [
-        { author: username, deadline: { $gte: today, $lte: twoDaysLater } },
-        { participants: username, deadline: { $gte: today, $lte: twoDaysLater } } 
-      ]
-    });
-
-    if (upcomingActivities.length > 0) {
-      const emails = await Promise.all(upcomingActivities.map(async (activity) => {
-        const participantsEmails = await User.find({ _id: { $in: activity.participants } }, 'email');
-        return participantsEmails.map(participant => participant.email);
-      }));
-
-      const uniqueEmails = [...new Set(emails.flat())];
-
-      await sendReminderEmail(uniqueEmails, upcomingActivities);
-      res.status(200).json({ message: 'Email inviata con successo a tutti i partecipanti' });
-    } else {
-      res.status(200).json({ message: 'Nessuna attività imminente da inviare via email' });
-    }
-
-  } catch (error) {
-    console.error('Errore durante invio email:', error);
-    res.status(500).json({ message: 'Errore del server durante l\'invio dell\'email' });
-  }
-};*/
-// Modificata x inviare una volta
 exports.sendEmailWithActivities = async (req, res) => {
   try {
     const { username } = req.body;
@@ -364,7 +317,8 @@ exports.getOverdueActivities = async (req, res) => {
 exports.deleteActivities = async (req, res) => {
   try {
     const activityID = req.params.id;
-    const username = req.query.username; // Otteniamo l'username dai parametri della richiesta
+    const username = req.query.username; 
+    console.log(username);
 
     const activity = await Activity.findById(activityID);
 
@@ -372,13 +326,11 @@ exports.deleteActivities = async (req, res) => {
       return res.status(404).json({ message: 'Attività non trovata' });
     }
 
-    // Controllo se l'utente è l'autore dell'attività
     if (activity.author === username) {
-      // Se l'utente è l'autore, elimina l'intera attività
       await Activity.findByIdAndDelete(activityID);
+      console.log(`Attività ${activityID} eliminata con successo`);
       return res.json({ message: 'Attività eliminata con successo' });
     } else {
-      // Se l'utente non è l'autore, rimuove solo il suo nome dai partecipanti
       activity.participants = activity.participants.filter(
         (participant) => participant !== username
       );

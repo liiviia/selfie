@@ -486,9 +486,11 @@ export default {
     const discardActivity = async (id) => {
   try {
     const token = sessionStorage.getItem('token');
+    const username = localStorage.getItem('username');
     console.log('Discarding activity with ID:', id); 
     await axios.delete(`/api/activitiesRemove/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
+      params: {username: username}
     });
     overdueActivities.value = overdueActivities.value.filter(a => a._id !== id);
   } catch (error) {

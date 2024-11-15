@@ -49,7 +49,7 @@ const sendNotifEmail = (recipientEmail, eventDetails) => {
     subject: 'NON DIMENTICARTI L EVENTO:',
     html: `
        <div style="font-family: Arial, sans-serif;">
-        <h2 style="color: #2c3e50;">L'evento "${eventDetails.title}" è stato creato !</h2>
+        <h2 style="color: #2c3e50;">L'evento "${eventDetails.title}"</h2>
         <p style="font-size: 16px;">
           <strong>📅 Data:</strong> ${eventDetails.date}<br>
           <strong>🕒 Ora di inizio:</strong> ${eventDetails.startTime}<br>
@@ -64,7 +64,29 @@ const sendNotifEmail = (recipientEmail, eventDetails) => {
   sendMail(mailOptions);
 } ;
 
+const sendNotifEmailActivity = (recipientEmail , activityDetails) => {
+ 
+  const mailOptions = {
+    from: '"Servizio sito SELFIE"<app4905@gmail.com>',
+    to:recipientEmail,
+    subject: 'NON DIMENTICARTI L ATTIVITÀ:',
+    html: `
+       <div style="font-family: Arial, sans-serif;">
+        <h2 style="color: #2c3e50;">L'attività "${activityDetails.title}"</h2>
+        <p style="font-size: 16px;">
+          <strong>📅 Scadenza:</strong> ${activityDetails.deadline}<br>
+          <strong>🕒 Descrizione:</strong> ${activityDetails.description}<br>
+          <p style="font-size: 14px;">Non mancare! </p>
+        <p style="font-size: 14px;">Grazie,<br>Il Team SELFIE</p>
+        </p>        
+      </div>
+    `
+  };
+  sendMail(mailOptions);
+
+};
 
 
-module.exports = { sendReminderEmail, sendNotifEmail };
+
+module.exports = { sendReminderEmail, sendNotifEmail, sendNotifEmailActivity };
 

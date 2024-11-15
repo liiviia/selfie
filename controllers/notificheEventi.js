@@ -1,12 +1,14 @@
 const Event = require('../models/Event');
+const Activity = require('../models/Activity');
+const User = require('../models/User');
 const timeMachineConfig = require('../timeMachineConfig');
 const moment = require('moment-timezone');
 const { sendNotifEmail } = require('../services/emailService');
+const {sendNotifEmailActivity} = require('../services/emailService');
 const { sendAlertNotification } = require('../websocketServer'); 
 const sentNotifications = new Set();
 
 const getTimeMachineDate1 = async () => {
- // console.log("GET TIME MACHINE:", moment(timeMachineConfig.getTimeMachineDate()).tz('Europe/Rome'));
   return moment(timeMachineConfig.getTimeMachineDate()).tz('Europe/Rome');
 };
 
@@ -18,12 +20,10 @@ const calculateNotificationTime = (event) => {
   } else if (event.date instanceof Date) {
     eventDateTimeString = `${event.date.toISOString().slice(0, 10)}T${event.startTime}:00`;
   } else {
-//    console.error("Tipo di data evento non valido:", event.date);
     return null;
   }
 
   const eventTime = moment(eventDateTimeString).tz('Europe/Rome');
-// console.log("event time", eventTime.format('YYYY-MM-DD HH:mm:ss'));
 
   if (eventTime.isValid() === false) {
     console.error("La data dell'evento non è valida:", eventDateTimeString);
@@ -31,32 +31,54 @@ const calculateNotificationTime = (event) => {
   }
 
   const notificationTime = eventTime.clone().subtract(event.notificationTime, 'minutes');
- // console.log("quando inviare notifica", notificationTime.format('YYYY-MM-DD HH:mm:ss'));
   return notificationTime.valueOf();
 };
 
 const sendNotification = async (event) => {
   if (sentNotifications.has(event._id.toString())) {
-   // console.log(`Notifica già inviata per l'evento: ${event.title}`);
     return;
   }
 
- // console.log("Notifica inviata per l'evento:", event.title);
 
   try {
     if (event.notificationMechanism.includes('email')) {
-      const emailRicevente = event.email;
-      await sendNotifEmail(emailRicevente, event);
-    //  console.log("Email inviata correttamente");
+      let emailRicevente = [];
+
+      if (event.type === 'gruppo') {
+        const userEmails = await User.find({ username: { $in: event.participants } }).select('email');
+        emailRicevente = userEmails.map(user => user.email);
+      } else if (event.type === 'singola') {
+        emailRicevente = event.email;
+      }
+
+      if (Array.isArray(emailRicevente)) {
+        for (const email of emailRicevente) {
+          await sendNotifEmail(email, event);
+          console.log(`Email inviata a: ${email}`);
+        }
+      } else {
+        await sendNotifEmail(emailRicevente, event);
+        console.log(`Email inviata a: ${emailRicevente}`);
+      }
     }
     
 
     if (event.notificationMechanism.includes('alert')) {
 
-      sendAlertNotification(event.title, event.date, event.startTime, event.author);
+      let recipients = [];
+
+      if (event.type === 'gruppo') {
+        recipients = event.participants;
+      } else if (event.type === 'singola') {
+        recipients = [event.author];
+      }
+
+      for (const recipient of recipients) {
+        sendAlertNotification(event.title, event.date, event.startTime, recipient);
+        console.log(`Alert inviato per l'evento: ${event.title} a ${recipient}`);
+      }
 
 
-  //  console.log("Alert inviato per l'evento:", event.title);
     }
     
 
@@ -73,17 +95,17 @@ const sendNotification = async (event) => {
 
 const handleRepeatedNotifications = (event, repeatTime) => {
   if (repeatTime > 0) {
- //  console.log(`Invio notifiche ripetute per l'evento: ${event.title}`);
+
 
     let count = 0;
     const intervalId = setInterval(() => {
       if (count < repeatTime) {
         sendNotification(event);  
-    //  console.log(`Notifica inviata ${count + 1} volta per l'evento: ${event.title}`);
+
         count++;
       } else {
         clearInterval(intervalId);
-     //  console.log(`tutte notifiche inviate per evento: ${event.title}`);
+
       }
     }, 60000);  
   }
@@ -91,19 +113,16 @@ const handleRepeatedNotifications = (event, repeatTime) => {
 
 
 const checkAndSendNotifications = async () => {
- // console.log("Controllo notifiche eventi");
+
   const timeMachineDate = await getTimeMachineDate1();  
   const timeMachineDateInMs = timeMachineDate.valueOf(); 
 
- // console.log("time Machine to date::", timeMachineDate.format('YYYY-MM-DD HH:mm:ss'));
-  //console.log("tm in ms::" ,timeMachineDateInMs);
-  //console.log("itme machine time minuti ore", timeMachineDate.format('HH:mm'));
+ 
 
 const events = await Event.find();
 
 
 
-//  console.log("eventi non scaduti:::::::", events);
 
   for (const event of events) {
     const notificationDateInMs = calculateNotificationTime(event);
@@ -112,14 +131,11 @@ const events = await Event.find();
 
 if (notificationDateInMs !== null) {
   if (timeMachineDateInMs >= (notificationDateInMs - TOLLERANZA_MS) && timeMachineDateInMs <= (notificationDateInMs + TOLLERANZA_MS)) {
- //  console.log("notification time in ms", notificationDateInMs);
-   // console.log(`Inviando notifica per l'evento: ${event.title}`);
+ 
     await sendNotification(event); 
     handleRepeatedNotifications(event, event.repeatNotification); 
   } else {
-  // console.log("notification time in ms", notificationDateInMs);
-    //console.log("time machine in ms", timeMachineDateInMs);
-    //console.log(`Evento scaduto o notifica non ancora da inviare: ${event.title}`);
+  
   }
 }
 
@@ -127,9 +143,85 @@ if (notificationDateInMs !== null) {
 };
 
 const startNotificationMonitoring = () => {
-  //console.log("Monitoraggio notifiche eventi");
+
   setInterval(checkAndSendNotifications, 1000);
+
+  setInterval(checkAndSendActivityNotifications, 1000);
 };
+
+const checkAndSendActivityNotifications = async () => {
+  const timeMachineDate = await getTimeMachineDate1();  
+  const timeMachineDateInMsA = timeMachineDate.valueOf(); 
+
+
+  const activities = await Activity.find({ completed: false });
+
+
+  for (const activity of activities) {
+
+    const notificationTimes = calculateNotificationTimeActivity(activity);
+    console.log("time machine:", timeMachineDate, "in MS:", timeMachineDateInMsA);
+
+    const TOLLERANZA_MS = 3600000; 
+
+    if (notificationTimes !== null) {
+      for (const notificationTime of notificationTimes) {
+
+        const localNotificationTime = moment.utc(notificationTime).local().valueOf();
+        console.log("momento invio notifica:", localNotificationTime);
+
+        const diff = Math.abs(localNotificationTime - timeMachineDateInMsA);
+        console.log(`Differenza tra time machine e notifica: ${diff} ms`);
+
+
+        if (timeMachineDateInMsA == localNotificationTime - TOLLERANZA_MS) {
+
+          await sendNotificationA(activity); 
+
+          console.log(`Notifica inviata per l'attività: ${activity.title} alle: ${new Date(timeMachineDateInMsA).toLocaleString()}`);
+          console.log("------------------------------");
+        }
+      }
+    }
+  }
+};
+
+const sendNotificationA = async (activity) => {
+  let emails = [];
+
+  if (activity.type === 'gruppo') {
+    const userEmails = await User.find({ username: { $in: activity.participants } }).select('email');
+    emails = userEmails.map(user => user.email);
+    console.log('Email dei partecipanti:', emails);
+  }
+  else if (activity.type === 'singola') {
+    emails = [activity.email];
+    console.log('Email dell\'autore:', emails);
+  }
+
+  for (const email of emails) {
+    await sendNotifEmailActivity(email, activity);
+    console.log(`Notifica inviata a: ${email}`);
+  }
+};
+
+
+
+const calculateNotificationTimeActivity = (activity) => {
+  const notificationTimes = [];
+
+  notificationTimes.push(moment(activity.deadline).valueOf());
+
+  notificationTimes.push(moment(activity.deadline).add(6, 'hours').valueOf());
+
+  notificationTimes.push(moment(activity.deadline).add(9, 'hours').valueOf());
+
+  notificationTimes.push(moment(activity.deadline).add(10, 'hours').valueOf());
+
+  
+  return notificationTimes;
+};
+
 
 module.exports = {
   startNotificationMonitoring,
