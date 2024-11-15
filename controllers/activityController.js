@@ -364,6 +364,7 @@ exports.getOverdueActivities = async (req, res) => {
 exports.deleteActivities = async (req, res) => {
   try {
     const activityID = req.params.id;
+    const username = req.query.username; // Otteniamo l'username dai parametri della richiesta
 
     const activity = await Activity.findById(activityID);
 
@@ -371,10 +372,22 @@ exports.deleteActivities = async (req, res) => {
       return res.status(404).json({ message: 'Attività non trovata' });
     }
 
-    await Activity.findByIdAndDelete(activityID);
-    res.json({ message: 'Attività eliminata con successo' });
+    // Controllo se l'utente è l'autore dell'attività
+    if (activity.author === username) {
+      // Se l'utente è l'autore, elimina l'intera attività
+      await Activity.findByIdAndDelete(activityID);
+      return res.json({ message: 'Attività eliminata con successo' });
+    } else {
+      // Se l'utente non è l'autore, rimuove solo il suo nome dai partecipanti
+      activity.participants = activity.participants.filter(
+        (participant) => participant !== username
+      );
+      await activity.save();
+      return res.json({ message: 'Utente rimosso dai partecipanti' });
+    }
   } catch (error) {
     console.error('Errore nella cancellazione della attività:', error);
     res.status(500).send('Errore nella cancellazione della attività');
   }
 };
+

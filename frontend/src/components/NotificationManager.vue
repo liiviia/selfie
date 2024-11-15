@@ -91,7 +91,7 @@ sendAlertNotification(event) {
         
         this.events.forEach(event => {
           const emailRicevente = localStorage.getItem('email');
-          console.log("Eventi trovati");
+        console.log("Eventi trovati");
        console.log(event,emailRicevente);
         });
       } catch (error) {

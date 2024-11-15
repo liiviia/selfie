@@ -63,18 +63,29 @@
         <input type="text" v-model="newEvent.author" required />
       </div>
 
-      <div>
-        <label>Aggiungere altri partecipanti?</label>
-        <input type="checkbox" v-model="newEvent.altri" />
+      <div class="form-group">
+        <label for="type">Tipo di Evento:</label>
+        <select v-model="newEvent.type" id="type" class="form-input">
+          <option value="singola">Singola</option>
+          <option value="gruppo">Gruppo</option>
+        </select>
       </div>
       
-      <div v-if="newEvent.altri">
-        <label for="participants">Partecipanti</label>
-        <select v-model="selectedParticipants" multiple>
-          <option v-for="user in users" :key="user._id" :value="user._id">
-            {{ user.username }}
-          </option>
-        </select>
+      <div v-if="newEvent.type === 'gruppo'">
+        <label>Partecipanti:</label>
+        <div v-for="user in users" :key="user.username" class="form-check">
+          <input 
+            class="form-check-input" 
+            type="checkbox" 
+            :value="user.username" 
+            :id="user.username" 
+            v-model="newEvent.participants" 
+            v-if="user.username !== loggedInUsername"  
+          />
+          <label class="form-check-label" :for="user.username">
+            {{ user.username }} 
+          </label>
+        </div>
       </div>
 
       <button type="submit">Crea Evento</button>
@@ -97,8 +108,10 @@ export default {
   
   setup() {
     const route = useRoute();
-    const router=useRouter();
+    const message = ref(''); 
+    const router = useRouter();
     const email = localStorage.getItem('email');
+    const loggedInUsername = localStorage.getItem('username') || 'Guest'; 
     const newEvent = ref({
       title: '',
       description: '',
@@ -108,52 +121,130 @@ export default {
       location: '',
       isRecurring: false,
       frequency: 'one-time',
-      email:email,
+      email: email,
       numberOfOccurrences: null,
       notificationMechanism: [],
       notificationTime: 0,
       repeatNotification: 0,
-      author: localStorage.getItem('username') || 'Guest',
-      altri:false,
+      author: loggedInUsername,
+      participants: [loggedInUsername] , 
+      type: 'singola',
+      altri: false,
     });
 
     onMounted(() => {
-
-     
       if (route.query.date) {
         newEvent.value.date = route.query.date;
       }
-      fetchUsers(); // Carica gli utenti quando il componente viene montato
-
+      fetchUsers(); 
     });
 
-    
-    const message = ref('');
     const selectedParticipants = ref([]);
     const users = ref([]);
     
-
     const createEvent = async () => {
       try {
         const token = sessionStorage.getItem('token');
-       
-        // console.log("chiamata a scheduler");
-        // console.log("notitiche", newEvent.value.notificationMechanism);
-        // ///////////
-        // const notificationManager = proxy.$refs.notificationManager;
-        // const emaill = localStorage.getItem('email');
-        // notificationManager.scheduleNotification(newEvent.value, emaill);
+        const author = newEvent.value.author;
+        const participants = newEvent.value.participants.filter(participant => participant !== author);
+        
+        console.log("selected partecipans", participants);
+        console.log("dati evento:", newEvent.value);
+  
+        for (const participant of participants) {
+    const unavailableTimes = await fetchUnavailableTimes(participant);
 
-        //aggiunge i partecipanti selezionati
-        newEvent.value.participants=selectedParticipants.value;
+    for (const time of unavailableTimes) {
+        const unavailableDate = new Date(time.giorno);
+        const formattedDate = unavailableDate.toISOString().split('T')[0];
+        console.log("Data di indisponibilità:", formattedDate, "per l'utente:", participant);
+
+
+
+
+
+        const unavailableStart = new Date(unavailableDate);
+        unavailableStart.setHours(time.startHour, time.startMinute, 0, 0);
+
+
+        const unavailableEnd = new Date(unavailableDate);
+        unavailableEnd.setHours(time.endHour, time.endMinute, 0, 0);
+
+
+        const startHour = unavailableStart.getHours();
+        const startMinute = unavailableStart.getMinutes();
+        const endHour = unavailableEnd.getHours();
+        const endMinute = unavailableEnd.getMinutes();
+
+        console.log(`Orario di inizio indisponibilità: ${startHour}:${startMinute.toString().padStart(2, '0')} per l'utente: ${participant}`);
+        console.log(`Orario di fine indisponibilità: ${endHour}:${endMinute.toString().padStart(2, '0')} per l'utente: ${participant}`);
+
+
+        console.log("data evento:", newEvent.value.date);
+        console.log("ora evento:", newEvent.value.startTime);
+
+
+        const eventDate = new Date(newEvent.value.date);
+        const eventStartTime = newEvent.value.startTime;
+        const [eventStartHour, eventStartMinute] = eventStartTime.split(':').map(Number);
+        const eventStartInMinutes = eventStartHour * 60 + eventStartMinute; // Converte l'orario evento in minuti
+
+
+        if (time.repeatDaily) {
+
+            console.log("caso ripeti tutti i giorni" , time.repeatDaily);
+            const unavailableStartInMinutes = startHour * 60 + startMinute;
+            const unavailableEndInMinutes = endHour * 60 + endMinute;
+
+            if (eventStartInMinutes >= unavailableStartInMinutes && eventStartInMinutes <= unavailableEndInMinutes) {
+                console.log(`L'orario dell'evento ${eventStartTime} è compreso nell'intervallo di indisponibilità ${startHour}:${startMinute} - ${endHour}:${endMinute} per l'utente: ${participant}`);
+                alert(`L'orario dell'evento ${eventStartTime} è compreso nell'intervallo di indisponibilità ${startHour}:${startMinute} - ${endHour}:${endMinute} per l'utente: ${participant}`);
+                return;
+            }
+
+        } else {
+            console.log("caso ripeti un giorno", time.repeatDaily);
+            const formattedEventDate = eventDate.toISOString().split('T')[0];
+
+            if (formattedEventDate === formattedDate) {
+                const unavailableStartInMinutes = startHour * 60 + startMinute;
+                const unavailableEndInMinutes = endHour * 60 + endMinute;
+
+                if (eventStartInMinutes >= unavailableStartInMinutes && eventStartInMinutes <= unavailableEndInMinutes) {
+                    console.log(`L'orario dell'evento ${eventStartTime} è compreso nell'intervallo di indisponibilità ${startHour}:${startMinute} - ${endHour}:${endMinute} per l'utente: ${participant}`);
+                    alert(`L'orario dell'evento ${eventStartTime} è compreso nell'intervallo di indisponibilità ${startHour}:${startMinute} - ${endHour}:${endMinute} per l'utente: ${participant}`);
+                    
+                    return;
+                }
+                 else {
+                  console.log("orario non c'è");
+                 }
+            }
+               else {
+                console.log("giorno non c'è");
+               }
+        }
+
+
+
+
+          }
+        }
+
+        
+
+     
+    
+  
 
         const response = await axios.post('/api/events', newEvent.value, {
           headers: {
             Authorization: `Bearer ${token}`
           }
         });
-        console.log('Evento creato con successo:', response.data);
 
+        
+        
         newEvent.value = {
           title: '',
           description: '',
@@ -169,24 +260,44 @@ export default {
           notificationTime: 0,
           repeatNotification: 0,
           author: localStorage.getItem('username') || 'Guest',
-          participants: selectedParticipants,
-          altri:false,
+          participants: [], 
+          type:'singola',
+          altri: false,
         };
 
-        selectedParticipants.value = [];
-
+        console.log('Evento creato con successo:', response.data);
         message.value = 'Evento creato con successo!';
-        console.log("evento creato", response.data);
+        
         setTimeout(() => {
           message.value = '';
-          router.push('/homePrincipale'); ////
+          router.push('/homePrincipale');
         }, 3000);
-
       } catch (error) {
         message.value = 'Errore durante la creazione dell\'evento: ' + error.message;
         console.error('Errore:', error);
       }
     };
+
+   const fetchUnavailableTimes = async (username) => {
+
+    const token = sessionStorage.getItem('token');
+    try {
+        const response = await axios.get('/api/nonDisponibileGET', {
+            headers: {
+                Authorization: `Bearer ${token}` 
+            },
+            params: { username: username },
+        });
+        return response.data;
+    } catch (error) {
+        console.log("Errore recupero non disponibile user", error);
+        return[];
+    }
+};
+
+    
+
+
 
     const fetchUsers = async () => {
       try {
@@ -205,7 +316,8 @@ export default {
       selectedParticipants,
       users,
       message,
-      createEvent
+      createEvent,
+      loggedInUsername
     };
   },
 

@@ -42,6 +42,76 @@
       </div>
     </div>
   </div>
+
+  <button class="fixed-button" @click="openModal" style="background:#f4a460; margin-bottom: 50px;">
+  non disponibile? segnalo qua!
+</button>
+
+<div v-if="openNotificationModal" class="modal" @click.self="closeNotificationModal">
+      <div class="modal-dialog">
+        <div class="modal-content" style="background: linear-gradient(to bottom, #f4a460, #eee8aa);">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5">Notifiche</h1>
+          </div>
+          <div class="modal-body">
+            <p>Non disponibile? segnalalo qua!</p>
+            <form @submit.prevent="submitForm">
+              <input v-model="formData.startHour" type="number" placeholder="Start Hour" />
+<input v-model="formData.startMinute" type="number" placeholder="Start Minute" />
+<input v-model="formData.endHour" type="number" placeholder="End Hour" />
+<input v-model="formData.endMinute" type="number" placeholder="End Minute" />
+<input type="checkbox" v-model="formData.repeatDaily" /> Repeat Daily
+<input v-if="!formData.repeatDaily" v-model="formData.giorno" type="date" placeholder="Giorno non disponibile" />
+<button type="submit">Submit</button>
+  </form>
+
+          
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @click="closeNotificationModal" style="background:#f4a460;">Chiudi</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+    <button class="fixed-button" @click="openUnavailableTimeModalFunction" style="background:#f4a460; margin-bottom: 50px;">
+  Gestisci i tuoi tempi non disponibili
+</button>
+
+
+<div v-if="openUnavailableTimeModal" class="modal" @click.self="closeUnavailableTimeModal">
+    <div class="modal-dialog">
+      <div class="modal-content" style="background: linear-gradient(to bottom, #f4a460, #eee8aa);">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5">Gestisci i tuoi tempi non disponibili</h1>
+        </div>
+        <div class="modal-body">
+          <div v-if="unavailableTimes.length > 0">
+            <ul>
+              <li v-for="(time, index) in unavailableTimes" :key="index">
+                <p>Orario di inizio: {{ time.startHour }}:{{ time.startMinute }}</p>
+                <p>Orario di fine: {{ time.endHour }}:{{ time.endMinute }}</p>
+                <p>Ripetizione giornaliera: {{ time.repeatDaily ? 'Sì' : 'No' }}</p>
+                <div v-if="!time.repeatDaily">
+                <p>Giorno non disponibile: {{ time.giorno }}</p>
+              </div>
+                <button type="button" class="btn btn-danger" @click="eliminaUnavailableTime(time._id)">Elimina</button>
+              </li>
+            </ul>
+          </div>
+          <p v-else>Non ci sono tempi non disponibili.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" @click="closeUnavailableTimeModal" style="background:#f4a460;">Chiudi</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
 </div>
 </template>
 
@@ -49,6 +119,7 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
+//import { use } from 'marked';
 
 export default {
   setup() {
@@ -59,10 +130,44 @@ export default {
     const activityMap = ref({});
     const pomodoroMap = ref({});
     const calendarDays = ref([]);
+    const openNotificationModal = ref(false);
+    const openUnavailableTimeModal = ref(false);
+    const unavailableTimes = ref([]);
+
+
+
+    const formData = ref({
+  startHour: 0,
+  startMinute: 0,
+  endHour: 0,
+  endMinute: 0,
+  repeatDaily: false,
+  giorno:"",
+});
+
+
 
     const currentMonthYear = computed(() => {
       return currentDate.value.toLocaleString('it-IT', { month: 'long', year: 'numeric' });
     });
+
+    function openModal() {
+      openNotificationModal.value = true;
+    }
+    function closeNotificationModal() {
+      openNotificationModal.value = false;
+    }
+    function openUnavailableTimeModalFunction() {
+      VediNonDisponibile();
+  openUnavailableTimeModal.value = true;
+}
+function closeUnavailableTimeModal() {
+  openUnavailableTimeModal.value = false;
+}
+
+
+
+
 
     function formatDateToLocal(date) {
       const year = date.getFullYear();
@@ -206,6 +311,91 @@ export default {
 }
 
 
+function submitForm() {
+  addUnavailableTime(formData.value.startHour, formData.value.startMinute, formData.value.endHour, formData.value.endMinute, formData.value.repeatDaily, formData.value.giorno);
+  closeNotificationModal(); 
+}
+
+
+async function VediNonDisponibile() {
+    const username = localStorage.getItem('username');
+    const token = sessionStorage.getItem('token');
+    try {
+        const response = await axios.get('/api/nonDisponibileGET', {
+            headers: {
+                Authorization: `Bearer ${token}` 
+            },
+            params: { username: username },
+        });
+        unavailableTimes.value = response.data;
+        console.log("unatim",unavailableTimes.value);
+    } catch (error) {
+        console.log("Errore recupero non disponibile user", error);
+    }
+}
+
+async function eliminaUnavailableTime(id) {
+  console.log(id);
+  try {
+    const token = sessionStorage.getItem('token');
+    const username = localStorage.getItem('username');
+    if (!token) {
+      console.error('Token mancante. L\'utente potrebbe non essere autenticato.');
+      return;
+    }
+
+    const response = await axios.delete('/api/rimNonDisponibile', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      params: {username:username , id: id } 
+    });
+
+    console.log('Tempo non disponibile eliminato con successo:', response.data);
+
+    VediNonDisponibile(); 
+  } catch (error) {
+    console.error('Errore durante l\'eliminazione del tempo non disponibile:', error);
+  }
+}
+
+
+
+
+async function addUnavailableTime(startHour, startMinute, endHour, endMinute, repeatDaily,giorno) {
+  try {
+    const username = localStorage.getItem('username');
+    const token = sessionStorage.getItem('token');
+    if (!username || !token) {
+      console.error('Username o token mancante. L\'utente potrebbe non essere autenticato.');
+      return;
+    }
+
+    const response = await axios.post(`/api/nonDisponibile`, {
+      startHour,
+      startMinute,
+      endHour,
+      endMinute,
+      repeatDaily,
+      giorno,
+    }, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    console.log('Indisponibilità aggiunta con successo:', response.data);
+  } catch (error) {
+    console.error('Errore durante l\'aggiunta dell\'indisponibilità:', error);
+  }
+}
+
+
+
+
+
+
+
     function prevMonth() {
       const newDate = new Date(currentDate.value);
       newDate.setMonth(newDate.getMonth() - 1);
@@ -254,6 +444,17 @@ export default {
       prevMonth,
       nextMonth,
       selectDate,
+      openNotificationModal,
+      openModal,
+      closeNotificationModal,
+      submitForm,
+      formData,
+      closeUnavailableTimeModal,  
+      openUnavailableTimeModalFunction,
+      openUnavailableTimeModal,
+      VediNonDisponibile,
+      unavailableTimes,
+      eliminaUnavailableTime
     };
   }, 
 
@@ -261,6 +462,66 @@ export default {
 </script>
 
 <style scoped>
+
+.fixed-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+}
+
+.fixed-button:nth-of-type(1) {
+  bottom: 90px;
+}
+
+.fixed-button:nth-of-type(2) {
+  bottom: 50px; 
+}
+
+.fixed-button:nth-of-type(3) {
+  bottom: 20px; 
+}
+button {
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+button.rounded-btn {
+  border-radius: 20px; 
+}
+.modal {
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.modal-dialog {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  border-radius: 5px;
+  max-width: 500px;
+  width: 100%;
+}
+
+.modal-content {
+  background: linear-gradient(to bottom, #f4a460, #eee8aa);
+}
+
 
 
 .calendar {
@@ -280,6 +541,8 @@ export default {
   align-items: center;
   margin-bottom: 20px;
 }
+
+
 
 .calendar-header button {
   background-color: #007bff;
@@ -389,6 +652,7 @@ export default {
   border-radius: 10px; 
   box-shadow: 0 0 10px rgba(0, 123, 255, 0.3); 
 }
+
 
 @media (max-width: 600px) {
   .calendar {

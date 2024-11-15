@@ -68,7 +68,12 @@ const eventSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  participants : [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  type:
+   { type: String, 
+    enum: ['singola', 'gruppo'], 
+    default: 'singola' },
+
+  participants: [{ type: String }],
 }, { timestamps: true });
 
 const Event = mongoose.model('Event', eventSchema);

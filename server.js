@@ -42,7 +42,7 @@ const incrementTimeMachine = () => {
   const currentTime = moment(timeMachineConfig.getTimeMachineDate()).tz('Europe/Rome');
   const updatedTime = currentTime.add(1, 'seconds').toDate();
   timeMachineConfig.setTimeMachineDate(updatedTime);
-  console.log("time machine data:::" , moment(timeMachineConfig.getTimeMachineDate()).tz('Europe/Rome'));
+  //console.log("time machine data:::" , moment(timeMachineConfig.getTimeMachineDate()).tz('Europe/Rome'));
 };
 
 setInterval(incrementTimeMachine, 1000);

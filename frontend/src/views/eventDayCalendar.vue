@@ -5,11 +5,21 @@
       <h3>I TUOI EVENTI:</h3>
       <div v-if="events.length > 0">
         <div v-for="event in events" :key="event._id" class="item-container">
-          <h4><span style="font-size: 0.9em;">Titolo:</span> {{ event.title }}</h4>
-          <p>Data: {{ formatDate(event.date) }}</p>
-          <p>Descrizione: {{ event.description }}</p>
-          <button @click="confirmDeleteEvent(event._id)" class="delete-btn">🗑️</button>
-        </div>
+  <h4><span style="font-size: 0.9em;">Titolo:</span> {{ event.title }}</h4>
+  <p>Data: {{ formatDate(event.date) }}</p>
+  <p>Descrizione: {{ event.description }}</p>
+  <p v-if="event.type === 'gruppo'" style="color: #FF6347;">
+    Evento di gruppo creato da: {{ event.author }} <br>
+    gruppo composto da: {{ event.participants.join(', ') }}
+  </p>
+
+  <button v-if="event.author === currentUser" @click="confirmDeleteEvent(event._id)" class="delete-btn">🗑️ Elimina Evento</button>
+
+  <!-- Bottone visibile solo ai partecipanti dell'evento, ma non all'autore -->
+  <button v-if="event.participants.includes(currentUser) && event.author !== currentUser" 
+          @click="rejectEvent(event._id)" 
+          class="delete-btn">🗑️ Rifiuta Evento</button>
+</div>
       </div>
       <p v-else>Nessun evento per questa data.</p>
       <div class="button-container">
@@ -129,6 +139,7 @@ export default {
     const pomodoros = ref([]); 
     const incompleteSessions = ref([]);
     const overdueActivities = ref([]); 
+    const currentUser = localStorage.getItem('username') ;
     const queryDate = computed(() => route.query.date);
     const timeMachine = ref();
 
@@ -170,13 +181,19 @@ export default {
       }
     };
 
+    const rejectEvent = (id) => {
+      deleteEvents(id);
+    }
+
     const deleteEvents = async (id) => {
       try {
         const token = sessionStorage.getItem('token');
+        const username = localStorage.getItem('username');
         await axios.delete(`/api/eventsRemove/${id}`, {
           headers: {
             Authorization: `Bearer ${token}` 
-          }
+          },
+          params: { username: username }
         });
         console.log('Evento eliminato');
         fetchEvents(); 
@@ -246,7 +263,7 @@ export default {
     const isSameDay = (date1, date2) => {
       const d1 = new Date(date1);
         const d2 = new Date(date2);
-       // console.log("query date:", date1 , "time machine date:" , date2);
+       console.log("query date:", date1 , "time machine date:" , date2);
         return (
             d1.getFullYear() === d2.getFullYear() &&
             d1.getMonth() === d2.getMonth() &&
@@ -520,7 +537,9 @@ export default {
       discardActivity,
       iniziaPomodoro,
       timeMachine,
-      isSameDay
+      isSameDay,
+      currentUser,
+      rejectEvent
     };
   }
 };

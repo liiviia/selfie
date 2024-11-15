@@ -17,4 +17,10 @@ router.delete('/eventsRemove/:id', authenticateToken, eventController.deleteEven
 
 router.post('/events/email',authenticateToken, eventController.sendEmailNotificationCreate);
 
+router.post('/nonDisponibile' , authenticateToken , eventController.nonDisponibile);
+
+router.get('/nonDisponibileGET', authenticateToken , eventController.nonDisponibileGET);
+
+router.delete('/rimNonDisponibile', authenticateToken , eventController.rimNonDisponibile);
+
 module.exports = router;
