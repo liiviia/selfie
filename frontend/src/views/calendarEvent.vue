@@ -509,7 +509,6 @@ async function addUnavailableTime(startHour, startMinute, endHour, endMinute, re
       prevMonth,
       nextMonth,
       selectDate,
-<<<<<<< HEAD
       openNotificationModal,
       openModal,
       closeNotificationModal,
@@ -520,10 +519,8 @@ async function addUnavailableTime(startHour, startMinute, endHour, endMinute, re
       openUnavailableTimeModal,
       VediNonDisponibile,
       unavailableTimes,
-      eliminaUnavailableTime
-=======
-      generateICS,
->>>>>>> origin/main
+      eliminaUnavailableTime,
+      generateICS
     };
   }, 
 

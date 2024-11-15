@@ -89,19 +89,11 @@ export default {
         
         this.events = response.data;
         
-<<<<<<< HEAD
-        this.events.forEach(event => {
-          const emailRicevente = localStorage.getItem('email');
-        console.log("Eventi trovati");
-       console.log(event,emailRicevente);
-        });
-=======
         // this.events.forEach(event => {
         //   const emailRicevente = localStorage.getItem('email');
         //   //console.log("Eventi trovati");
         //   console.log(event,emailRicevente);
         // });
->>>>>>> origin/main
       } catch (error) {
         console.error('Errore nel recupero degli eventi:', error);
       }
