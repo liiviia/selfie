@@ -15,10 +15,13 @@
 
   <button v-if="event.author === currentUser" @click="confirmDeleteEvent(event._id)" class="delete-btn">🗑️ Elimina Evento</button>
 
-  <!-- Bottone visibile solo ai partecipanti dell'evento, ma non all'autore -->
+  
+
   <button v-if="event.participants.includes(currentUser) && event.author !== currentUser" 
           @click="rejectEvent(event._id)" 
           class="delete-btn">🗑️ Rifiuta Evento</button>
+
+          <button @click="exportToIcal(event)" class="export-btn">📅 Esporta su iCalendar</button>
 </div>
       </div>
       <p v-else>Nessun evento per questa data.</p>
@@ -129,6 +132,7 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
+import { createEvent } from 'ics';
 
 export default {
   setup() {
@@ -184,6 +188,54 @@ export default {
     const rejectEvent = (id) => {
       deleteEvents(id);
     }
+
+    const exportToIcal = async (event) => {
+
+      
+
+      const eventDate = new Date(event.date);
+      const [hour, minute] = event.startTime.split(':').map(Number); // Converte l'orario in numeri
+      console.log("EV",event.date);
+
+      
+
+      const icsEvent = {
+        start: [
+      eventDate.getFullYear(), // Anno
+      eventDate.getMonth() + 1, // Mese (aggiungiamo 1 perché in Date i mesi partono da 0)
+      eventDate.getDate(), // Giorno
+      hour, // Ora (dallo startTime)
+      minute, // Minuti (dallo startTime)
+    ],
+      duration: {hours: event.duration},
+      title: event.title,
+      description: event.description,
+      organizer: { name: event.author}, 
+      };
+      console.log("vedi se va:", icsEvent);
+
+
+
+      createEvent(icsEvent, (error, value) => {
+       if (error) {
+      console.error('Errore nella creazione del file iCalendar:', error);
+      return;
+        }
+
+    const blob = new Blob([value], { type: 'text/calendar' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${event.title || "evento"}.ics`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    console.log('Evento esportato con successo!');
+  });
+
+
+    };
 
     const deleteEvents = async (id) => {
       try {
@@ -541,7 +593,8 @@ export default {
       timeMachine,
       isSameDay,
       currentUser,
-      rejectEvent
+      rejectEvent,
+      exportToIcal
     };
   }
 };

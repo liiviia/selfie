@@ -1,6 +1,7 @@
 <template>
   <div class="container">
-    <button @click="generateICS">Esporta in ICS</button>
+    
+
   <div class="calendar">
     <div class="calendar-header">
       <button @click="prevMonth">&lt;</button>
@@ -117,10 +118,9 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
-//import { use } from 'marked';
 
 export default {
   setup() {
@@ -220,6 +220,11 @@ function closeUnavailableTimeModal() {
 
       calendarDays.value = calendarArray;
     }
+    
+   
+
+    
+
 
     async function fetchEvents() {
       try {
@@ -422,84 +427,19 @@ async function addUnavailableTime(startHour, startMinute, endHour, endMinute, re
     }
 
 
-    //genera file .ics
-    async function generateICS() {
-      const username = localStorage.getItem('username');
-      const token = sessionStorage.getItem('token');
-
-      const eventResponse = await axios.get(`/api/eventsGET`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        },
-        params: { author: username }
-      });
-      const events = eventResponse.data;
-
-      //console.log("eventss:",events);
-      let icsContent = "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//SELfie//Calendar//EN\n";
-
-      // eventi iCalendar
-      events.forEach(event => {
-        if (event.date) {
-          icsContent += "BEGIN:EVENT\r\n";
-          icsContent += `TITLE:${event.title}\r\n`;
-          icsContent += `DESCRIPTION:${event.description || "Nessuna descrizione"}\r\n`;
-          icsContent += `LOCATION:${event.location || "N/A"}\r\n`;
-          //icsContent += `DTSTART:${formatDateToICS(new Date(event.startDate))}\r\n`;
-          icsContent += `DATE:${formatDateToICS(new Date(event.date))}\r\n`;
-          icsContent += "CATEGORY:Evento\r\n";
-          icsContent += "END:EVENT\r\n";
-        }
-      });
-      //attivita
-      // Object.keys(activityMap.value).forEach(dateString => {
-      //   const activityDate = new Date(dateString);
-      //   icsContent += "BEGIN:VEVENT\n";
-      //   icsContent += `UID:${dateString}-activity@yourapp.com\n`;
-      //   icsContent += `DTSTAMP:${formatDateToICS(activityDate)}\n`;
-      //   icsContent += `DTSTART:${formatDateToICS(activityDate)}\n`;
-      //   icsContent += `SUMMARY:Attività\n`;
-      //   icsContent += "END:VEVENT\n";
-      // });
-      // //pomodoro
-      // Object.keys(pomodoroMap.value).forEach(dateString => {
-      //   const pomodoroDate = new Date(dateString);
-      //   icsContent += "BEGIN:VEVENT\n";
-      //   icsContent += `UID:${dateString}-pomodoro@yourapp.com\n`;
-      //   icsContent += `DTSTAMP:${formatDateToICS(pomodoroDate)}\n`;
-      //   icsContent += `DTSTART:${formatDateToICS(pomodoroDate)}\n`;
-      //   icsContent += `SUMMARY:Pomodoro\n`;
-      //   icsContent += "END:VEVENT\n";
-      // });
-
-      icsContent += "END:VCALENDAR";
-
-      // Crea un file blob e scaricalo
-      const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "calendar.ics";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-
-    // formatta la data in formato iCalendar
-    function formatDateToICS(date) {
-      return date.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
-    }
+    
+   
 
 
    onMounted(async () => {
+
+    
+
       await fetchEvents();
       updateCalendarDays();
     });
 
-    watch(currentDate, async () => {
-      await fetchEvents();
-      updateCalendarDays();
-    });
+   
 
     return {
       currentDate,
@@ -520,7 +460,6 @@ async function addUnavailableTime(startHour, startMinute, endHour, endMinute, re
       VediNonDisponibile,
       unavailableTimes,
       eliminaUnavailableTime,
-      generateICS
     };
   }, 
 

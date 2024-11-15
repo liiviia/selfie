@@ -1,7 +1,8 @@
 const Event = require('../models/Event');
 const { sendNotifEmail } = require('../services/emailService');
 const User = require('../models/User');
-const { getTimeMachineDate } = require('../controllers/timeMachineController'); 
+const { getTimeMachineDate } = require('../controllers/timeMachineController');
+const ICAL = require('ical.js');
 
 exports.createEvent = async (req, res) => {
   try {
@@ -55,7 +56,7 @@ exports.createEvent = async (req, res) => {
         notificationMechanism: notificationMechanismArray,
         notificationTime,
         repeatNotification,
-        participants: type === 'gruppo' ? participants : [] ,
+        participants: type === 'gruppo' ? participants : [],
         type,
       });
 
@@ -122,7 +123,7 @@ exports.createEvent = async (req, res) => {
         notificationMechanism: notificationMechanismArray,
         notificationTime,
         repeatNotification,
-        participants:type === 'gruppo' ? participants : [] ,
+        participants: type === 'gruppo' ? participants : [],
         type,
       });
 
@@ -146,12 +147,12 @@ exports.getEvents = async (req, res) => {
       return res.status(400).json({ message: 'Autore è necessario' });
     }
 
-    const events = await Event.find({ 
+    const events = await Event.find({
       $or: [
         { author: author },
         { participants: author }
       ]
-       });
+    });
     res.json(events);
   } catch (error) {
     console.error('Errore nel recupero degli eventi:', error);
@@ -167,7 +168,7 @@ exports.getLastEvent = async (req, res) => {
       return res.status(400).json({ message: 'Autore è necessario' });
     }
 
-    const event = await Event.findOne({ 
+    const event = await Event.findOne({
 
       $or: [
         { author: author },
@@ -175,7 +176,7 @@ exports.getLastEvent = async (req, res) => {
       ]
     }).sort({ _id: -1 });
 
-    
+
     res.status(200).json(event);
   } catch (error) {
     console.error('Errore nel recupero dell\'evento:', error);
@@ -193,9 +194,9 @@ exports.getCurrentDayEvents = async (req, res) => {
       return res.status(400).json({ message: 'Username è necessario' });
     }
 
-    const timeMachineDate = await getTimeMachineDate(); 
+    const timeMachineDate = await getTimeMachineDate();
     const currentDate = new Date(timeMachineDate);
-    currentDate.setHours(0, 0, 0, 0); 
+    currentDate.setHours(0, 0, 0, 0);
 
     const endOfDay = new Date(currentDate);
     endOfDay.setDate(currentDate.getDate() + 1);
@@ -247,7 +248,7 @@ exports.getEventByDate = async (req, res) => {
 exports.deleteEvents = async (req, res) => {
   try {
     const eventID = req.params.id;
-    const username = req.query.username; 
+    const username = req.query.username;
 
     const event = await Event.findById(eventID);
 
@@ -272,10 +273,10 @@ exports.deleteEvents = async (req, res) => {
 };
 
 
-exports.sendEmailNotificationCreate=async(req,res) => {
+exports.sendEmailNotificationCreate = async (req, res) => {
   const { emailRicevente, eventDetails } = req.body;
-  
-  try {  
+
+  try {
     await sendNotifEmail(emailRicevente, eventDetails);
     res.status(200).json({ message: 'Email inviata con successo' });
 
@@ -288,54 +289,54 @@ exports.sendEmailNotificationCreate=async(req,res) => {
 
 exports.nonDisponibile = async (req, res) => {
   try {
-      const { startHour, startMinute, endHour, endMinute, repeatDaily,giorno } = req.body;
-      console.log("dati non disp", req.body);
-      const userId = req.user.id;
+    const { startHour, startMinute, endHour, endMinute, repeatDaily, giorno } = req.body;
+    console.log("dati non disp", req.body);
+    const userId = req.user.id;
 
-      const user = await User.findById(userId);
-      if (!user) {
-          return res.status(404).json({ message: 'Utente non trovato' });
-      }
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'Utente non trovato' });
+    }
 
-      user.unavailableTimes.push({
-          startHour,
-          startMinute,
-          endHour,
-          endMinute,
-          repeatDaily,
-          giorno
-      });
+    user.unavailableTimes.push({
+      startHour,
+      startMinute,
+      endHour,
+      endMinute,
+      repeatDaily,
+      giorno
+    });
 
-      await user.save();
+    await user.save();
 
-      res.status(200).json({ message: 'Indisponibilità aggiunta con successo' });
+    res.status(200).json({ message: 'Indisponibilità aggiunta con successo' });
   } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Errore del server' });
+    console.error(error);
+    res.status(500).json({ message: 'Errore del server' });
   }
 };
 
 exports.nonDisponibileGET = async (req, res) => {
   try {
-      const username = req.query.username;
-      const user = await User.findOne({ username });
+    const username = req.query.username;
+    const user = await User.findOne({ username });
 
-      if (!user) {
-          return res.status(404).json({ message: 'Utente non trovato' });
-      }
+    if (!user) {
+      return res.status(404).json({ message: 'Utente non trovato' });
+    }
 
-      return res.status(200).json(user.unavailableTimes);
+    return res.status(200).json(user.unavailableTimes);
   } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: 'Errore interno del server' });
+    console.error(error);
+    return res.status(500).json({ message: 'Errore interno del server' });
   }
 };
 
 exports.rimNonDisponibile = async (req, res) => {
   console.log("aico0");
   try {
-    const  username = req.query.username;
-    const id = req.query.id; 
+    const username = req.query.username;
+    const id = req.query.id;
     console.log("us:", username, "id", id);
 
     const user = await User.findOne({ username });
@@ -361,5 +362,16 @@ exports.rimNonDisponibile = async (req, res) => {
     return res.status(500).json({ message: 'Errore interno del server' });
   }
 };
+
+
+
+
+
+function calculateDuration(startDate, endDate) {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const duration = (end - start) / (1000 * 60); // durata in minuti
+  return duration;
+}
 
 
