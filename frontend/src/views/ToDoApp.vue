@@ -4,11 +4,11 @@
     <form @submit.prevent="addNote" class="note-form">
       <div class="form-group">
         <label for="heading">Titolo:</label>
-        <input type="text" v-model="newNote.heading" id="heading" required class="form-input" />
+        <input type="text" v-model="newNote.heading" id="heading" required="true" class="form-input" />
       </div>
       <div class="form-group">
         <label for="content">Contenuto(possibile scrivere in markdwon):</label>
-        <textarea v-model="newNote.content" id="content" rows="4" class="form-textarea"></textarea>
+        <textarea v-model="newNote.content" id="content" rows="4" class="form-textarea" required="true"></textarea>
       </div>
 
       <div class="form-group">
@@ -86,7 +86,6 @@ export default {
   async created() {
 
     this.username = localStorage.getItem('username'); 
-    console.log("username nota", this.username); 
 
     await this.fetchNotes();
     await this.fetchUsers(); 
@@ -153,7 +152,6 @@ export default {
       }
     });
 
-    console.log('Nota eliminata');
     this.fetchNotes();
   } catch (error) {
     if (error.response && error.response.status === 403) {

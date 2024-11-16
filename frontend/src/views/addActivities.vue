@@ -10,7 +10,7 @@
 
       <div class="form-group">
         <label for="description">Descrizione:</label>
-        <textarea v-model="newActivity.description" id="description" class="form-textarea"></textarea>
+        <textarea v-model="newActivity.description" id="description" class="form-textarea" required="true"></textarea>
       </div>
 
       <div class="form-group">

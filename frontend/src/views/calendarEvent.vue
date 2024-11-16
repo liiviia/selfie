@@ -58,14 +58,28 @@
           <div class="modal-body">
             <p>Non disponibile? segnalalo qua!</p>
             <form @submit.prevent="submitForm">
-              <input v-model="formData.startHour" type="number" placeholder="Start Hour" />
-<input v-model="formData.startMinute" type="number" placeholder="Start Minute" />
-<input v-model="formData.endHour" type="number" placeholder="End Hour" />
-<input v-model="formData.endMinute" type="number" placeholder="End Minute" />
-<input type="checkbox" v-model="formData.repeatDaily" /> Repeat Daily
-<input v-if="!formData.repeatDaily" v-model="formData.giorno" type="date" placeholder="Giorno non disponibile" />
-<button type="submit">Submit</button>
-  </form>
+  <label for="startHour">ora di inzio in cui non sei disponibile</label>
+  <input v-model="formData.startHour" id="startHour" type="number" placeholder="Start Hour" required="true" />
+
+  <label for="startMinute">Minuto di inzio in cui non sei disponibile</label>
+  <input v-model="formData.startMinute" id="startMinute" type="number" placeholder="Start Minute" required="true"/>
+
+  <label for="endHour">ora di fine in cui non sei disponibile</label>
+  <input v-model="formData.endHour" id="endHour" type="number" placeholder="End Hour" required="true"/>
+
+  <label for="endMinute">minuto di fine in cui non sei disponibile</label>
+  <input v-model="formData.endMinute" id="endMinute" type="number" placeholder="End Minute" required="true"/>
+
+  <label for="repeatDaily">
+    <input type="checkbox" v-model="formData.repeatDaily" id="repeatDaily" />
+    clicca se non disponibile in questa fascia oraria tutti i giorni
+  </label>
+
+  <label v-if="!formData.repeatDaily" for="giorno">Giorno non disponibile</label>
+  <input v-if="!formData.repeatDaily" v-model="formData.giorno" id="giorno" type="date" placeholder="Giorno non disponibile" />
+
+  <button type="submit">Submit</button>
+</form>
 
           
           </div>
@@ -79,7 +93,7 @@
 
 
     <button class="fixed-button" @click="openUnavailableTimeModalFunction" style="background:#f4a460; margin-bottom: 50px;">
-  Gestisci i tuoi tempi non disponibili
+  Gestisci i tempi non disponibili
 </button>
 
 
@@ -97,9 +111,10 @@
                 <p>Orario di fine: {{ time.endHour }}:{{ time.endMinute }}</p>
                 <p>Ripetizione giornaliera: {{ time.repeatDaily ? 'Sì' : 'No' }}</p>
                 <div v-if="!time.repeatDaily">
-                <p>Giorno non disponibile: {{ time.giorno }}</p>
-              </div>
-                <button type="button" class="btn btn-danger" @click="eliminaUnavailableTime(time._id)">Elimina</button>
+                  <p>Giorno non disponibile: {{ formatDate(time.giorno) }}</p>
+                              </div>
+                 <button type="button" @click="eliminaUnavailableTime(time._id)" class="delete-btn" style="background: transparent; border: none; color: inherit; padding: 0;">🗑️</button>
+                
               </li>
             </ul>
           </div>
@@ -138,10 +153,10 @@ export default {
 
 
     const formData = ref({
-  startHour: 0,
-  startMinute: 0,
-  endHour: 0,
-  endMinute: 0,
+  startHour: '',
+  startMinute: '',
+  endHour: '',
+  endMinute: '',
   repeatDaily: false,
   giorno:"",
 });
@@ -259,7 +274,6 @@ function closeUnavailableTimeModal() {
         });
         const pomodoros = pomodoroResponse.data;
 
-        console.log("Risposta API Pomodori:", pomodoroResponse.data);
 
         eventsMap.value = {};
         activityMap.value = {};
@@ -334,14 +348,12 @@ async function VediNonDisponibile() {
             params: { username: username },
         });
         unavailableTimes.value = response.data;
-        console.log("unatim",unavailableTimes.value);
     } catch (error) {
         console.log("Errore recupero non disponibile user", error);
     }
 }
 
 async function eliminaUnavailableTime(id) {
-  console.log(id);
   try {
     const token = sessionStorage.getItem('token');
     const username = localStorage.getItem('username');
@@ -356,9 +368,8 @@ async function eliminaUnavailableTime(id) {
       },
       params: {username:username , id: id } 
     });
-
-    console.log('Tempo non disponibile eliminato con successo:', response.data);
-
+      console.log(response);
+      
     VediNonDisponibile(); 
   } catch (error) {
     console.error('Errore durante l\'eliminazione del tempo non disponibile:', error);
@@ -419,7 +430,6 @@ async function addUnavailableTime(startHour, startMinute, endHour, endMinute, re
     function selectDate(day) {
       const username = localStorage.getItem('username');
       const dateString = formatDateToLocal(day.date); 
-      console.log("dateString", dateString);
       router.push({
         name: 'eventDayCalendar',
         query: { author: username, date: dateString }
@@ -428,7 +438,10 @@ async function addUnavailableTime(startHour, startMinute, endHour, endMinute, re
 
 
     
-   
+    function formatDate(date) {
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return new Date(date).toLocaleDateString('it-IT', options);
+  }
 
 
    onMounted(async () => {
@@ -460,6 +473,7 @@ async function addUnavailableTime(startHour, startMinute, endHour, endMinute, re
       VediNonDisponibile,
       unavailableTimes,
       eliminaUnavailableTime,
+      formatDate,
     };
   }, 
 
@@ -467,6 +481,130 @@ async function addUnavailableTime(startHour, startMinute, endHour, endMinute, re
 </script>
 
 <style scoped>
+input::placeholder {
+  color: #999; 
+  opacity: 1;  
+}
+
+input[type="number"]::placeholder,
+input[type="date"]::placeholder {
+  color: #999;  
+  opacity: 1;
+}
+
+/* Modal */
+.modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.modal-dialog {
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Modal Header */
+.modal-header {
+  background: linear-gradient(to bottom, #f4a460, #eee8aa);
+  padding: 15px;
+  color: #333;
+  font-weight: bold;
+}
+
+.modal-title {
+  font-size: 1.5rem;
+  text-align: center;
+  color: #333;
+}
+
+/* Modal Body */
+.modal-body {
+  padding: 20px;
+  background: #fafafa;
+  font-size: 1rem;
+  color: #333;
+  text-align: center;
+}
+
+.modal-body p {
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Input Fields */
+input[type="number"], input[type="date"], input[type="checkbox"] {
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+}
+
+input[type="number"]:focus, input[type="date"]:focus {
+  border-color: #f4a460;
+  outline: none;
+}
+
+/* Submit Button */
+button[type="submit"], .btn-secondary {
+  padding: 10px 20px;
+  font-size: 1rem;
+  background: #f4a460;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+button[type="submit"]:hover, .btn-secondary:hover {
+  background: #e5943a;
+}
+
+/* Custom Styles for Checkboxes */
+input[type="checkbox"] {
+  margin-right: 10px;
+  transform: scale(1.2);
+}
+
+/* Footer */
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 15px;
+  background: #fff;
+  border-top: 1px solid #eee;
+}
+
+.modal-footer .btn-secondary {
+  background: #f4a460;
+  border-radius: 5px;
+  padding: 10px 20px;
+  font-size: 1rem;
+}
+
+
+
 
 .fixed-button {
   position: fixed;
@@ -660,6 +798,23 @@ button.rounded-btn {
 
 
 @media (max-width: 600px) {
+  .fixed-button {
+  position: fixed; /* Assicurati che l'elemento sia posizionato rispetto alla finestra */
+    right: 10px; /* Distanza dal lato destro */
+  padding: 8px 15px; /* Riduci il padding per renderli più piccoli */
+  font-size: 0.8rem; /* Riduci la dimensione del testo */
+}
+  .fixed-button:nth-of-type(1) {
+    bottom: 70px;  
+  }
+
+  .fixed-button:nth-of-type(2) {
+    bottom: 40px;  
+  }
+
+  .fixed-button:nth-of-type(3) {
+    bottom: 10px;  
+  }
   .calendar {
     padding: 10px; 
   }
@@ -733,7 +888,7 @@ button.rounded-btn {
     box-shadow: 0 0 10px rgba(0, 123, 255, 0.3); 
   }
   .calendar {
-  max-width: 600px; 
+  max-width: 500px; 
   padding: 10px; 
 }
 

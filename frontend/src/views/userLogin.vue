@@ -44,16 +44,12 @@ export default {
 
         const token = response.data.token;
         sessionStorage.setItem('token', token);
-        console.log("token login:", response.data.token);
 
         localStorage.setItem('username', this.username);
         const userEmail = response.data.email; 
         localStorage.setItem('email', userEmail);
-        const numeroTel = response.data.phone;
-        localStorage.setItem('phone', numeroTel);
 
-        console.log("email:", userEmail);
-        console.log("tel:", numeroTel);
+        
         this.$router.push('/homePrincipale'); 
       
       } catch (error) {

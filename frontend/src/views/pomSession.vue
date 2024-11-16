@@ -43,7 +43,6 @@ export default {
             Authorization: `Bearer ${token}` 
           }
         });
-        console.log('Sessione Pomodoro eliminata');
         this.fetchPoms(); 
       } catch (error) {
         console.error('Errore nell\'eliminazione della sessione:', error);

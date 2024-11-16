@@ -75,7 +75,6 @@ const sendNotification = async (event) => {
 
       for (const recipient of recipients) {
         sendAlertNotification(event.title, event.date, event.startTime, recipient);
-        console.log(`Alert inviato per l'evento: ${event.title} a ${recipient}`);
       }
 
 
@@ -160,7 +159,6 @@ const checkAndSendActivityNotifications = async () => {
   for (const activity of activities) {
 
     const notificationTimes = calculateNotificationTimeActivity(activity);
-    //console.log("time machine:", timeMachineDate, "in MS:", timeMachineDateInMsA);
 
     const TOLLERANZA_MS = 3600000; 
 
@@ -168,10 +166,8 @@ const checkAndSendActivityNotifications = async () => {
       for (const notificationTime of notificationTimes) {
 
         const localNotificationTime = moment.utc(notificationTime).local().valueOf();
-        //console.log("momento invio notifica:", localNotificationTime);
 
         const diff = Math.abs(localNotificationTime - timeMachineDateInMsA);
-        //console.log(`Differenza tra time machine e notifica: ${diff} ms`);
 
 
         if (timeMachineDateInMsA == localNotificationTime - TOLLERANZA_MS) {
@@ -192,16 +188,13 @@ const sendNotificationA = async (activity) => {
   if (activity.type === 'gruppo') {
     const userEmails = await User.find({ username: { $in: activity.participants } }).select('email');
     emails = userEmails.map(user => user.email);
-   // console.log('Email dei partecipanti:', emails);
   }
   else if (activity.type === 'singola') {
     emails = [activity.email];
-   // console.log('Email dell\'autore:', emails);
   }
 
   for (const email of emails) {
     await sendNotifEmailActivity(email, activity);
-    //console.log(`Notifica inviata a: ${email}`);
   }
 };
 

@@ -14,10 +14,6 @@
           <input v-model="user.email" id="email" class="registration__input" placeholder="Email" type="email" required />
         </div>
         <div class="registration__field">
-          <i class="registration__icon fas fa-phone"></i>
-          <input v-model="user.phoneNumber" id="phoneNumber" class="registration__input" placeholder="Numero di Telefono" required />
-        </div>
-        <div class="registration__field">
           <i class="registration__icon fas fa-lock"></i>
           <input v-model="user.password" type="password" id="password" class="registration__input" placeholder="Password" required />
         </div>
@@ -38,7 +34,6 @@ export default {
       user: {
         username: '',
         email: '',      
-        phoneNumber: '',
         password: ''
       },
       message: ''
@@ -54,7 +49,6 @@ export default {
         this.user = {
           username: '',
           email: '',       
-          phoneNumber: '', 
           password: ''
         };
       } catch (error) {

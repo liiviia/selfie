@@ -16,9 +16,7 @@ const moment = require('moment-timezone');
 const { startNotificationMonitoring } = require('./controllers/notificheEventi');
 const { initializeWebSocket } = require('./websocketServer');
 const http = require('http');
-const socketIo = require('socket.io');
 
-const { scheduleEmailReminders } = require('./cronTask');
 require('dotenv').config({ path: __dirname + '/.env' });
 
 const app = express();
@@ -42,7 +40,6 @@ const incrementTimeMachine = () => {
   const currentTime = moment(timeMachineConfig.getTimeMachineDate()).tz('Europe/Rome');
   const updatedTime = currentTime.add(1, 'seconds').toDate();
   timeMachineConfig.setTimeMachineDate(updatedTime);
-  //console.log("time machine data:::" , moment(timeMachineConfig.getTimeMachineDate()).tz('Europe/Rome'));
 };
 
 setInterval(incrementTimeMachine, 1000);
@@ -66,7 +63,6 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'frontend/frontend/dist', 'index.html'));
 });
 
-scheduleEmailReminders();
 
 server.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);

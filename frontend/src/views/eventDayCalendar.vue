@@ -8,6 +8,9 @@
   <h4><span style="font-size: 0.9em;">Titolo:</span> {{ event.title }}</h4>
   <p>Data: {{ formatDate(event.date) }}</p>
   <p>Descrizione: {{ event.description }}</p>
+  <p>Ora di inizio: {{ event.startTime }}</p>
+  <p>Luogo: {{ event.location }}</p>
+  <p>Durata: {{ event.duration }}</p>
   <p v-if="event.type === 'gruppo'" style="color: #FF6347;">
     Evento di gruppo creato da: {{ event.author }} <br>
     gruppo composto da: {{ event.participants.join(', ') }}
@@ -21,7 +24,7 @@
           @click="rejectEvent(event._id)" 
           class="delete-btn">🗑️ Rifiuta Evento</button>
 
-          <button @click="exportToIcal(event)" class="export-btn">📅 Esporta su iCalendar</button>
+          <button @click="exportToIcal(event)" class="export-btn">📅 Esporta</button>
 </div>
       </div>
       <p v-else>Nessun evento per questa data.</p>
@@ -45,8 +48,8 @@
               Attività di gruppo creata da: {{ activity.author }}<br>
               Gruppo composto da: {{ activity.participants.join(', ') }}
             </p>
-            <button v-if="!activity.completed" @click="markAsCompleted(activity)" class="complete-btn">Completata</button>
-            <button @click="confirmDeleteActivity(activity._id)" class="delete-btn">🗑️</button>
+            <button v-if="!activity.completed" @click="markAsCompleted(activity)" class="complete-btn" style="background:#f4a460;">Completata</button>
+            <button @click="confirmDeleteActivity(activity._id)" class="delete-btn" >🗑️</button>
           </div>
         </div>
         <p v-else>Nessuna attività per questa data.</p>
@@ -173,7 +176,8 @@ export default {
           params: { username: username } 
         });
         console.log('Attività eliminata');
-        fetchEvents(); 
+        fetchActivities(); 
+        fetchOverdueActivities();
       } catch (error) {
         console.error('Errore nell\'eliminazione della attività:', error);
       }
@@ -194,25 +198,23 @@ export default {
       
 
       const eventDate = new Date(event.date);
-      const [hour, minute] = event.startTime.split(':').map(Number); // Converte l'orario in numeri
-      console.log("EV",event.date);
+      const [hour, minute] = event.startTime.split(':').map(Number); 
 
       
 
       const icsEvent = {
         start: [
-      eventDate.getFullYear(), // Anno
-      eventDate.getMonth() + 1, // Mese (aggiungiamo 1 perché in Date i mesi partono da 0)
-      eventDate.getDate(), // Giorno
-      hour, // Ora (dallo startTime)
-      minute, // Minuti (dallo startTime)
+      eventDate.getFullYear(), 
+      eventDate.getMonth() + 1, 
+      eventDate.getDate(), 
+      hour, 
+      minute, 
     ],
       duration: {hours: event.duration},
       title: event.title,
       description: event.description,
       organizer: { name: event.author}, 
       };
-      console.log("vedi se va:", icsEvent);
 
 
 
@@ -279,7 +281,6 @@ export default {
     const iniziaPomodoro = async (id, remainingTime, date, tempoStudio, tempoPausa, ripetizioni) => {
   try {
     const token = sessionStorage.getItem('token');
-    console.log("token pom", token);
     const response = await axios.post(`/api/iniziaPomodoro/${id}`, {
       date },
       {
@@ -303,7 +304,7 @@ export default {
         }
       });
     } else {
-      console.log(response.data.message); 
+         console.log("errore");
     }
   } catch (error) {
     console.error('Errore durante l\'avvio del pomodoro:', error);
@@ -315,7 +316,6 @@ export default {
     const isSameDay = (date1, date2) => {
       const d1 = new Date(date1);
         const d2 = new Date(date2);
-       console.log("query date:", date1 , "time machine date:" , date2);
         return (
             d1.getFullYear() === d2.getFullYear() &&
             d1.getMonth() === d2.getMonth() &&
@@ -329,7 +329,6 @@ export default {
   try {
     const token = sessionStorage.getItem('token');
     const author = localStorage.getItem('username'); 
-    console.log('Fetching activities for:', { date: queryDate.value, author }); 
     const response = await axios.get('/api/activities/by-date', {
       headers: { Authorization: `Bearer ${token}` },
       params: { date: queryDate.value, author }, 
@@ -362,7 +361,6 @@ export default {
           return sessionDate >= today;
         });
 
-        console.log('Sessioni Pomodoro recuperate e filtrate:', this.poms);
       } catch (error) {
         console.error('Errore durante il recupero delle sessioni Pomodoro:', error);
       }
@@ -376,30 +374,19 @@ export default {
         const username = route.query.username || author;
 
         const token = sessionStorage.getItem('token');
-        console.log('Fetching events for:', author, date);
 
         const response = await axios.get('/api/events/by-date', {
           headers: { Authorization: `Bearer ${token}` },
           params: { author, date }
         });
         events.value = Array.isArray(response.data) ? response.data : [response.data];
-        console.log('Fetched events:', events.value);
 
-/*      const activityResponse = await axios.get('/api/activities/by-date', {
-          headers: { Authorization: `Bearer ${token}` },
-          params: { author, date }
-        });
-        // Filtra le attività completate 
-        const allActivities = Array.isArray(activityResponse.data) ? activityResponse.data : [activityResponse.data];
-        activities.value = allActivities;
-        console.log('Fetched activities:', activities.value);
-*/
+
         const pomodoroResponse = await axios.get('/api/poms/by-date', {
           headers: { Authorization: `Bearer ${token}` },
           params: { username, date }
         });
         pomodoros.value = Array.isArray(pomodoroResponse.data) ? pomodoroResponse.data : [pomodoroResponse.data];
-        console.log('Fetched pomodoros:', pomodoros.value);
 
       } catch (error) {
         console.error('Errore nel recupero degli eventi, delle attività e dei pomodori:', error);
@@ -407,7 +394,6 @@ export default {
     };
 
     const fetchIncompleteSessions = async () => {
-      console.log("fetchIncompleteSessions chiamata");
       const token = sessionStorage.getItem('token');
       const username = localStorage.getItem('username');
 
@@ -416,13 +402,19 @@ export default {
           headers: { Authorization: `Bearer ${token}` },
           params: { username }
         });
+
+       
+
+const query = queryDate.value; 
+    const queryDateMs = query ? new Date(query).valueOf() : null;
         
         incompleteSessions.value = (Array.isArray(response.data) ? response.data : [response.data]).filter(session => {
-        return (
+          return (
           session.studyCycles > 0 && 
           session.remainingTime > 0 &&
           session.tempoStudio && 
-          session.tempoPausa 
+          session.tempoPausa &&
+          new Date(session.giorno.valueOf()) <= queryDateMs 
       );
     });
 
@@ -434,7 +426,6 @@ export default {
     const resumePomodoro = (session) => {
     const plainSession = JSON.parse(JSON.stringify(session));
 
-    console.log("Sessione passata a pomodoroTempo:", plainSession);
     const nuovo = false;
 
     router.push({
@@ -460,7 +451,6 @@ export default {
         headers: { Authorization: `Bearer ${token}` }
       });
         incompleteSessions.value = incompleteSessions.value.filter(s => s._id !== session._id);
-        console.log('Sessione Pomodoro scartata.');
       } catch (error) {
         console.error('Errore nello scartare la sessione pomodoro:', error.response?.data || error);
       }
@@ -488,7 +478,7 @@ export default {
           headers: { Authorization: `Bearer ${token}` },
           params: { username },
         });
-        overdueActivities.value = response.data;
+        overdueActivities.value = response.data; 
       } catch (error) {
         console.error('Errore nel recupero delle attività scadute:', error);
       }
@@ -499,25 +489,6 @@ export default {
     );
 
 
-    /*const markActivityComplete = async (activity) => {
-      try {
-        const token = sessionStorage.getItem('token');
-        const username = localStorage.getItem('username');
-
-        const response = await axios.post('/api/activities/mark-complete', {
-          id: activity._id,
-          username,
-          }, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-
-      console.log('Attività completata:', response.data);
-
-      activities.value = activities.value.filter(a => a._id !== activity._id);
-      } catch (error) {
-      console.error('Errore nel segnare l\'attività come completata:', error);
-    }
-  };*/
 
       const markAsCompleted = async (activity) => {
       try {
@@ -539,11 +510,12 @@ export default {
   try {
     const token = sessionStorage.getItem('token');
     const username = localStorage.getItem('username');
-    console.log('Discarding activity with ID:', id); 
     await axios.delete(`/api/activitiesRemove/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
       params: {username: username}
     });
+    fetchOverdueActivities();
+    fetchActivities(); 
     overdueActivities.value = overdueActivities.value.filter(a => a._id !== id);
   } catch (error) {
     console.error('Errore nello scartare l\'attività:', error);
@@ -555,7 +527,6 @@ export default {
     try{
     const response = await axios.get('/api/getTime-machine');
     timeMachine.value = response.data
-    //console.log(" data time machine event day calendar",timeMachine);
 
     } catch (error) {
       console.log("errore recupero data time machine" , error);
@@ -717,13 +688,40 @@ hr {
   font-size: 1.2em;
   color: #e74c3c; 
 }
+.export-btn {
+  position: absolute; 
+  bottom: 50px;
+  right: 10px; 
+  background: none;
+  border: none; 
+  cursor: pointer; 
+  font-size: 1.2em;
+  color: #e74c3c; 
+}
 
 .delete-btn:hover {
   color: #c0392b; 
 }
+.export-btn:hover {
+  color:#c0392b; 
+}
 
 
 @media (max-width: 768px) {
+  .delete-btn, .export-btn {
+    font-size: 0.9em;        /* Ridotto font-size */
+    right: 20px;   
+    color: blue;         /* Spostati più a destra */
+  }
+
+  .delete-btn {
+    bottom: -10px;           /* Spostato più in alto */
+  }
+
+  .export-btn {
+    bottom: -10px;          /* Spostato più in alto */
+    right: 150px;
+  }
   .content-container {
     flex-direction: column; 
     margin-left: 0; 

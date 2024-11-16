@@ -46,15 +46,6 @@
   </script>
   
   <style scoped>
-  ul {
-    list-style-type: none;
-    padding: 0;
-  }
-  li {
-    margin-bottom: 10px;
-  }
-  strong {
-    color: #333;
-  }
+  
   </style>
   

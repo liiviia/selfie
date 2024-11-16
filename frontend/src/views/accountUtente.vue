@@ -8,7 +8,6 @@
       <h2>Dati Personali</h2>
       <p><strong>Username:</strong> {{ username }}</p>
       <p><strong>Email:</strong> {{ email }}</p>
-      <p><strong>Numero di Telefono:</strong> {{ phone }}</p>
     </div>
 
     <div class="manage-password">
@@ -42,7 +41,6 @@ export default {
     return {
       username: localStorage.getItem('username') || 'Guest',
       email: localStorage.getItem('email') || '', 
-      phone: localStorage.getItem('phone') || '', 
       currentPassword: '',
       newPassword: '',
       errorMessage: '',
@@ -51,30 +49,31 @@ export default {
   },
   methods: {
     async updatePassword() {
-      try {
-        const token = sessionStorage.getItem('token');
-        const response = await axios.put('/api/updatePassword', {
-          headers: {
-           Authorization: `Bearer ${token}` 
-      },
-          username: this.username,
-          currentPassword: this.currentPassword,
-          newPassword: this.newPassword
-        });
-
-        this.successMessage = response.data.message || 'Password aggiornata con successo!';
-        console.log("aggiornata");
-        this.errorMessage = '';
-
-        this.currentPassword = '';
-        this.newPassword = '';
-        this.$router.push('/'); 
-      } catch (error) {
-        this.errorMessage = error.response?.data?.message || 'Errore durante l\'aggiornamento della password.';
-        console.log("errore", error);
-        this.successMessage = '';
+  try {
+    const token = sessionStorage.getItem('token');
+    const response = await axios.put('/api/updatePassword', {
+      username: this.username,
+      currentPassword: this.currentPassword,
+      newPassword: this.newPassword
+    }, {
+      headers: {
+        Authorization: `Bearer ${token}` 
       }
-    },
+    });
+
+    this.successMessage = response.data.message || 'Password aggiornata con successo!';
+    this.errorMessage = '';
+
+    this.currentPassword = '';
+    this.newPassword = '';
+    this.$router.push('/'); 
+  } catch (error) {
+    this.errorMessage = error.response?.data?.message || 'Errore durante l\'aggiornamento della password.';
+    console.log("errore", error);
+    this.successMessage = '';
+  }
+},
+
     
     async deleteAccount() {
       try {

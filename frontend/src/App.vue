@@ -1,6 +1,5 @@
 <template>
   <div id="App">
-    <!-- Navbar visibile solo se non sei nella pagina di login o registrazione -->
     <Nav v-if="!isLoginPage && !isRegisterPage" />
     
     <div class="container">
@@ -9,7 +8,6 @@
 
     <Notifiche />     
 
-    <!-- Footer visibile solo se non sei nella pagina di login o registrazione -->
     <AppFooter v-if="!isLoginPage && !isRegisterPage"/>
   </div>
 </template>

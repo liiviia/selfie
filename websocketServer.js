@@ -13,12 +13,10 @@ const initializeWebSocket = (server) => {
 
 
   io.on('connection', (socket) => {
-  console.log('Un client si è connesso');
 
   
 
   socket.on('disconnect', () => {
-    console.log('Un client si è disconnesso');
   });
 });
 };
@@ -31,7 +29,6 @@ const sendAlertNotification = (title, date, startTime, userNome) => {
       startTime,
       userNome,
     });
-    console.log('Alert inviato:', title);
   } else {
     console.error('Socket.io non è inizializzato');
   }

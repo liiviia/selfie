@@ -5,7 +5,6 @@ exports.getTimeMachineDate = (req, res) => {
     const timeMachineDate = timeMachineConfig.getTimeMachineDate();
 
     const localTime = moment(timeMachineDate).tz('Europe/Rome').format();
-    //console.log("-----------------");
 
     return res.send(localTime);  
 };

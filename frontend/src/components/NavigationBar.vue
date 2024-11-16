@@ -21,22 +21,9 @@
             <span class="username-initials">{{ username }}</span>
         </a>
 
-        <a class="me-4" href="#" @click="toggleNotifications">
-          <i class="fas fa-bell" style="color: black;"></i> 
-          <span v-if="notifications.length" class="badge">{{ notifications.length }}</span> 
-        </a>
+       
 
-        <div v-if="showNotifications" class="notifications-dropdown">
-          <ul>
-            <li v-for="notification in notifications" :key="notification._id">
-              titolo: {{ notification.title }} - Scadenza: {{ notification.deadline }}
-            </li>
-            <li v-if="notifications.length === 0">
-              Nessuna notifica
-            </li>
-          </ul>
-          <button @click="sendEmail" class="btn btn-primary">Invia Email</button> 
-        </div>        
+        
 
       </div>
 
@@ -69,7 +56,6 @@
               </a>
               <ul class="dropdown-menu" aria-labelledby="eventDropdown">
                 <li><a class="dropdown-item" href="/addEvent">Aggiungi evento</a></li>
-                <li><a class="dropdown-item" href="/eventsE">Lista eventi</a></li>
               </ul>
             </li>
   
@@ -79,13 +65,11 @@
               </a>
               <ul class="dropdown-menu" aria-labelledby="activityDropdown">
                 <li><a class="dropdown-item" href="/addActivities">Aggiungi attività</a></li>
-               <li><a class="dropdown-item" href="/activities">Lista attività</a></li> 
               </ul>
             </li>
   
             <li class="nav-item"><a class="nav-link" href="/calendarEvent">Calendario</a></li>
             <li class="nav-item"><a class="nav-link" href="/pomodoroTempo">Pomodoro</a></li>
-            <li class="nav-item"><a class="nav-link" href="/pomSession">Sessioni Pomodoro</a></li>
             <!-- <li class="nav-item"><a class="nav-link" href="/accountUtente">Gestisci il tuo Account</a></li> --> 
           </ul>
           <button type="button" class="btn btn-dark mt-3" @click="logout">Logout</button>
@@ -108,7 +92,9 @@ import moment from 'moment-timezone';
         showNotifications: false,
         notifications: [] ,
         timeMachineDate: '',  
-        timeMachineTime: ''  
+        timeMachineTime: ''  ,
+        selectedDate: '', 
+        selectedTime: ''
       };
     }, 
     computed:{
@@ -213,46 +199,7 @@ import moment from 'moment-timezone';
       },
 
 
-      async toggleNotifications(){
-        this.showNotifications = !this.showNotifications;
-        if (this.showNotifications) {
-          await this.checkDeadlines();
-        }
-      },
   
-
-      async checkDeadlines() {    
-        try {
-          const token = sessionStorage.getItem('token');
-          const username = localStorage.getItem('username');
-          const response = await axios.get('/api/activities/2days', {
-            headers: {Authorization: `Bearer ${token}`},
-            params:{username: username}
-          });
-          this.notifications = response.data; 
-          console.log(this.notifications);
-          console.log(response.data);
-        } catch (error) {
-          console.error('Errore nel recupero delle notifiche:', error);
-        } 
-      },
-
-
-      async sendEmail() {
-        try {
-          const token = sessionStorage.getItem('token');
-          const username = localStorage.getItem('username');
-          const response = await axios.post('/api/activities/sendEmail', 
-            { username: username },  
-            {headers: { Authorization: `Bearer ${token}` }
-            }
-          );
-          alert(response.data.message); 
-        } catch (error) {
-          console.error('Errore nell invio dell email:', error);
-          alert('Errore durante invio email');
-        }
-      }      
       
       
     }
@@ -367,6 +314,27 @@ import moment from 'moment-timezone';
 .notifications-dropdown button {
   margin-top: 10px;
   width: 100%; 
+}
+
+@media (max-width: 767px) {
+  .time-machine-form input,
+  .time-machine-form button {
+    width: 70px; 
+  }
+
+  .form-control-sm {
+    font-size: 0.7rem; 
+    padding: 0.3rem 0.6rem; 
+  }
+
+  .btn-sm {
+    padding: 0.3rem 0.6rem; 
+    font-size: 0.7rem; 
+  }
+
+  .notifications-dropdown {
+    width: 160px; 
+  }
 }
 
 </style>

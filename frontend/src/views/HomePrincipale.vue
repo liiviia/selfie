@@ -94,49 +94,52 @@
   </div>
 
 
-   <div class="col-5 section-container">
-    <div class="form-group mt-3">
-      <label for="activitySelect">Scegli preview:</label>
-      <select id="activitySelect" v-model="isCurrentDayActivity" @change="toogleActivity" class="custom-select event-select">
-        <option :value="false">Ultima attività</option>
-        <option :value="true">Attività del giorno corrente</option>
-        <option :value="null">Tutte le attività</option>
-      </select>
-    </div>
+  <div class="col-5 section-container">
+  <div class="form-group mt-3">
+    <label for="activitySelect">Scegli preview:</label>
+    <select id="activitySelect" v-model="isCurrentDayActivity" @change="toogleActivity" class="custom-select event-select">
+      <option :value="false">Ultima attività</option>
+      <option :value="true">Attività del giorno corrente</option>
+      <option :value="null">Tutte le attività</option>
+    </select>
+  </div>
 
-    <h2>
-      {{ isCurrentDayActivity === null ? 'Tutte le Attività' : (isCurrentDayActivity ? 'Attività di Oggi' : 'Ultima Attività') }}
-    </h2>
-    <p v-if="noActivitiesMessage">{{ noActivitiesMessage }}</p>
+  <h2>
+    {{ isCurrentDayActivity === null ? 'Tutte le Attività' : (isCurrentDayActivity ? 'Attività di Oggi' : 'Ultima Attività') }}
+  </h2>
+  
+  <div v-if="isCurrentDayActivity === null && allActivities.length > 0">
+    <h3>Attività Trovate:</h3>
+    <ul>
+      <li v-for="activity in allActivities" :key="activity.id">
+        <strong>Titolo:</strong> {{ activity.title || 'N/A' }}<br>
+        <strong>Descrizione:</strong> {{ activity.description || 'N/A' }}<br>
+        <strong>Scadenza:</strong> {{ formatDate(activity.deadline) }}
+      </li>
+    </ul>
+  </div>
 
-    <div v-if="isCurrentDayActivity === null && allActivities.length > 0">
-      <h3>Attività Trovate:</h3>
-      <ul>
-        <li v-for="activity in allActivities" :key="activity.id">
-          <strong>Titolo:</strong> {{ activity.title || 'N/A' }}<br>
-          <strong>Descrizione:</strong> {{ activity.description || 'N/A' }}<br>
-          <strong>Scadenza:</strong> {{ formatDate(activity.deadline) }}
-        </li>
-      </ul>
-    </div>
+  <div v-else-if="isCurrentDayActivity">
+    <p v-if="currentDayActivities.length === 0">Non ci sono attività per oggi.</p>
+    <ul v-if="currentDayActivities.length > 0">
+      <li v-for="activity in currentDayActivities" :key="activity.id">
+        <strong>Titolo:</strong> {{ activity.title || 'N/A' }}<br>
+        <strong>Descrizione:</strong> {{ activity.description || 'N/A' }}<br>
+        <strong>Scadenza:</strong> {{ formatDate(activity.deadline) }}
+      </li>
+    </ul>
+  </div>
 
-    <div v-else-if="isCurrentDayActivity">
-      <p v-if="currentDayActivities.length === 0">Non ci sono attività per oggi.</p>
-      <ul>
-        <li v-for="activity in currentDayActivities" :key="activity.id">
-          <strong>Titolo:</strong> {{ activity.title || 'N/A' }}<br>
-          <strong>Descrizione:</strong> {{ activity.description || 'N/A' }}<br>
-          <strong>Scadenza:</strong> {{ formatDate(activity.deadline) }}
-        </li>
-      </ul>
-    </div>
-
+  <div v-else>
+    <p v-if="!lastActivityTitle && !lastActivityDescription && !lastActivityDeadline">Non ci sono attività disponibili.</p>
     <div v-else>
       <strong>Titolo:</strong> {{ lastActivityTitle }}<br>
       <strong>Descrizione:</strong> {{ lastActivityDescription }}<br>
       <strong>Scadenza:</strong> {{ lastActivityDeadline }}
     </div>
-   </div>
+  </div>
+</div>
+
 </div>
 
 
@@ -186,12 +189,10 @@
   Vedi Notifiche
 </button>
 
-<!-- Pulsante per inviare notifiche -->
 <button class="fixed-button" @click="openModal" style="background:#f4a460;">
   <i class="fas fa-paper-plane"></i>
 </button>
 
-    <!-- Nuovo Modal per le notifiche -->
     <div v-if="isNotificationModalOpen" class="modal" @click.self="closeNotificationModal">
       <div class="modal-dialog">
         <div class="modal-content" style="background: linear-gradient(to bottom, #f4a460, #eee8aa);">
@@ -223,7 +224,6 @@
       </div>
     </div>
 
-    <!-- Modal per inviare notifiche -->
     <div v-if="isModalOpen" class="modal" @click.self="closeModal">
       <div class="modal-dialog">
         <div class="modal-content" style="background: linear-gradient(to bottom, #f4a460, #eee8aa);">
@@ -349,7 +349,6 @@ export default {
 
 
     async getCurrentDayActivities() {
-      console.log("Chiamata a getCurrentDayActivities");
       try {
         const token = sessionStorage.getItem('token');
         const username = localStorage.getItem('username');
@@ -389,7 +388,6 @@ export default {
     },
 
     async getLastActivity() {
-      console.log("Chiamata a getLastActivity");
       try {
         const token = sessionStorage.getItem('token');
         const username = localStorage.getItem('username');
@@ -414,7 +412,6 @@ export default {
           this.lastActivityDescription = response.data.description;
           this.lastActivityDeadline = new Date(response.data.deadline).toLocaleDateString();
           this.lastGroupActivity = response.data.type;
-          console.log(this.lastGroupActivity) ;
           this.noActivitiesMessage = '';
           this.isCurrentDayActivity = false;
         } else {
@@ -498,7 +495,6 @@ export default {
         if (response.data && response.data.length > 0) {
           this.allEvents = response.data;
           this.noEventsMessage = '';
-          console.log("tutti gli eventi:", response.data);
         } else {
           this.noEventsMessage = 'Non ci sono eventi disponibili';
           this.allEvents = [];
@@ -538,7 +534,6 @@ export default {
           this.noEventsMessage = 'Non ci sono eventi imminenti';
           this.allEventCurrent = [];
         }
-        console.log("eventi del giorno corrente", response.data);
       } catch (error) {
         console.error('Errore nel recupero degli eventi del giorno corrente:', error);
         this.noEventsMessage = 'Errore nel caricamento degli eventi del giorno corrente.';
@@ -553,7 +548,6 @@ export default {
     async getLastEvent() {
       try {
         const token = sessionStorage.getItem('token');
-        console.log("token home ", token);
         const response = await axios.get('/api/events/last', {
           headers: {
             Authorization: `Bearer ${token}`
@@ -681,7 +675,6 @@ export default {
           },
           params: { author: this.username }
         });
-        //console.log(response.data);
         if (response.data) {
           this.notifications = response.data;
         } else {

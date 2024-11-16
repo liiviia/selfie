@@ -180,8 +180,7 @@ exports.getCurrentDayActivities = async (req, res) => {
       return res.status(400).json({ message: 'Username è necessario' });
     }
 
-    const timeMachineDate = await getTimeMachineDate(); 
-    const currentDate = new Date(timeMachineDate);
+    const currentDate = new Date();
     currentDate.setHours(0, 0, 0, 0);
 
     const endOfDay = new Date(currentDate);
@@ -196,7 +195,7 @@ exports.getCurrentDayActivities = async (req, res) => {
     });
 
     if (activities.length === 0) {
-      return res.status(404).json({ message: 'Nessuna attività trovata per oggi' });
+      return res.status(200).json({ message: 'Nessuna attività trovata per oggi' });
     }
 
     res.json(activities);
@@ -214,7 +213,7 @@ exports.getActivitiesByDate = async (req, res) => {
     const { author, date } = req.query;
 
     if (!author || !date) {
-      return res.status(400).json({ message: 'Autore e data sono necessari' }); // Parametri mancanti
+      return res.status(400).json({ message: 'Autore e data sono necessari' }); 
     }
 
     const startDate = new Date(date).setHours(0, 0, 0, 0);
@@ -293,7 +292,6 @@ exports.getOverdueActivities = async (req, res) => {
     }
 
     const today = new Date(timeMachineConfig.getTimeMachineDate().getTime() - (new Date().getTimezoneOffset() * 60000));
-    console.log("attivita per:", today);
 
     const overdueActivities = await Activity.find({
       completed: false,
@@ -318,7 +316,6 @@ exports.deleteActivities = async (req, res) => {
   try {
     const activityID = req.params.id;
     const username = req.query.username; 
-    console.log(username);
 
     const activity = await Activity.findById(activityID);
 
@@ -328,7 +325,6 @@ exports.deleteActivities = async (req, res) => {
 
     if (activity.author === username) {
       await Activity.findByIdAndDelete(activityID);
-      console.log(`Attività ${activityID} eliminata con successo`);
       return res.json({ message: 'Attività eliminata con successo' });
     } else {
       activity.participants = activity.participants.filter(

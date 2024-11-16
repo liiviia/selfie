@@ -73,7 +73,6 @@ export default {
         this.activities = response.data.filter(activity => 
           new Date(activity.deadline) >= currentDate
         );
-        console.log(response.data);
       } catch (error) {
         console.error('Errore durante il recupero delle attività:', error);
       }

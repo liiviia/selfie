@@ -2,7 +2,6 @@ const Event = require('../models/Event');
 const { sendNotifEmail } = require('../services/emailService');
 const User = require('../models/User');
 const { getTimeMachineDate } = require('../controllers/timeMachineController');
-const ICAL = require('ical.js');
 
 exports.createEvent = async (req, res) => {
   try {
@@ -24,7 +23,6 @@ exports.createEvent = async (req, res) => {
       participants,
       type,
     } = req.body;
-    console.log(req.body);
 
     if (!title || !date || !startTime || !author) {
       return res.status(400).json({ error: 'I campi titolo, data, ora di inizio e autore sono obbligatori.' });
@@ -38,7 +36,6 @@ exports.createEvent = async (req, res) => {
       notificationMechanismArray = notificationMechanism.split(',');
     }
 
-    console.log("NotificationMechanismArray", notificationMechanismArray);
 
     const createAndSaveEvent = async (eventDate) => {
       const newEvent = new Event({
@@ -61,7 +58,6 @@ exports.createEvent = async (req, res) => {
       });
 
       const savedEvent = await newEvent.save();
-      //console.log(savedEvent);
       return savedEvent;
     };
 
@@ -128,7 +124,6 @@ exports.createEvent = async (req, res) => {
       });
 
       const savedEvent = await newEvent.save();
-      console.log("Evento salvato:", savedEvent);
       res.status(201).json(savedEvent);
     }
 
@@ -194,13 +189,13 @@ exports.getCurrentDayEvents = async (req, res) => {
       return res.status(400).json({ message: 'Username è necessario' });
     }
 
-    const timeMachineDate = await getTimeMachineDate();
-    const currentDate = new Date(timeMachineDate);
+    const currentDate = new Date();
     currentDate.setHours(0, 0, 0, 0);
 
     const endOfDay = new Date(currentDate);
     endOfDay.setDate(currentDate.getDate() + 1);
     endOfDay.setMilliseconds(endOfDay.getMilliseconds() - 1);
+    
 
     const events = await Event.find({
       $or: [
@@ -290,7 +285,6 @@ exports.sendEmailNotificationCreate = async (req, res) => {
 exports.nonDisponibile = async (req, res) => {
   try {
     const { startHour, startMinute, endHour, endMinute, repeatDaily, giorno } = req.body;
-    console.log("dati non disp", req.body);
     const userId = req.user.id;
 
     const user = await User.findById(userId);
@@ -333,11 +327,9 @@ exports.nonDisponibileGET = async (req, res) => {
 };
 
 exports.rimNonDisponibile = async (req, res) => {
-  console.log("aico0");
   try {
     const username = req.query.username;
     const id = req.query.id;
-    console.log("us:", username, "id", id);
 
     const user = await User.findOne({ username });
 
@@ -367,11 +359,5 @@ exports.rimNonDisponibile = async (req, res) => {
 
 
 
-function calculateDuration(startDate, endDate) {
-  const start = new Date(startDate);
-  const end = new Date(endDate);
-  const duration = (end - start) / (1000 * 60); // durata in minuti
-  return duration;
-}
 
 

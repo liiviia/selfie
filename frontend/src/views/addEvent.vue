@@ -4,27 +4,27 @@
     <form @submit.prevent="createEvent">
       <div>
         <label for="title">Titolo:</label>
-        <input type="text" v-model="newEvent.title" required />
+        <input type="text" v-model="newEvent.title" required="true" />
       </div>
       <div>
         <label for="description">Descrizione:</label>
-        <textarea v-model="newEvent.description"></textarea>
+        <textarea v-model="newEvent.description" required="true"></textarea>
       </div>
       <div>
         <label for="date">Data:</label>
-        <input type="date" v-model="newEvent.date" required />
+        <input type="date" v-model="newEvent.date" required="true" />
       </div>
       <div>
         <label for="startTime">Ora di Inizio:</label>
-        <input type="time" v-model="newEvent.startTime" required />
+        <input type="time" v-model="newEvent.startTime" required="true" />
       </div>
       <div>
         <label for="duration">Durata (minuti):</label>
-        <input type="number" v-model="newEvent.duration" required />
+        <input type="number" v-model="newEvent.duration" required="true" />
       </div>
       <div>
         <label for="location">Luogo:</label>
-        <input type="text" v-model="newEvent.location" />
+        <input type="text" v-model="newEvent.location" required="true"/>
       </div>
       <div>
         <label>È Ripetibile?</label>
@@ -33,14 +33,13 @@
       <div v-if="newEvent.isRecurring">
         <label for="frequency">Frequenza:</label>
         <select v-model="newEvent.frequency">
-          <option value="one-time">Una tantum</option>
           <option value="daily">Giornaliero</option>
           <option value="weekly">Settimanale</option>
           <option value="monthly">Mensile</option>
         </select>
         <div> 
           <label for="numberOfOccurrences">Numero di Ripetizioni:</label>
-          <input type="number" v-model="newEvent.numberOfOccurrences" placeholder="Lascia vuoto per ripetere indefinitamente" />
+          <input type="number" v-model="newEvent.numberOfOccurrences"  />
         </div>
       </div>
       <div>
@@ -54,13 +53,9 @@
           <input type="number" v-model="newEvent.notificationTime" />
         </div>
         <div>
-          <label for="repeatNotification">Ripeti Notifica (minuti):</label>
+          <label for="repeatNotification">Quante volte ripetere la notifica:</label>
           <input type="number" v-model="newEvent.repeatNotification" />
         </div>
-      </div>
-      <div>
-        <label for="author">Autore:</label>
-        <input type="text" v-model="newEvent.author" required />
       </div>
 
       <div class="form-group">
@@ -90,7 +85,6 @@
 
       <button type="submit">Crea Evento</button>
     </form>
-    <NotificationManager ref="notificationManager" />
     <p v-if="message">{{ message }}</p>
   </div>
 </template>
@@ -99,12 +93,9 @@
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
-import NotificationManager from '../components/NotificationManager.vue';
 
 export default {
-  components:{
-    NotificationManager
-  },
+ 
   
   setup() {
     const route = useRoute();
@@ -148,8 +139,7 @@ export default {
         const author = newEvent.value.author;
         const participants = newEvent.value.participants.filter(participant => participant !== author);
         
-        console.log("selected partecipans", participants);
-        console.log("dati evento:", newEvent.value);
+       
   
         for (const participant of participants) {
     const unavailableTimes = await fetchUnavailableTimes(participant);
@@ -157,7 +147,6 @@ export default {
     for (const time of unavailableTimes) {
         const unavailableDate = new Date(time.giorno);
         const formattedDate = unavailableDate.toISOString().split('T')[0];
-        console.log("Data di indisponibilità:", formattedDate, "per l'utente:", participant);
 
 
 
@@ -176,12 +165,7 @@ export default {
         const endHour = unavailableEnd.getHours();
         const endMinute = unavailableEnd.getMinutes();
 
-        console.log(`Orario di inizio indisponibilità: ${startHour}:${startMinute.toString().padStart(2, '0')} per l'utente: ${participant}`);
-        console.log(`Orario di fine indisponibilità: ${endHour}:${endMinute.toString().padStart(2, '0')} per l'utente: ${participant}`);
-
-
-        console.log("data evento:", newEvent.value.date);
-        console.log("ora evento:", newEvent.value.startTime);
+        
 
 
         const eventDate = new Date(newEvent.value.date);
@@ -192,18 +176,15 @@ export default {
 
         if (time.repeatDaily) {
 
-            console.log("caso ripeti tutti i giorni" , time.repeatDaily);
             const unavailableStartInMinutes = startHour * 60 + startMinute;
             const unavailableEndInMinutes = endHour * 60 + endMinute;
 
             if (eventStartInMinutes >= unavailableStartInMinutes && eventStartInMinutes <= unavailableEndInMinutes) {
-                console.log(`L'orario dell'evento ${eventStartTime} è compreso nell'intervallo di indisponibilità ${startHour}:${startMinute} - ${endHour}:${endMinute} per l'utente: ${participant}`);
                 alert(`L'orario dell'evento ${eventStartTime} è compreso nell'intervallo di indisponibilità ${startHour}:${startMinute} - ${endHour}:${endMinute} per l'utente: ${participant}`);
                 return;
             }
 
         } else {
-            console.log("caso ripeti un giorno", time.repeatDaily);
             const formattedEventDate = eventDate.toISOString().split('T')[0];
 
             if (formattedEventDate === formattedDate) {
@@ -211,7 +192,6 @@ export default {
                 const unavailableEndInMinutes = endHour * 60 + endMinute;
 
                 if (eventStartInMinutes >= unavailableStartInMinutes && eventStartInMinutes <= unavailableEndInMinutes) {
-                    console.log(`L'orario dell'evento ${eventStartTime} è compreso nell'intervallo di indisponibilità ${startHour}:${startMinute} - ${endHour}:${endMinute} per l'utente: ${participant}`);
                     alert(`L'orario dell'evento ${eventStartTime} è compreso nell'intervallo di indisponibilità ${startHour}:${startMinute} - ${endHour}:${endMinute} per l'utente: ${participant}`);
                     
                     return;

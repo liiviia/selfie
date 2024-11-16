@@ -50,7 +50,7 @@
 
 
 
-                   <button class="fixed-button" @click="openNotificationModal" style="background:#f4a460; margin-bottom: 50px;">
+                   <button class="fixed-button" @click="openNotificationModal" style="background:#f4a460; margin-bottom: 10px;">
                   Vedi Notifiche
                     </button>
 
@@ -95,7 +95,7 @@
 
 
 
-   <button class="fixed-button" @click="openHelpStudy" style="background:#f4a460; margin-bottom: 50px;">
+   <button class="fixed-button" @click="openHelpStudy" style="background:#f4a460; margin-bottom: 10px;">
                   Non sai come studiare?
                     </button>
 
@@ -224,15 +224,12 @@ export default {
 
 
 
-   // const params = new URLSearchParams(window.location.search); 
     const query = route.query;
     
     if (Object.keys(query).length > 0 && route.query.nonFare === 'true'){
 
 
-  console.log(route.query.nuovo);
   if(route.query.nuovo === 'false'){
-    console.log("non nuovo");
   newPom.value.tempoStudio = route.query.tempoStudio
     ? parseInt(route.query.tempoStudio)
     : newPom.value.tempoStudio;
@@ -258,15 +255,7 @@ export default {
     : true;
 
 
-  console.log("Parametri inizializzati dal route.query o default:", {
-    giorno: newPom.value.giorno,
-    tempoStudio: newPom.value.tempoStudio,
-    tempoPausa: newPom.value.tempoPausa,
-    ripetizioni: newPom.value.ripetizioni,
-    remainingTime: remainingTime.value,
-    studyCycles: studyCycles.value,
-    isStudyPhase: isStudyPhase.value,
-  });
+  
 
   if (remainingTime.value > 0) {
     document.getElementById('timerDisplay').textContent = formatTime(remainingTime.value);
@@ -280,7 +269,6 @@ export default {
 
 }  
   else {
-    console.log("Nuovo ciclo");
     studyCycles.value = newPom.value.ripetizioni;
     startNewCycle();
   }
@@ -310,13 +298,11 @@ export default {
     document.getElementById('timerDisplay').textContent = formatTime(remainingTime.value);
 
     if (isStudyPhase.value) {
-      console.log("study timer" , newPom.value.tempoStudio);
       startStudyTimer(newPom.value.tempoStudio, studyCycles.value);
     } else {
       startBreakTimer(newPom.value.tempoPausa, studyCycles.value);
     }
   } else {
-    console.log("study timer" , newPom.value.tempoStudio);
 
     startStudyTimer(newPom.value.tempoStudio, studyCycles.value);
   }
@@ -334,7 +320,6 @@ export default {
 
     const getUsers = async () => {
       try {
-        console.log("ciao");
         const username = localStorage.getItem('username');
         const token = sessionStorage.getItem('token');
         const response = await axios.get('/api/users', {
@@ -344,7 +329,6 @@ export default {
           params: { username: username }
         });
         users.value = response.data; 
-        console.log("users:", users.value);
       } catch (error) {
         console.error('Errore nel recupero degli utenti:', error);
       }
@@ -352,27 +336,48 @@ export default {
 
 
     const aggiungiPomodoro = async () => {
+  try {
+    const token = sessionStorage.getItem('token');
+    const currentDate = new Date();
+    const selectedDate = new Date(newPom.value.giorno);
+
+    const response = await axios.post('/api/pomsPOST', newPom.value, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    console.log('Sessione pomodoro aggiunta:', response.data);
+
+    if (selectedDate.getTime() > currentDate.getTime()) {
+      statusMessage.value = 'Sessione pomodoro aggiunta per una data futura.';
+    } else {
+      studyCycles.value = newPom.value.ripetizioni;
+
+      const pomodoroId = response.data._id; 
       try {
-        const token = sessionStorage.getItem('token');
-        const currentDate = new Date();
-        const selectedDate = new Date(newPom.value.giorno);
+  const startResponse = await axios.post(
+    `/api/iniziaPomodoro/${pomodoroId}`,
+    {}, 
+    {
+      headers: { Authorization: `Bearer ${token}` } 
+    }
+  );
+  console.log(startResponse);
 
-        const response = await axios.post('/api/pomsPOST', newPom.value, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
 
-        console.log('Sessione pomodoro aggiunta:', response.data);
+  startStudyTimer(newPom.value.tempoStudio, studyCycles.value, newPom.value.tempoPausa);
+} catch (startError) {
+  console.error('Errore durante l\'avvio del pomodoro:', startError);
+  statusMessage.value = 'Errore durante l\'avvio del pomodoro.';
+}
 
-        if (selectedDate.getTime() > currentDate.getTime()) {
-          statusMessage.value = 'Sessione pomodoro aggiunta per una data futura.';
-        } else {
-          studyCycles.value = newPom.value.ripetizioni;
-          startStudyTimer(newPom.value.tempoStudio, studyCycles.value, newPom.value.tempoPausa);
-        }
-      } catch (error) {
-        console.error('Errore:', error);
-      }
-    };
+     
+    }
+  } catch (error) {
+    console.error('Errore:', error);
+    statusMessage.value = 'Errore durante l\'aggiunta del pomodoro.';
+  }
+};
+
 
 
     const aggiungiPomDaNotifica = async (notificationId , tempoStudio , tempoPausa , ripetizioni , giorno) => {
@@ -402,6 +407,23 @@ export default {
         if(giornoDate.getTime() > currentDate.getTime()) {
           statusMessage.value = 'sessione pomodoro aggiunta per una data futura';
         }  else {
+          const pomodoroId = response.data._id; 
+      try {
+  const startResponse = await axios.post(
+    `/api/iniziaPomodoro/${pomodoroId}`,
+    {}, 
+    {
+      headers: { Authorization: `Bearer ${token}` }
+    }
+  );
+
+  console.log('Pomodoro avviato:', startResponse.data);
+
+  startStudyTimer(newPom.value.tempoStudio, studyCycles.value, newPom.value.tempoPausa);
+} catch (startError) {
+  console.error('Errore durante l\'avvio del pomodoro:', startError);
+  statusMessage.value = 'Errore durante l\'avvio del pomodoro.';
+}
           studyCycles.value = ripetizioni;
           startStudyTimer(tempoStudio, studyCycles.value , tempoPausa);
         }
@@ -429,7 +451,6 @@ export default {
         });
         if (response.data) {
           notificationsPom.value = response.data;
-          console.log("no:",notificationsPom);
         } else {
           this.noNotificationsMessage = 'Nessuna notifica trovata.';
         }
@@ -451,7 +472,6 @@ export default {
 
 
         const rifiutaNotifica = async (notificationId) => {
-  console.log("not id:", notificationId);
   const token = sessionStorage.getItem('token');
 
   try {
@@ -463,7 +483,6 @@ export default {
     notificationsPom.value = notificationsPom.value.filter(
           notifica => notifica._id !== notificationId
   );
-    console.log("notifica pom eliminata");
     alert("Notifica eliminata");
 
   } catch (error) {
@@ -510,7 +529,6 @@ export default {
     };
 
     const openNotificationModal = () => {
-      console.log("aperto notifiche modal");
        isNotificationModalOpen.value = true;
        fetchInvitiPom();
     };
@@ -566,7 +584,6 @@ export default {
     }
 
 
-    console.log(cycles);
     risultatiCicli.value = cycles;
 };
 
@@ -575,7 +592,6 @@ export default {
     const sendNotificationPom = async () => {
   const token = sessionStorage.getItem('token');
   const username = localStorage.getItem('username');
-  console.log("selected user:",selectedUsers.value);
 
 
   try {
@@ -1114,6 +1130,25 @@ button.rounded-btn {
 
 
 @media (max-width: 600px) {
+  .fixed-button {
+  position: fixed; 
+    right: 10px; 
+  padding: 8px 15px; 
+  font-size: 0.8rem; 
+}
+
+
+
+
+ 
+
+  .controls button {
+    padding: 6px 12px;  
+    font-size: 0.9rem; 
+    margin: 5px;         
+  }
+
+  
   h1 {
     margin-top: 30px; 
   }
