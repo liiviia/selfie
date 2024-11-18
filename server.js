@@ -1,7 +1,6 @@
 const express = require('express');
 const path = require('path');
-//const connectDB = require('./config/dbConnection');
-const mongoose = require('mongoose');
+const connectDB = require('./config/dbConnection');
 const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');
 const noteRoutes = require('./routes/noteRoutes');
@@ -36,26 +35,7 @@ app.use(cors({
 
 
 
-const mongoDBUri = "mongodb://site232432:ahB4ha7j@mongo_site232432:27017/site232432"; 
-mongoose.connect(mongoDBUri, { useNewUrlParser: true, useUnifiedTopology: true });
-mongoose.connection.on("connected", () => console.log("Connesso a MongoDB"));
-mongoose.connection.on("reconnected", () => console.log("Riconnesso a MongoDB"));
-mongoose.connection.on("disconnected", () => console.log("Disconnesso da MongoDB"));
-mongoose.connection.on("error", (err) => console.error("Errore di connessione a MongoDB:", err));
-
-process.on("SIGINT", () => {
-    mongoose.connection.close()
-        .then(() => {
-            console.log("Connessione MongoDB chiusa");
-            process.exit(0);
-        })
-        .catch(err => {
-            console.error("Errore durante la chiusura della connessione MongoDB:", err);
-            process.exit(1);
-        });
-});
-
-
+connectDB();
 
 
 
