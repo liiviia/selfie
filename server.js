@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 //const connectDB = require('./config/dbConnection');
+const mongoose = require('mongoose');
 const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');
 const noteRoutes = require('./routes/noteRoutes');
