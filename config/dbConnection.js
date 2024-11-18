@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
-const mongoDBUri = "mongodb://mongo:27017/site232432"; // URI per il cluster di Gocker
+// Aggiorna l'URI con i dettagli forniti da Gocker
+const mongoDBUri = "mongodb://site232432:ahB4ha7j@mongo_site232432:27017/site232432"; 
 
 const connectDB = () => {
     mongoose.connect(mongoDBUri, { useNewUrlParser: true, useUnifiedTopology: true });
