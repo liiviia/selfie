@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcryptjs");
 
 const unavailableTimeSchema = new mongoose.Schema({
     startHour: { type: Number, required: true, min: 0, max: 23 },
