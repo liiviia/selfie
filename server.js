@@ -20,7 +20,7 @@ const http = require('http');
 require('dotenv').config({ path: __dirname + '/.env' });
 
 const app = express();
-const port = 3000;
+const port = 8000;
 
 const server = http.createServer(app);
 initializeWebSocket(server);
@@ -28,10 +28,11 @@ initializeWebSocket(server);
 
 
 app.use(cors({
-  origin: 'http://localhost:8080',
+  origin: 'http://site232432.tw.cs.unibo.it',
   methods: ['GET', 'POST'],
   credentials: true,
 }));
+
 
 
 connectDB();
