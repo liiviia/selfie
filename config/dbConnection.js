@@ -3,7 +3,7 @@ const mongoDBUri = "mongodb://siteUser:pswPerMongo@127.0.0.1:27017/site232432";
 const connectDB = async () => {
     let debug = [];
     try {   
-           try {
+          
     console.log("Inizio connessione...");
     await mongoose.connect(mongoDBUri);
     console.log("Connesso con successo!");
