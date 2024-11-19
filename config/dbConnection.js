@@ -3,14 +3,14 @@ const mongoDBUri = "mongodb://siteUser:pswPerMongo@127.0.0.1:27017/site232432";
 const connectDB = async () => {
     let debug = [];
     try {   
-          
+
     console.log("Inizio connessione...");
     await mongoose.connect(mongoDBUri);
     console.log("Connesso con successo!");
 } catch (err) {
     console.error("Errore aaaaaaaa:", err.message);
 }
-         
+
 
         debug.push(`Attempting to connect to MongoDB with URI: ${mongoDBUri}`);
  /*       console.log("connettendosi al db");
@@ -37,10 +37,9 @@ const connectDB = async () => {
         });
 
         return { message: "Connected to MongoDB", debug };
-    } catch (e) {
-        debug.push(`Error connecting to MongoDB: ${e.message}`);
-        return { error: e.message, debug };
-    }
+    
+
 };
+
 
 module.exports = connectDB;
