@@ -68,5 +68,5 @@ app.get('*', (req, res) => {
 
 
 server.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+  console.log(`Server running at site232432.tw.cs.unibo.it:${port}`);
 });
