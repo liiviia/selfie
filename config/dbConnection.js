@@ -1,15 +1,25 @@
 const mongoose = require("mongoose");
-const mongoDBUri = "mongodb://siteUser:pswPerMongo@127.0.0.1:27017/site232432";
+const mongoDBUri = "mongodb://siteUser:ohSh3EeX@mongo_site232432:27017/site232432";
+const mongoCredentials = {
+    user: "site232432",       // Username MongoDB
+    pwd: "ohSh3EeX",          // Password MongoDB
+    site: "mongo_site232432"  // Nome host MongoDB
+};
+const dbname = "site232432";
+const mongouri = `mongodb://${mongoCredentials.user}:${mongoCredentials.pwd}@${mongoCredentials.site}:27017/${dbname}?authSource=admin&writeConcern=majority`;
+
 const connectDB = async () => {
     let debug = [];
     try {
-        console.log("Inizio connessione...");
+console.log("provaprovaprova");
+        console.log("Inizio connessione123...");
         debug.push("Inizio connessione...");
-        await mongoose.connect(mongoDBUri);
+                await mongoose.connect(mongoDBUri);
         console.log("Connesso con successo!");
+await new Promise(resolve => setTimeout(resolve, 100));
         debug.push("Connesso con successo!");
     } catch (err) {
-        console.error("Errore aaaaaaaa:", err.message);
+        console.log("Errore aaaaaaaa:", err);
         debug.push(`Errore durante la connessione: ${err.message}`);
         return { message: "Errore durante la connessione", debug };
     }
