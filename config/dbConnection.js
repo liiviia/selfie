@@ -5,7 +5,7 @@ const connectDB = async () => {
     let debug = [];
     try {
         debug.push(`Attempting to connect to MongoDB with URI: ${mongoDBUri}`);
-        await mongoose.connect(mongoDBUri, { useNewUrlParser: true, useUnifiedTopology: true });
+        await mongoose.connect(mongoDBUri);
         debug.push("Successfully connected to MongoDB");
 
         mongoose.connection.on("connected", () => debug.push("Connected to MongoDB"));
