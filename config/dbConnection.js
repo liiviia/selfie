@@ -1,14 +1,27 @@
 const mongoose = require("mongoose");
-const mongoDBUri = "mongodb://site232432:ahB4ha7j@mongo_site232432:27017/site232432"; 
-
+const mongoDBUri = "mongodb://siteUser:pswPerMongo@127.0.0.1:27017/site232432";
 const connectDB = async () => {
     let debug = [];
     try {
-        debug.push(`Attempting to connect to MongoDB with URI: ${mongoDBUri}`);
-        await mongoose.connect(mongoDBUri, { useNewUrlParser: true, useUnifiedTopology: true });
-        debug.push("Successfully connected to MongoDB");
 
-        mongoose.connection.on("connected", () => debug.push("Connected to MongoDB"));
+           try {
+    console.log("Inizio connessione...");
+    await mongoose.connect(mongoDBUri);
+    console.log("Connesso con successo!");
+} catch (err) {
+    console.error("Errore aaaaaaaa:", err.message);
+}
+         
+
+        debug.push(`Attempting to connect to MongoDB with URI: ${mongoDBUri}`);
+ /*       console.log("connettendosi al db");
+        await mongoose.connect(mongoDBUri);
+        console.log("connesso");
+        debug.push("Successfully connected to MongoDB");*/
+
+        mongoose.connection.on("connected", () =>{
+      console.log("Connected to MongoDB");
+ debug.push("Connected to MongoDB");});
         mongoose.connection.on("disconnected", () => debug.push("Disconnected from MongoDB"));
         mongoose.connection.on("error", (err) => debug.push(`MongoDB connection error: ${err}`));
 
