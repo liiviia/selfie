@@ -14,13 +14,15 @@ const timeMachineRoutes = require('./routes/timeMachineRoutes');
 const timeMachineConfig = require('./timeMachineConfig');
 const moment = require('moment-timezone');
 const { startNotificationMonitoring } = require('./controllers/notificheEventi');
-const notification = require('./websocketServer');  // Assicurati che il percorso sia corretto
+const { initializeWebSocket } = require('./websocketServer');
+const http = require('http');
 
 require('dotenv').config({ path: __dirname + '/.env' });
 
 const app = express();
 const port = 8000;
 
+const server = http.createServer(app);
 
 
 
@@ -41,7 +43,7 @@ const incrementTimeMachine = () => {
   const currentTime = moment(timeMachineConfig.getTimeMachineDate()).tz('Europe/Rome');
   const updatedTime = currentTime.add(1, 'seconds').toDate();
   timeMachineConfig.setTimeMachineDate(updatedTime);
-  console.log(timeMachineConfig.getTimeMachineDate());
+  console.log("time ma", timeMachineConfig.getTimeMachineDate());
 };
 
 setInterval(incrementTimeMachine, 1000);
@@ -58,7 +60,6 @@ app.use('/api', registerRoutes);
 app.use('/api', accountRoutes);
 app.use('/api', timeMachineRoutes);
 app.use('/api/notifications', notificationRoutes);
-app.use('/api', notificationRoutes);
 
 app.use(express.static(path.join(__dirname, 'frontend/frontend/dist')));
 
