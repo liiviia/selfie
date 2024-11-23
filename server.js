@@ -14,16 +14,13 @@ const timeMachineRoutes = require('./routes/timeMachineRoutes');
 const timeMachineConfig = require('./timeMachineConfig');
 const moment = require('moment-timezone');
 const { startNotificationMonitoring } = require('./controllers/notificheEventi');
-const { initializeWebSocket } = require('./websocketServer');
-const http = require('http');
 
 require('dotenv').config({ path: __dirname + '/.env' });
 
 const app = express();
 const port = 8000;
 
-const server = http.createServer(app);
-initializeWebSocket(server);
+
 
 
 

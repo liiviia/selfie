@@ -1,39 +1,29 @@
-const socketIo = require('socket.io');
-let io;
+const express = require('express');
+const app = express();
 
-const initializeWebSocket = (server) => {
-     io = socketIo(server, {
-        cors: {
-          origin: 'http://site232432.tw.cs.unibo.it', 
-          methods: ['GET', 'POST'],
-          allowedHeaders: ['Content-Type'],
-          credentials: true,
-        },
-      });
+let alertQueue = []; 
 
-  console.log('WebSocket server inizializzato e in ascolto sulla porta 8000');
-  io.on('connection', (socket) => {
-      console.log("giusto");
+app.get('/alerts', (req, res) => {
+  const userNome = req.query.userNome; 
 
-  socket.on('disconnect', () => {
-  });
+  const userAlerts = alertQueue.filter((alert) => alert.userNome === userNome);
+
+  alertQueue = alertQueue.filter((alert) => alert.userNome !== userNome);
+
+  res.json(userAlerts);
 });
-};
 
 const sendAlertNotification = (title, date, startTime, userNome) => {
-  if (io) {
-    io.emit('alert', {
-      title,
-      date,
-      startTime,
-      userNome,
-    });
-  } else {
-    console.error('Socket.io non è inizializzato');
-  }
+  alertQueue.push({
+    title,
+    date,
+    startTime,
+    userNome,
+  });
+  console.log(`Notifica aggiunta per ${userNome}:`, title);
 };
 
 module.exports = {
-  initializeWebSocket,
+  app,
   sendAlertNotification,
 };

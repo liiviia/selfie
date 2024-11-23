@@ -1,53 +1,45 @@
 <template>
-    <div>
-    </div>
-  </template>
-  
-  <script>
-  import io from 'socket.io-client';
-  
-  export default {
-    data() {
-      return {
-        alerts: [], 
-        socket: null,
-      };
-    },
-    created() {
-      this.socket = io('http://site232432.tw.cs.unibo.it:8000', {
-     transports: ['websocket'], 
-      });
-  
-      this.socket.on('connect_error', (error) => {
-        
-        console.log('Errore di connessione:', error);
-      });
-  
-      this.socket.on('alert', (data) => {
-        console.log('Alert ricevuto:', data);
-  
+  <div>
+    <ul>
+      <li v-for="alert in alerts" :key="alert.title">
+        {{ alert.title }} - {{ alert.date }} - {{ alert.startTime }}
+      </li>
+    </ul>
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      alerts: [], 
+    };
+  },
+  created() {
+    const fetchAlerts = async () => {
+      try {
         const loggedInUser = localStorage.getItem('username'); 
-  
-        if (data.userNome === loggedInUser) {
-          alert(`TITOLO: ${data.title}\nOra di inizio: ${data.startTime}\nDi utente: ${data.userNome}`);
-          this.alerts.push(data); 
+        const response = await fetch(`/alerts?userNome=${loggedInUser}`);
+        if (response.ok) {
+          const newAlerts = await response.json();
+          this.alerts.push(...newAlerts); 
+          newAlerts.forEach(alert => {
+            alert(`TITOLO: ${alert.title}\nOra di inizio: ${alert.startTime}\nDi utente: ${alert.userNome}`);
+          });
+        } else {
+          console.error('Errore durante il polling:', response.statusText);
         }
-      });
-  
-      this.socket.on('connect', () => {
-        console.log('Connesso al server WebSocket');
-      });
-    },
-    unmounted() {
-      if (this.socket) {
- this.socket.close();
-        this.socket.disconnect();
+      } catch (error) {
+        console.error('Errore nella richiesta:', error);
+      } finally {
+        setTimeout(fetchAlerts, 1000);
       }
-    },
-  };
-  </script>
-  
-  <style scoped>
-  
-  </style>
-  
+    };
+
+    fetchAlerts();
+  },
+};
+</script>
+
+<style scoped>
+</style>
