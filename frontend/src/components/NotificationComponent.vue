@@ -15,7 +15,6 @@
     },
     created() {
       this.socket = io('http://site232432.tw.cs.unibo.it:8000', {
-  console.log("web socket all'indirizzo", this.socket);   
      transports: ['websocket'], 
       });
   
