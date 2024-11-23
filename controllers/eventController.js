@@ -28,108 +28,97 @@ exports.createEvent = async (req, res) => {
       return res.status(400).json({ error: 'I campi titolo, data, ora di inizio e autore sono obbligatori.' });
     }
 
-    let notificationMechanismArray = [];
-
-    if (Array.isArray(notificationMechanism)) {
-      notificationMechanismArray = notificationMechanism;
-    } else if (typeof notificationMechanism === 'string') {
-      notificationMechanismArray = notificationMechanism.split(',');
-    }
-
+    const notificationMechanismArray = Array.isArray(notificationMechanism)
+      ? notificationMechanism
+      : notificationMechanism?.split(',') || [];
 
     const createAndSaveEvent = async (eventDate) => {
-      const newEvent = new Event({
-        title,
-        description,
-        date: eventDate,
-        startTime,
-        duration,
-        isRecurring,
-        frequency,
-        email,
-        numberOfOccurrences,
-        location,
-        author,
-        notificationMechanism: notificationMechanismArray,
-        notificationTime,
-        repeatNotification,
-        participants: type === 'gruppo' ? participants : [],
-        type,
-      });
+      try {
+        const newEvent = new Event({
+          title,
+          description,
+          date: eventDate,
+          startTime,
+          duration,
+          isRecurring,
+          frequency,
+          email,
+          numberOfOccurrences,
+          location,
+          author,
+          notificationMechanism: notificationMechanismArray,
+          notificationTime,
+          repeatNotification,
+          participants: type === 'gruppo' ? participants : [],
+          type,
+        });
 
-      const savedEvent = await newEvent.save();
-      return savedEvent;
+        const savedEvent = await newEvent.save();
+        return savedEvent;
+      } catch (error) {
+        if (error.code === 11000) {
+          console.error('Errore: Evento duplicato', error);
+          return null;
+        }
+        throw error;
+      }
     };
 
     if (isRecurring) {
       const events = [];
-
-      let occurrences = numberOfOccurrences;
       const startDate = new Date(date);
 
-      switch (frequency) {
-        case 'daily':
-          for (let i = 0; i < occurrences; i++) {
-            const newDate = new Date(startDate);
+      for (let i = 0; i < numberOfOccurrences; i++) {
+        const newDate = new Date(startDate);
+
+        switch (frequency) {
+          case 'daily':
             newDate.setDate(startDate.getDate() + i);
-
-            const savedEvent = await createAndSaveEvent(newDate.toISOString());
-            events.push(savedEvent);
-          }
-          break;
-
-        case 'weekly':
-          for (let i = 0; i < occurrences; i++) {
-            const newDate = new Date(startDate);
+            break;
+          case 'weekly':
             newDate.setDate(startDate.getDate() + i * 7);
-
-            const savedEvent = await createAndSaveEvent(newDate.toISOString());
-            events.push(savedEvent);
-          }
-          break;
-
-        case 'monthly':
-          for (let i = 0; i < occurrences; i++) {
-            const newDate = new Date(startDate);
+            break;
+          case 'monthly':
             newDate.setMonth(startDate.getMonth() + i);
+            break;
+          default:
+            return res.status(400).json({ error: 'Frequenza non supportata' });
+        }
 
-            const savedEvent = await createAndSaveEvent(newDate.toISOString());
-            events.push(savedEvent);
-          }
-          break;
-
-        default:
-          return res.status(400).json({ error: 'Frequenza non supportata' });
+        const savedEvent = await createAndSaveEvent(newDate.toISOString());
+        if (savedEvent) {
+          events.push(savedEvent);
+        }
       }
 
-      res.status(201).json(events);
-    } else {
-      const newEvent = new Event({
-        title,
-        description,
-        date,
-        startTime,
-        duration,
-        isRecurring,
-        frequency,
-        email,
-        numberOfOccurrences,
-        location,
-        author,
-        notificationMechanism: notificationMechanismArray,
-        notificationTime,
-        repeatNotification,
-        participants: type === 'gruppo' ? participants : [],
-        type,
-      });
-
-      const savedEvent = await newEvent.save();
-      res.status(201).json(savedEvent);
+      return res.status(201).json(events);
     }
 
+    const newEvent = new Event({
+      title,
+      description,
+      date,
+      startTime,
+      duration,
+      isRecurring,
+      frequency,
+      email,
+      numberOfOccurrences,
+      location,
+      author,
+      notificationMechanism: notificationMechanismArray,
+      notificationTime,
+      repeatNotification,
+      participants: type === 'gruppo' ? participants : [],
+      type,
+    });
+
+    const savedEvent = await newEvent.save();
+    res.status(201).json(savedEvent);
+
   } catch (error) {
-    console.error('Errore durante aggiunta evento:', error);
-    res.status(500).json({ error: 'Errore durante aggiunta dell\'evento' });
+    console.error('Errore durante creazione evento:', error);
+    res.status(500).json({ error: 'Errore durante creazione evento' });
   }
 };
 

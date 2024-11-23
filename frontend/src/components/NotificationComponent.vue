@@ -14,11 +14,13 @@
       };
     },
     created() {
-      this.socket = io('http://localhost:3000', {
-        transports: ['websocket'], 
+      this.socket = io('http://site232432.tw.cs.unibo.it:8000', {
+  console.log("web socket all'indirizzo", this.socket);   
+     transports: ['websocket'], 
       });
   
       this.socket.on('connect_error', (error) => {
+        
         console.log('Errore di connessione:', error);
       });
   
@@ -39,6 +41,7 @@
     },
     unmounted() {
       if (this.socket) {
+ this.socket.close();
         this.socket.disconnect();
       }
     },

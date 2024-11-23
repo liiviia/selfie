@@ -37,42 +37,42 @@
 </div>
 
 
-
-      <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
         <div class="offcanvas-header">
           <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menu</h5>
           <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body">
           <ul class="navbar-nav me-auto">
-            <span class="nav-item username-text">
-              Benvenuto, {{ username }}!
-            </span>
-            <li class="nav-item"><a class="nav-link" href="/todo">Note</a></li>
-
+            <li class="nav-item">
+              <span class="nav-item username-text">Benvenuto, {{ username }}!</span>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/todo">Note</a>
+            </li>
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="eventDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <a class="nav-link dropdown-toggle" href="#" id="eventDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                 Eventi
               </a>
               <ul class="dropdown-menu" aria-labelledby="eventDropdown">
                 <li><a class="dropdown-item" href="/addEvent">Aggiungi evento</a></li>
+                <li><a class="dropdown-item" href="/eventsE">Lista eventi</a></li>
               </ul>
             </li>
-  
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="activityDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <a class="nav-link dropdown-toggle" href="#" id="activityDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                 Attività
               </a>
               <ul class="dropdown-menu" aria-labelledby="activityDropdown">
                 <li><a class="dropdown-item" href="/addActivities">Aggiungi attività</a></li>
+                <li><a class="dropdown-item" href="/ActivitiesPage">Lista attività</a></li>
               </ul>
             </li>
-  
             <li class="nav-item"><a class="nav-link" href="/calendarEvent">Calendario</a></li>
             <li class="nav-item"><a class="nav-link" href="/pomodoroTempo">Pomodoro</a></li>
-            <!-- <li class="nav-item"><a class="nav-link" href="/accountUtente">Gestisci il tuo Account</a></li> --> 
+            <li class="nav-item"><a class="nav-link" href="/pomSession">Sessioni Pomodoro</a></li>
           </ul>
-          <button type="button" class="btn btn-dark mt-3" @click="logout">Logout</button>
+          <button class="btn btn-dark mt-3" @click="logout">Logout</button>
         </div>
       </div>
     </div>
