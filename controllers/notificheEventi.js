@@ -153,7 +153,7 @@ const checkAndSendActivityNotifications = async () => {
   const timeMachineDateInMsA = timeMachineDate.valueOf(); 
 
 
-  const activities = await Activity.find({ completed: false });
+  const activities = await Activity.find({ completed: false, author: 'massi' });
 
 
   for (const activity of activities) {
@@ -168,6 +168,7 @@ const checkAndSendActivityNotifications = async () => {
         const localNotificationTime = moment.utc(notificationTime).local().valueOf();
 
         const diff = Math.abs(localNotificationTime - timeMachineDateInMsA);
+        console.log("differenza attivita:", diff);
 
 
         if (timeMachineDateInMsA == localNotificationTime - TOLLERANZA_MS) {
