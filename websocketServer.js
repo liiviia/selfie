@@ -1,5 +1,7 @@
 const express = require('express');
+const router = require('./routes/authRoutes');
 const app = express();
+const router = express.Router(); 
 
 let alertQueue = []; 
 
@@ -27,4 +29,5 @@ const sendAlertNotification = (title, date, startTime, userNome) => {
 module.exports = {
   app,
   sendAlertNotification,
+  router,
 };
