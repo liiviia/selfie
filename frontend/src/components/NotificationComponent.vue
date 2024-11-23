@@ -1,10 +1,6 @@
 <template>
   <div>
-    <ul>
-      <li v-for="alert in alerts" :key="alert.title">
-        {{ alert.title }} - {{ alert.date }} - {{ alert.startTime }}
-      </li>
-    </ul>
+    <!-- Non è più necessario visualizzare le notifiche in una lista -->
   </div>
 </template>
 
@@ -12,27 +8,34 @@
 export default {
   data() {
     return {
-      alerts: [], 
     };
   },
   created() {
     const fetchAlerts = async () => {
       try {
-        const loggedInUser = localStorage.getItem('username'); 
+        const loggedInUser = localStorage.getItem('username');
         const response = await fetch(`/alerts?userNome=${loggedInUser}`);
+
+        const text = await response.text();
+        console.log('Risposta dal server:', text);
+
         if (response.ok) {
-          const newAlerts = await response.json();
-          this.alerts.push(...newAlerts); 
-          newAlerts.forEach(alert => {
-            alert(`TITOLO: ${alert.title}\nOra di inizio: ${alert.startTime}\nDi utente: ${alert.userNome}`);
-          });
+          const newAlerts = JSON.parse(text);
+
+          if (Array.isArray(newAlerts) && newAlerts.length > 0) {
+            // Quando ci sono notifiche, visualizzale subito come alert() invece di aggiungerle alla lista
+            newAlerts.forEach(alert => {
+              // Mostra il messaggio di notifica con alert()
+              alert(`TITOLO: ${alert.title}\nData: ${alert.date}\nOra di inizio: ${alert.startTime}`);
+            });
+          } else {
+            console.log('Nessuna notifica per l\'utente');
+          }
         } else {
-          console.error('Errore durante il polling:', response.statusText);
+          console.error('Errore nella richiesta:', response.statusText);
         }
       } catch (error) {
         console.error('Errore nella richiesta:', error);
-      } finally {
-        setTimeout(fetchAlerts, 1000);
       }
     };
 
