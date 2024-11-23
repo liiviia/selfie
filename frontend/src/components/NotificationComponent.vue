@@ -5,6 +5,8 @@
 </template>
 
 <script>
+import axios from 'axios'; // Importa Axios
+
 export default {
   data() {
     return {
@@ -15,39 +17,22 @@ export default {
     const fetchAlerts = async () => {
       try {
         const loggedInUser = localStorage.getItem('username');
-        const response = await fetch(`/alerts?userNome=${loggedInUser}`);
-        console.log("risposta alerts,", response.data);
 
-        if (response.ok) {
-          // Verifica se la risposta è vuota
-          const text = await response.text(); // Ottieni la risposta come testo
+        // Utilizza Axios per fare la richiesta GET
+        const response = await axios.get(`/alerts?userNome=${loggedInUser}`);
+        console.log("Risposta Axios:", response);
 
-          if (text.trim() === "") {
-            console.log('Nessuna notifica disponibile per l\'utente');
-            return; // Se la risposta è vuota, non fare nulla
-          }
-
-          // Controlla che la risposta sia in formato JSON
-          const contentType = response.headers.get("content-type");
-          if (contentType && contentType.includes("application/json")) {
-            const newAlerts = JSON.parse(text);
-
-            if (Array.isArray(newAlerts) && newAlerts.length > 0) {
-              // Quando ci sono notifiche, visualizzale subito come alert()
-              newAlerts.forEach(alert => {
-                alert(`TITOLO: ${alert.title}\nData: ${alert.date}\nOra di inizio: ${alert.startTime}`);
-              });
-            } else {
-              console.log('Nessuna notifica per l\'utente');
-            }
-          } else {
-            console.error('La risposta del server non è in formato JSON');
-          }
+        if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+          // Quando ci sono notifiche, visualizzale subito come alert()
+          response.data.forEach(alert => {
+            alert(`TITOLO: ${alert.title}\nData: ${alert.date}\nOra di inizio: ${alert.startTime}`);
+          });
         } else {
-          console.error('Errore nella richiesta:', response.statusText);
+          console.log('Nessuna notifica per l\'utente');
         }
       } catch (error) {
-        console.error('Errore nella richiesta:', error);
+        // Gestisci gli errori
+        console.error('Errore nella richiesta Axios:', error);
       }
     };
 

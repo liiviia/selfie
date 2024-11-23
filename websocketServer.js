@@ -23,6 +23,7 @@ const sendAlertNotification = (title, date, startTime, userNome) => {
   console.log(`Notifica aggiunta per ${userNome}:`, title);
 };
 
+
 module.exports = {
   app,
   sendAlertNotification,
