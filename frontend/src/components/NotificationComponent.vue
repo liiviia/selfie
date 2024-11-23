@@ -16,6 +16,7 @@ export default {
       try {
         const loggedInUser = localStorage.getItem('username');
         const response = await fetch(`/alerts?userNome=${loggedInUser}`);
+        console.log("risposta alerts,", response.data);
 
         if (response.ok) {
           // Verifica se la risposta è vuota
