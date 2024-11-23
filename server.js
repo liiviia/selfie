@@ -59,7 +59,6 @@ app.use('/api', timeMachineRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/alerts');  
 
-sendAlertNotification('Titolo della Notifica', '2024-11-23', '12:30', 'userExample');  // Puoi usare la funzione sendAlertNotification ovunque per aggiungere notifiche
 
 app.use(express.static(path.join(__dirname, 'frontend/frontend/dist')));
 
