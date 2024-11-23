@@ -6,6 +6,7 @@
 
 <script>
 import axios from 'axios'; // Importa Axios
+import moment from 'moment-timezone';
 
 export default {
   data() {
@@ -14,6 +15,20 @@ export default {
     };
   },
   created() {
+    
+
+const timeMachine = async () => {
+  try {
+        const response = await axios.get('/api/getTime-machine'); 
+        console.log("get time machine", response.data);
+
+        const localDate = moment(response.data.date).tz('Europe/Rome', true).format();
+        console.log("Data convertita nel fuso orario locale:", localDate);
+    } catch (error) {
+        console.error('Errore nella richiesta GET:', error);
+    }
+
+};
     const fetchAlerts = async () => {
       try {
         const loggedInUser = localStorage.getItem('username');
@@ -37,8 +52,9 @@ export default {
     };
 
     // Esegui `fetchAlerts` ogni secondo
-    this.intervalId = setInterval(fetchAlerts, 1000); // 1000ms = 1 secondo
+    this.intervalId = setInterval(fetchAlerts, timeMachine, 1000); // 1000ms = 1 secondo
   },
+
   beforeUnmount() {
     // Quando il componente viene distrutto, cancella l'intervallo
     if (this.intervalId) {
