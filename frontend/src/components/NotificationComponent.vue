@@ -29,7 +29,7 @@ const timeMachine = async () => {
     }
 
 };
-    const fetchAlerts = async () => {
+  /*  const fetchAlerts = async () => {
       try {
         const loggedInUser = localStorage.getItem('username');
 
@@ -49,10 +49,10 @@ const timeMachine = async () => {
         // Gestisci gli errori
         console.error('Errore nella richiesta Axios:', error);
       }
-    };
+    };*/
 
     // Esegui `fetchAlerts` ogni secondo
-    this.intervalId = setInterval(fetchAlerts, timeMachine, 1000); // 1000ms = 1 secondo
+    this.intervalId = setInterval( timeMachine, 1000); // 1000ms = 1 secondo
   },
 
   beforeUnmount() {
