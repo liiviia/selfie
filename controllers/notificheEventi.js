@@ -145,7 +145,7 @@ console.log("eeee", events);
 if (notificationDateInMs !== null) {
   
   
-  if (timeMachineDateInMs == notificationDateInMs - TOLLERANZA_MS || timeMachineDateInMs == notificationDateInMs - TOLLERANZA_MS - 29) {
+  if (timeMachineDateInMs == notificationDateInMs - TOLLERANZA_MS) {
  
     await sendNotification(event); 
     handleRepeatedNotifications(event, event.repeatNotification); 
