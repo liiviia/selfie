@@ -126,6 +126,8 @@ console.log("eeee", events);
 
   for (const event of events) {
     const notificationDateInMs = calculateNotificationTime(event);
+    console.log("time machine",timeMachineDateInMs);
+    console.log("notification time eventi", notificationDateInMs);
 
     const TOLLERANZA_MS = 10; 
 
@@ -152,7 +154,7 @@ const startNotificationMonitoring = () => {
 const checkAndSendActivityNotifications = async () => {
   const timeMachineDate = await getTimeMachineDate1();  
   const timeMachineDateInMsA = timeMachineDate.valueOf(); 
-  console.log(timeMachineDate);
+  //console.log(timeMachineDate);
 
 
   const activities = await Activity.find({ completed: false });
