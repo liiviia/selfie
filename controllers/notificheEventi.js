@@ -173,7 +173,7 @@ const checkAndSendActivityNotifications = async () => {
         const localNotificationTime = moment.utc(notificationTime).local().valueOf();
 
         const diff = Math.abs(localNotificationTime - timeMachineDateInMsA);
-        console.log("differenza attivita:", diff);
+//        console.log("differenza attivita:", diff);
 
 
         if (timeMachineDateInMsA == localNotificationTime - TOLLERANZA_MS) {
