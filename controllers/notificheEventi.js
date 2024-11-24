@@ -119,6 +119,7 @@ const checkAndSendNotifications = async () => {
  
 
 const events = await Event.find();
+console.log("eeee", events);
 
 
 
@@ -149,12 +150,17 @@ const startNotificationMonitoring = () => {
 };
 
 const checkAndSendActivityNotifications = async () => {
+  console.log("ciaociao");
   const timeMachineDate = await getTimeMachineDate1();  
   const timeMachineDateInMsA = timeMachineDate.valueOf(); 
+  console.log(timeMachineDate);
 
 
-  const activities = await Activity.find({ completed: false, author: 'massi' });
+  const activities = await Activity.find({ completed: false });
 
+  console.log("attivita",activities);
+
+  
 
   for (const activity of activities) {
 
