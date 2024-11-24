@@ -9,9 +9,15 @@ const { sendAlertNotification } = require('../websocketServer');
 const sentNotifications = new Set();
 
 const getTimeMachineDate1 = async () => {
+  /*
   console.log("time machine get return", moment(timeMachineConfig.getTimeMachineDate()).tz('Europe/Rome'))
 
-  return moment(timeMachineConfig.getTimeMachineDate()).tz('Europe/Rome');
+  return moment(timeMachineConfig.getTimeMachineDate()).tz('Europe/Rome');*/
+  const rawDate = timeMachineConfig.getTimeMachineDate();
+  const isoDate = moment(rawDate).toISOString(); // Assicura che sia in UTC
+  const romeTime = moment(isoDate).tz('Europe/Rome');
+  console.log("ISO:", isoDate, "Rome Time:", romeTime.format());
+  return romeTime;
 };
 
 const calculateNotificationTime = (event) => {
