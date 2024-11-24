@@ -10,7 +10,6 @@ exports.getTimeMachineDate = (req, res) => {
 };
 
 
-
 exports.updateTimeMachineDate = (req, res) => {
     const { date } = req.body;
 
@@ -18,19 +17,21 @@ exports.updateTimeMachineDate = (req, res) => {
         return res.status(400).json({ message: 'Data non fornita' });
     }
 
-    const dateTimeLocal = moment(date).tz('Europe/Rome', true).format(); 
+    // Forza il formato UTC per evitare errori
+    const dateTimeUTC = moment.tz(date, 'Europe/Rome').utc().format(); 
 
-    if (!moment(dateTimeLocal).isValid()) {
+    if (!moment(dateTimeUTC).isValid()) {
         return res.status(400).json({ message: 'Data non valida' });
     }
 
-    timeMachineConfig.setTimeMachineDate(dateTimeLocal);
+    timeMachineConfig.setTimeMachineDate(dateTimeUTC);
 
     res.status(200).json({
         message: 'Time Machine aggiornata con successo',
-        timeMachineDate: dateTimeLocal
+        timeMachineDate: dateTimeUTC
     });
 };
+
 
 exports.resetTimeMachineDate = (req, res) => {
     timeMachineConfig.resetTimeMachineDate();
