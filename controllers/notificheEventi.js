@@ -140,6 +140,7 @@ console.log("eeee", events);
     console.log("notification time eventi", notificationDateInMs, "notifiche normali",notificheNormali );
 
     const TOLLERANZA_MS = 10; 
+    console.log("differenza tim e mando not", notificationDateInMs - timeMachineDateInMs);
 
 if (notificationDateInMs !== null) {
   if (timeMachineDateInMs >= (notificationDateInMs - TOLLERANZA_MS) && timeMachineDateInMs <= (notificationDateInMs + TOLLERANZA_MS)) {
