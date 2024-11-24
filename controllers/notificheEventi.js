@@ -126,7 +126,7 @@ console.log("eeee", events);
 
   for (const event of events) {
     const notificationDateInMs = calculateNotificationTime(event);
-    console.log("time machine in ms",timeMachineDateInMs, "time machine normale");
+    console.log("time machine in ms",timeMachineDateInMs, "time machine normale",timeMachineDate);
     console.log("notification time eventi", notificationDateInMs);
 
     const TOLLERANZA_MS = 10; 
