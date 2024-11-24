@@ -139,16 +139,16 @@ console.log("eeee", events);
     const notificheNormali =  new Date(notificationDateInMs).toLocaleString();
     console.log("notification time eventi", notificationDateInMs, "notifiche normali",notificheNormali );
 
-    const TOLLERANZA_MS = 10; 
+    const TOLLERANZA_MS = 3600000; 
     console.log("differenza tim e mando not", notificationDateInMs - timeMachineDateInMs);
 
 if (notificationDateInMs !== null) {
-  if (timeMachineDateInMs >= (notificationDateInMs - TOLLERANZA_MS) && timeMachineDateInMs <= (notificationDateInMs + TOLLERANZA_MS)) {
+  
+  
+  if (timeMachineDateInMs == notificationDateInMs - TOLLERANZA_MS) {
  
     await sendNotification(event); 
     handleRepeatedNotifications(event, event.repeatNotification); 
-  } else {
-  
   }
 }
 
