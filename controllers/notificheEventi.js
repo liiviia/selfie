@@ -114,7 +114,7 @@ const handleRepeatedNotifications = (event, repeatTime) => {
         clearInterval(intervalId);
 
       }
-    }, 60000);  
+    }, 300000);  
   }
 };
 
@@ -145,7 +145,7 @@ console.log("eeee", events);
 if (notificationDateInMs !== null) {
   
   
-  if (timeMachineDateInMs == notificationDateInMs - TOLLERANZA_MS) {
+  if (timeMachineDateInMs == notificationDateInMs - TOLLERANZA_MS || timeMachineDateInMs == notificationDateInMs - TOLLERANZA_MS - 29) {
  
     await sendNotification(event); 
     handleRepeatedNotifications(event, event.repeatNotification); 
