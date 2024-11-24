@@ -135,7 +135,7 @@ console.log("eeee", events);
   for (const event of events) {
     const notificationDateInMs = calculateNotificationTime(event);
     console.log("time machine in ms",timeMachineDateInMs);
-    console.log("time machine normale");
+    console.log("time machine normale",timeMachineDate);
     const notificheNormali =  new Date(notificationDateInMs).toLocaleString();
     console.log("notification time eventi", notificationDateInMs, "notifiche normali",notificheNormali );
 
