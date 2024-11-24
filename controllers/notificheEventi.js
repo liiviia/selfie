@@ -9,6 +9,8 @@ const { sendAlertNotification } = require('../websocketServer');
 const sentNotifications = new Set();
 
 const getTimeMachineDate1 = async () => {
+  console.log("time machine get return", moment(timeMachineConfig.getTimeMachineDate()).tz('Europe/Rome'))
+
   return moment(timeMachineConfig.getTimeMachineDate()).tz('Europe/Rome');
 };
 
@@ -126,7 +128,8 @@ console.log("eeee", events);
 
   for (const event of events) {
     const notificationDateInMs = calculateNotificationTime(event);
-    console.log("time machine in ms",timeMachineDateInMs, "time machine normale",timeMachineDate);
+    console.log("time machine in ms",timeMachineDateInMs);
+    console.log("time machine normale");
     const notificheNormali =  new Date(notificationDateInMs).toLocaleString();
     console.log("notification time eventi", notificationDateInMs, "notifiche normali",notificheNormali );
 
