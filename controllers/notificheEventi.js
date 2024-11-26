@@ -140,12 +140,16 @@ const events = await Event.find({author: 'massi'});
     console.log("notification time eventi", notificationDateInMs, "notifiche normali",notificheNormali );
 
     const TOLLERANZA_MS = 3600000; 
+    const tol = 3599131;
     console.log("differenza tim e mando not", notificationDateInMs - timeMachineDateInMs);
 
 if (notificationDateInMs !== null) {
   
   
-  if (timeMachineDateInMs == notificationDateInMs - TOLLERANZA_MS) {
+  if (
+    timeMachineDateInMs === notificationDateInMs - TOLLERANZA_MS || 
+    timeMachineDateInMs === notificationDateInMs - tol
+  )  {
  
     await sendNotification(event); 
     handleRepeatedNotifications(event, event.repeatNotification); 
