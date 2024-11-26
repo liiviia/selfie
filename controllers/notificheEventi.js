@@ -140,7 +140,7 @@ const events = await Event.find({author: 'massi'});
     console.log("notification time eventi", notificationDateInMs, "notifiche normali",notificheNormali );
 
     const TOLLERANZA_MS = 3600000; 
-    const tol = 3599131;
+    const tol = 3599171;
     console.log("differenza tim e mando not", notificationDateInMs - timeMachineDateInMs);
 
 if (notificationDateInMs !== null) {
