@@ -127,7 +127,7 @@ const checkAndSendNotifications = async () => {
  
 
 const events = await Event.find({author: 'massi'});
-//console.log("eeee", events);
+console.log("eeee", events);
 
 
 
@@ -137,12 +137,12 @@ const events = await Event.find({author: 'massi'});
     console.log("time machine in ms",timeMachineDateInMs);
     console.log("time machine normale",timeMachineDate);
     const notificheNormali =  new Date(notificationDateInMs).toLocaleString();
-  //  console.log("notification time eventi", notificationDateInMs, "notifiche normali",notificheNormali );
+  console.log("notification time eventi", notificationDateInMs, "notifiche normali",notificheNormali );
 
     const TOLLERANZA_MS = 3600000; 
 const INTERVALLO_TOLLERANZA = 1000; // Tolleranza di ±1000 ms
 
-//console.log("differenza tim e mando not", notificationDateInMs - timeMachineDateInMs);
+console.log("differenza tim e mando not", notificationDateInMs - timeMachineDateInMs);
 
 if (notificationDateInMs !== null) {
   // Calcola la differenza effettiva
@@ -174,7 +174,7 @@ const checkAndSendActivityNotifications = async () => {
 
   const activities = await Activity.find({ completed: false });
 
-  console.log("attivita",activities);
+ // console.log("attivita",activities);
 
   
 
@@ -196,7 +196,7 @@ const checkAndSendActivityNotifications = async () => {
         // Calcola la differenza effettiva
         const differenza = timeMachineDateInMsA - (localNotificationTime - TOLLERANZA_MS);
     
-        console.log("differenza attività:", Math.abs(differenza));
+       // console.log("differenza attività:", Math.abs(differenza));
     
         // Verifica se la differenza rientra nell'intervallo tollerato
         if (Math.abs(differenza) <= INTERVALLO_TOLLERANZA) {
