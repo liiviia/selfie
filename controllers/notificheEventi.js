@@ -140,17 +140,17 @@ const events = await Event.find({author: 'massi'});
     console.log("notification time eventi", notificationDateInMs, "notifiche normali",notificheNormali );
 
     const TOLLERANZA_MS = 3600000; 
-    const tol = 3599171;
-    console.log("differenza tim e mando not", notificationDateInMs - timeMachineDateInMs);
+const INTERVALLO_TOLLERANZA = 1000; // Tolleranza di ±1000 ms
+
+console.log("differenza tim e mando not", notificationDateInMs - timeMachineDateInMs);
 
 if (notificationDateInMs !== null) {
+  // Calcola la differenza effettiva
+  const differenza = timeMachineDateInMs - (notificationDateInMs - TOLLERANZA_MS);
   
-  
-  if (
-    timeMachineDateInMs === notificationDateInMs - TOLLERANZA_MS || 
-    timeMachineDateInMs === notificationDateInMs - tol
-  )  {
- 
+  // Controlla se la differenza rientra nell'intervallo [-INTERVALLO_TOLLERANZA, INTERVALLO_TOLLERANZA]
+  if (Math.abs(differenza) <= INTERVALLO_TOLLERANZA) {
+    // Invia la notifica
     await sendNotification(event); 
     handleRepeatedNotifications(event, event.repeatNotification); 
   }
