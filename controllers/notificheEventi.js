@@ -127,7 +127,7 @@ const checkAndSendNotifications = async () => {
  
 
 const events = await Event.find({author: 'massi'});
-console.log("eeee", events);
+//console.log("eeee", events);
 
 
 
