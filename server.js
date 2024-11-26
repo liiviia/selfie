@@ -16,6 +16,7 @@ const moment = require('moment-timezone');
 const { startNotificationMonitoring } = require('./controllers/notificheEventi');
 const { initializeWebSocket } = require('./websocketServer');
 const http = require('http');
+const socketIo = require('socket.io');
 
 require('dotenv').config({ path: __dirname + '/.env' });
 
@@ -24,7 +25,7 @@ const port = 8000;
 
 const server = http.createServer(app);
 
-
+initializeWebSocket(server);
 
 
 app.use(cors({

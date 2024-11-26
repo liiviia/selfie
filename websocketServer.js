@@ -1,31 +1,45 @@
-const express = require('express');
-const router = require('./routes/authRoutes');
-const app = express();
+const socketIo = require('socket.io');
+let io;
 
-let alertQueue = []; 
+const initializeWebSocket = (server) => {
+     io = socketIo(server, {
+        cors: {
+          origin: 'http://http://site232432.tw.cs.unibo.it:8000', 
+          methods: ['GET', 'POST'],
+          allowedHeaders: ['Content-Type'],
+          credentials: true,
+        },
+      });
 
-app.get('/alerts', (req, res) => {
-  const userNome = req.query.userNome; 
 
-  const userAlerts = alertQueue.filter((alert) => alert.userNome === userNome);
+      console.log("web scoket inizializzato");
 
-  alertQueue = alertQueue.filter((alert) => alert.userNome !== userNome);
+  io.on('connection', (socket) => {
+  console.log('Un client si è connesso');
 
-  res.json(userAlerts);
-});
+  
 
-const sendAlertNotification = (title, date, startTime, userNome) => {
-  alertQueue.push({
-    title,
-    date,
-    startTime,
-    userNome,
+  socket.on('disconnect', () => {
+    console.log('Un client si è disconnesso');
   });
-  console.log(`Notifica aggiunta per ${userNome}:`, title);
+});
 };
 
+const sendAlertNotification = (title, date, startTime, userNome) => {
+  if (io) {
+    io.emit('alert', {
+      title,
+      date,
+      startTime,
+      userNome,
+    });
+    console.log('Alert inviato:', title);
+  } else {
+    console.error('Socket.io non è inizializzato');
+  }
+};
 
 module.exports = {
-  app,
+  initializeWebSocket,
   sendAlertNotification,
 };
