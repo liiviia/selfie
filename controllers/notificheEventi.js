@@ -126,31 +126,28 @@ const checkAndSendNotifications = async () => {
 
  
 
-const events = await Event.find({author: 'massi'});
-console.log("eeee", events);
+const events = await Event.find();
+//console.log("eeee", events);
 
 
 
 
   for (const event of events) {
     const notificationDateInMs = calculateNotificationTime(event);
-    console.log("time machine in ms",timeMachineDateInMs);
-    console.log("time machine normale",timeMachineDate);
+    //console.log("time machine in ms",timeMachineDateInMs);
+    //console.log("time machine normale",timeMachineDate);
     const notificheNormali =  new Date(notificationDateInMs).toLocaleString();
-  console.log("notification time eventi", notificationDateInMs, "notifiche normali",notificheNormali );
+  //console.log("notification time eventi", notificationDateInMs, "notifiche normali",notificheNormali );
 
     const TOLLERANZA_MS = 3600000; 
-const INTERVALLO_TOLLERANZA = 1000; // Tolleranza di ±1000 ms
+const INTERVALLO_TOLLERANZA = 1000; 
 
-console.log("differenza tim e mando not", notificationDateInMs - timeMachineDateInMs);
+//console.log("differenza tim e mando not", notificationDateInMs - timeMachineDateInMs);
 
 if (notificationDateInMs !== null) {
-  // Calcola la differenza effettiva
   const differenza = timeMachineDateInMs - (notificationDateInMs - TOLLERANZA_MS);
   
-  // Controlla se la differenza rientra nell'intervallo [-INTERVALLO_TOLLERANZA, INTERVALLO_TOLLERANZA]
   if (Math.abs(differenza) <= INTERVALLO_TOLLERANZA) {
-    // Invia la notifica
     await sendNotification(event); 
     handleRepeatedNotifications(event, event.repeatNotification); 
   }
@@ -183,26 +180,23 @@ const checkAndSendActivityNotifications = async () => {
     const notificationTimes = calculateNotificationTimeActivity(activity);
 
     const TOLLERANZA_MS = 3600000; 
-    const INTERVALLO_TOLLERANZA = 100; // Tolleranza di ±1000 ms
+    const INTERVALLO_TOLLERANZA = 100; 
     
     if (notificationTimes !== null) {
-      let notificaInviata = false; // Flag per evitare notifiche duplicate
+      let notificaInviata = false;
     
       for (const notificationTime of notificationTimes) {
-        if (notificaInviata) break; // Esci dal ciclo se la notifica è già stata inviata
+        if (notificaInviata) break;
     
         const localNotificationTime = moment.utc(notificationTime).local().valueOf();
     
-        // Calcola la differenza effettiva
         const differenza = timeMachineDateInMsA - (localNotificationTime - TOLLERANZA_MS);
     
        // console.log("differenza attività:", Math.abs(differenza));
     
-        // Verifica se la differenza rientra nell'intervallo tollerato
         if (Math.abs(differenza) <= INTERVALLO_TOLLERANZA) {
-          // Invia la notifica una sola volta
           await sendNotificationA(activity); 
-          notificaInviata = true; // Aggiorna il flag per evitare ulteriori notifiche
+          notificaInviata = true; 
     
           console.log(`Notifica inviata per l'attività: ${activity.title} alle: ${new Date(timeMachineDateInMsA).toLocaleString()}`);
           console.log("------------------------------");
