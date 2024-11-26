@@ -183,7 +183,7 @@ const checkAndSendActivityNotifications = async () => {
     const notificationTimes = calculateNotificationTimeActivity(activity);
 
     const TOLLERANZA_MS = 3600000; 
-    const INTERVALLO_TOLLERANZA = 1000; // Tolleranza di ±1000 ms
+    const INTERVALLO_TOLLERANZA = 100; // Tolleranza di ±1000 ms
     
     if (notificationTimes !== null) {
       let notificaInviata = false; // Flag per evitare notifiche duplicate
