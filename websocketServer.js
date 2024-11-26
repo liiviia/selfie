@@ -4,7 +4,7 @@ let io;
 const initializeWebSocket = (server) => {
      io = socketIo(server, {
         cors: {
-          origin: 'http://http://site232432.tw.cs.unibo.it:8000', 
+          origin: 'http://site232432.tw.cs.unibo.it:8000', 
           methods: ['GET', 'POST'],
           allowedHeaders: ['Content-Type'],
           credentials: true,

@@ -20,7 +20,7 @@ export default {
     };
   },
   created() {
-    this.socket = io('http://site232432.tw.cs.unibo.it/:8000', {
+    this.socket = io('http://site232432.tw.cs.unibo.it:8000', {
       transports: ['websocket'], 
     });
 

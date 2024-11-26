@@ -17,6 +17,7 @@ const { startNotificationMonitoring } = require('./controllers/notificheEventi')
 const { initializeWebSocket } = require('./websocketServer');
 const http = require('http');
 const socketIo = require('socket.io');
+const { sendAlertNotification} = require('./websocketServer');
 
 require('dotenv').config({ path: __dirname + '/.env' });
 
@@ -26,6 +27,14 @@ const port = 8000;
 const server = http.createServer(app);
 
 initializeWebSocket(server);
+
+const title = 'Alert di Test';
+  const date = new Date().toLocaleDateString();
+  const startTime = new Date().toLocaleTimeString();
+  const userNome = 'usernameDiTest'; 
+
+sendAlertNotification(title, date, startTime, userNome);
+
 
 
 app.use(cors({
