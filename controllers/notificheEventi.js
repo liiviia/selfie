@@ -183,25 +183,31 @@ const checkAndSendActivityNotifications = async () => {
     const notificationTimes = calculateNotificationTimeActivity(activity);
 
     const TOLLERANZA_MS = 3600000; 
+const INTERVALLO_TOLLERANZA = 1000; // Tolleranza di ±1000 ms
 
-    if (notificationTimes !== null) {
-      for (const notificationTime of notificationTimes) {
+if (notificationTimes !== null) {
+  for (const notificationTime of notificationTimes) {
+    const localNotificationTime = moment.utc(notificationTime).local().valueOf();
 
-        const localNotificationTime = moment.utc(notificationTime).local().valueOf();
+    // Calcola la differenza effettiva
+    const differenza = timeMachineDateInMsA - (localNotificationTime - TOLLERANZA_MS);
 
-        const diff = Math.abs(localNotificationTime - timeMachineDateInMsA);
-       console.log("differenza attivita:", diff);
+    console.log("differenza attività:", Math.abs(differenza));
 
+    // Verifica se la differenza rientra nell'intervallo tollerato
+    if (Math.abs(differenza) <= INTERVALLO_TOLLERANZA) {
+      // Invia la notifica una sola volta
+      await sendNotificationA(activity); 
 
-        if (timeMachineDateInMsA == localNotificationTime - TOLLERANZA_MS) {
+      console.log(`Notifica inviata per l'attività: ${activity.title} alle: ${new Date(timeMachineDateInMsA).toLocaleString()}`);
+      console.log("------------------------------");
 
-          await sendNotificationA(activity); 
-
-          console.log(`Notifica inviata per l'attività: ${activity.title} alle: ${new Date(timeMachineDateInMsA).toLocaleString()}`);
-          console.log("------------------------------");
-        }
-      }
+      // Esci dal ciclo per evitare notifiche duplicate
+      break; 
     }
+  }
+}
+
   }
 };
 
