@@ -183,25 +183,32 @@ const checkAndSendActivityNotifications = async () => {
     const notificationTimes = calculateNotificationTimeActivity(activity);
 
     const TOLLERANZA_MS = 3600000; 
-const INTERVALLO_TOLLERANZA = 1000; 
-
-if (notificationTimes !== null) {
-  for (const notificationTime of notificationTimes) {
-    const localNotificationTime = moment.utc(notificationTime).local().valueOf();
-
-    const differenza = timeMachineDateInMsA - (localNotificationTime - TOLLERANZA_MS);
-
-    console.log("differenza attività:", Math.abs(differenza));
-
-    if (Math.abs(differenza) <= INTERVALLO_TOLLERANZA) {
-      await sendNotificationA(activity); 
-
-      console.log(`Notifica inviata per l'attività: ${activity.title} alle: ${new Date(timeMachineDateInMsA).toLocaleString()}`);
-      console.log("------------------------------");
-
+    const INTERVALLO_TOLLERANZA = 1000; // Tolleranza di ±1000 ms
+    
+    if (notificationTimes !== null) {
+      let notificaInviata = false; // Flag per evitare notifiche duplicate
+    
+      for (const notificationTime of notificationTimes) {
+        if (notificaInviata) break; // Esci dal ciclo se la notifica è già stata inviata
+    
+        const localNotificationTime = moment.utc(notificationTime).local().valueOf();
+    
+        // Calcola la differenza effettiva
+        const differenza = timeMachineDateInMsA - (localNotificationTime - TOLLERANZA_MS);
+    
+        console.log("differenza attività:", Math.abs(differenza));
+    
+        // Verifica se la differenza rientra nell'intervallo tollerato
+        if (Math.abs(differenza) <= INTERVALLO_TOLLERANZA) {
+          // Invia la notifica una sola volta
+          await sendNotificationA(activity); 
+          notificaInviata = true; // Aggiorna il flag per evitare ulteriori notifiche
+    
+          console.log(`Notifica inviata per l'attività: ${activity.title} alle: ${new Date(timeMachineDateInMsA).toLocaleString()}`);
+          console.log("------------------------------");
+        }
+      }
     }
-  }
-}
 
   }
 };
