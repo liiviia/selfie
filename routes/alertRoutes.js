@@ -16,7 +16,8 @@ router.get('/send-test-alert', (req, res) => {
     console.log("Alert di prova inviato:", testAlert);
     addAlert(testAlert.title, testAlert.date, testAlert.startTime, testAlert.userNome);
   
-    res.json({ message: 'Alert di prova inviato!' });  // Assicurati che questa sia una risposta JSON corretta
+    res.json({ alerts: alerts });  // Rispondi con gli alert    
+    // Assicurati che questa sia una risposta JSON corretta
   });
 
 module.exports = router;

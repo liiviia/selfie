@@ -7,6 +7,8 @@ const { sendNotifEmail } = require('../services/emailService');
 const {sendNotifEmailActivity} = require('../services/emailService');
 const { sendAlertNotification } = require('../websocketServer'); 
 const {sendSseMessage} = require('../controllers/SSE');
+const {addAlert} = require('../controllers/alertController');
+
 const sentNotifications = new Set();
 
 const getTimeMachineDate1 = async () => {
