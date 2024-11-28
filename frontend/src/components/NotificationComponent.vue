@@ -1,6 +1,6 @@
 <template>
   <div>
-   
+    <!-- Contenuto della tua pagina -->
   </div>
 </template>
 
@@ -8,11 +8,12 @@
 export default {
   data() {
     return {
-      alerts: [],  
+      alerts: [],  // Stato per memorizzare gli alert ricevuti
+      seenAlerts: new Set(),  // Set per tenere traccia degli alert già visualizzati
     };
   },
   created() {
-    this.startPolling();  
+    this.startPolling();  // Avvia il polling quando il componente è creato
   },
   methods: {
     startPolling() {
@@ -22,21 +23,22 @@ export default {
             if (!response.ok) {
               throw new Error('Errore nella risposta');
             }
-            return response.json();  
+            return response.json();  // Converti la risposta in JSON
           })
           .then(data => {
-            
             if (data.alerts && data.alerts.length > 0) {
-              const username = localStorage.getItem('username');  
+              const username = localStorage.getItem('username');  // Ottieni lo username dal localStorage
               
+              // Filtra gli alert per userNome (username nel localStorage)
               const filteredAlerts = data.alerts.filter(alert => alert.userNome.toLowerCase() === username.toLowerCase());
               console.log('Alert filtrati:', filteredAlerts); 
 
               if (filteredAlerts.length > 0) {
-                this.alerts = filteredAlerts; 
+                this.alerts = filteredAlerts;  // Aggiorna gli alert ricevuti
                 filteredAlerts.forEach(alert => {
-                  alert(`Nuovo alert: ${alert.title}`);
-                }); 
+                  // Mostra un alert di tipo popup del browser per ogni alert ricevuto
+                  alert(`Evento: ${alert.title}\nData: ${new Date(alert.date).toLocaleDateString()}\nOrario: ${alert.startTime}`);
+                });
               }
             } else {
               console.log('Nessun alert trovato.');
@@ -45,11 +47,10 @@ export default {
           .catch(err => {
             console.error('Errore nel polling:', err);
           });
-      }, 5000); 
+      }, 5000); // Esegui il polling ogni 5 secondi
     }
   }
 };
-
 </script>
 
 <style scoped>
