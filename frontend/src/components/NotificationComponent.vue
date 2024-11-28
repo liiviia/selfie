@@ -1,11 +1,6 @@
 <template>
   <div>
-    <h2>Notifiche</h2>
-    <ul>
-      <li v-for="alert in alerts" :key="alert.title">
-        <strong>{{ alert.title }}</strong> - {{ alert.date }} at {{ alert.startTime }}
-      </li>
-    </ul>
+   
   </div>
 </template>
 
@@ -14,6 +9,7 @@ export default {
   data() {
     return {
       alerts: [],  // Stato per memorizzare gli alert ricevuti
+      seenAlerts: new Set(),  // Set per memorizzare gli alert già visualizzati
     };
   },
   created() {
@@ -22,7 +18,7 @@ export default {
   methods: {
     startPolling() {
       setInterval(() => {
-        fetch('/api/send-test-alert')
+        fetch('/api/get-latest-alert')
           .then(response => {
             if (!response.ok) {
               throw new Error('Errore nella risposta');
@@ -30,9 +26,13 @@ export default {
             return response.json();  // Converti la risposta in JSON
           })
           .then(data => {
-            console.log('Alert ricevuti:', data);
+            //console.log('Alert ricevuti:', data);
             if (data.alerts && data.alerts.length > 0) {
-              this.alerts = data.alerts;  // Aggiorna gli alert nel data
+              const username = localStorage.getItem('username');  // Ottieni lo username dal localStorage
+              // Filtra gli alert per userNome (username nel localStorage)
+              const filteredAlerts = data.alerts.filter(alert => alert.userNome === username);
+              console.log('Alert ricevuti:', filteredAlerts);
+              
             }
           })
           .catch(err => {
