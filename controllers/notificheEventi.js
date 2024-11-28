@@ -72,15 +72,14 @@ const sendNotification = async (event) => {
     
 
     if (event.notificationMechanism.includes('alert')) {
-
       let recipients = [];
-
+    
       if (event.type === 'gruppo') {
         recipients = event.participants;
       } else if (event.type === 'singola') {
         recipients = [event.author];
       }
-
+    
       for (const recipient of recipients) {
         const alertData = {
           title: event.title,
@@ -88,11 +87,11 @@ const sendNotification = async (event) => {
           startTime: event.startTime,
           userNome: recipient,
         };
-        sendSseMessage(alertData); // Invia l'alert ai client connessi
-        console.log("Alert inviato al frontend:", alertData);
+    
+        // Aggiungi l'alert al sistema (array o DB)
+        addAlert(alertData.title, alertData.date, alertData.startTime, alertData.userNome);
+        console.log("Alert aggiunto:", alertData);
       }
-
-
     }
     
 

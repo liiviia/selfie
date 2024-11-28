@@ -10,35 +10,19 @@
 </template>
 
 <script>
-export default {
-  data() {
-    return {
-      alerts: [],
-    };
-  },
-  created() {
-    // Connetti al server SSE
-    const eventSource = new EventSource('http://site232432.tw.cs.unibo.it:8000/sse');
-
-    // Ascolta i messaggi dal server
-    eventSource.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      console.log('Alert ricevuto:', data);
-
-      const loggedInUser = localStorage.getItem('username'); // Verifica l'utente loggato
-
-      if (data.userNome === loggedInUser) {
-        alert(`TITOLO: ${data.title}\nOra di inizio: ${data.startTime}\nDi utente: ${data.userNome}`);
-        this.alerts.push(data); // Aggiungi l'alert alla lista
+setInterval(() => {
+  fetch('/api/alerts/get-latest-alert') // Percorso per ottenere gli alert
+    .then(response => response.json())
+    .then(data => {
+      if (data.alerts && data.alerts.length > 0) {
+        // Mostra gli alert nel frontend (es. con una notifica)
+        data.alerts.forEach(alert => {
+          alert(`Alert ricevuto: ${alert.title}\nData: ${alert.date}\nOra di inizio: ${alert.startTime}`);
+        });
       }
-    };
-
-    eventSource.onerror = (error) => {
-      console.error('Errore SSE:', error);
-    };
-  },
-};
-
+    })
+    .catch(err => console.error('Errore nel polling:', err));
+}, 5000); // Esegui il polling ogni 5 secondi
 </script>
 
 <style scoped>

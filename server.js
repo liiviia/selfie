@@ -12,6 +12,9 @@ const registerRoutes = require('./routes/registerRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const timeMachineRoutes = require('./routes/timeMachineRoutes');
 const timeMachineConfig = require('./timeMachineConfig');
+const alertRoutes = require('./routes/alertRoutes');
+
+// Aggiungi la rotta per gli alert
 const moment = require('moment-timezone');
 const { startNotificationMonitoring } = require('./controllers/notificheEventi');
 const http = require('http');
@@ -23,33 +26,6 @@ const port = 8000;
 
 const server = http.createServer(app);
 
-
-const sendSseMessage = (data) => {
-  clients.forEach((client) => {
-    client.write(`data: ${JSON.stringify(data)}\n\n`);
-  });
-};
-
-let clients = []; 
-
-// Endpoint SSE
-app.get('/sse', (req, res) => {
-  res.setHeader('Content-Type', 'text/event-stream');
-  res.setHeader('Cache-Control', 'no-cache');
-  res.setHeader('Connection', 'keep-alive');
-  res.setHeader('Access-Control-Allow-Origin', '*'); 
-
-  console.log('Client connesso per SSE');
-
-  // Aggiungi il client all'elenco
-  clients.push(res);
-
-  // Rimuovi il client quando la connessione si chiude
-  req.on('close', () => {
-    console.log('Connessione SSE chiusa');
-    clients = clients.filter((client) => client !== res);
-  });
-});
 
 
 
@@ -85,6 +61,7 @@ app.use('/api', noteRoutes);
 app.use('/api', pomsRoutes);
 app.use('/api', eventRoutes);
 app.use('/api', activityRoutes);
+app.use('/api', alertRoutes);
 app.use('/api', registerRoutes);
 app.use('/api', accountRoutes);
 app.use('/api', timeMachineRoutes);
