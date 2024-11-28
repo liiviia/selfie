@@ -1,6 +1,5 @@
 <template>
   <div>
-    <!-- Contenuto della tua pagina -->
   </div>
 </template>
 
@@ -8,12 +7,12 @@
 export default {
   data() {
     return {
-      alerts: [],  // Stato per memorizzare gli alert ricevuti
-      seenAlerts: new Set(),  // Set per tenere traccia degli alert già visualizzati
+      alerts: [],  
+      seenAlerts: new Set(),  
     };
   },
   created() {
-    this.startPolling();  // Avvia il polling quando il componente è creato
+    this.startPolling();  
   },
   methods: {
     startPolling() {
@@ -23,22 +22,20 @@ export default {
             if (!response.ok) {
               throw new Error('Errore nella risposta');
             }
-            return response.json();  // Converti la risposta in JSON
+            return response.json();  
           })
           .then(data => {
             if (data.alerts && data.alerts.length > 0) {
-              const username = localStorage.getItem('username');  // Ottieni lo username dal localStorage
+              const username = localStorage.getItem('username');  
               
-              // Filtra gli alert per userNome (username nel localStorage)
               const filteredAlerts = data.alerts.filter(alert => alert.userNome.toLowerCase() === username.toLowerCase());
               console.log('Alert filtrati:', filteredAlerts); 
 
               if (filteredAlerts.length > 0) {
-                this.alerts = filteredAlerts;  // Aggiorna gli alert ricevuti
+                this.alerts = filteredAlerts;  
                 filteredAlerts.forEach(alertItem => {
-  // Usa la funzione alert predefinita di JavaScript per mostrare l'alert
-  alert(`Evento: ${alertItem.title}\nData: ${new Date(alertItem.date).toLocaleDateString()}\nOrario: ${alertItem.startTime}`);
-});
+                 alert(`Evento: ${alertItem.title}\nData: ${new Date(alertItem.date).toLocaleDateString()}\nOrario: ${alertItem.startTime}`);
+        });
 
               }
             } else {
@@ -48,21 +45,12 @@ export default {
           .catch(err => {
             console.error('Errore nel polling:', err);
           });
-      }, 5000); // Esegui il polling ogni 5 secondi
+      }, 5000); 
     }
   }
 };
 </script>
 
 <style scoped>
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  margin-bottom: 10px;
-}
-strong {
-  color: #333;
-}
+
 </style>

@@ -89,9 +89,7 @@ const sendNotification = async (event) => {
           startTime: event.startTime,
           userNome: recipient,
         };
-    
-        // Aggiungi l'alert al sistema (array o DB)
-        addAlert(alertData.title, alertData.date, alertData.startTime, alertData.userNome);
+            addAlert(alertData.title, alertData.date, alertData.startTime, alertData.userNome);
         console.log("Alert aggiunto:", alertData);
       }
     }
