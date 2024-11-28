@@ -26,13 +26,23 @@ export default {
             return response.json();  // Converti la risposta in JSON
           })
           .then(data => {
-            //console.log('Alert ricevuti:', data);
+            console.log('Dati ricevuti:', data); // Mostra cosa contiene la risposta
+            
+            // Verifica che ci siano alert e che la risposta non sia vuota
             if (data.alerts && data.alerts.length > 0) {
               const username = localStorage.getItem('username');  // Ottieni lo username dal localStorage
-              // Filtra gli alert per userNome (username nel localStorage)
-              const filteredAlerts = data.alerts.filter(alert => alert.userNome === username);
-              console.log('Alert ricevuti:', filteredAlerts);
+              console.log('Username dal localStorage:', username); // Verifica il valore di username
               
+              // Filtra gli alert per lo userNome
+              const filteredAlerts = data.alerts.filter(alert => alert.userNome.toLowerCase() === username.toLowerCase());
+              console.log('Alert filtrati:', filteredAlerts); // Mostra gli alert filtrati
+
+              // Se ci sono alert filtrati, aggiornali nel data
+              if (filteredAlerts.length > 0) {
+                this.alerts = filteredAlerts;  // Imposta gli alert nel componente
+              }
+            } else {
+              console.log('Nessun alert trovato.');
             }
           })
           .catch(err => {
@@ -42,6 +52,7 @@ export default {
     }
   }
 };
+
 </script>
 
 <style scoped>
