@@ -14,10 +14,7 @@ const timeMachineRoutes = require('./routes/timeMachineRoutes');
 const timeMachineConfig = require('./timeMachineConfig');
 const moment = require('moment-timezone');
 const { startNotificationMonitoring } = require('./controllers/notificheEventi');
-const { initializeWebSocket } = require('./websocketServer');
 const http = require('http');
-const socketIo = require('socket.io');
-const { sendAlertNotification} = require('./websocketServer');
 
 require('dotenv').config({ path: __dirname + '/.env' });
 
@@ -26,14 +23,33 @@ const port = 8000;
 
 const server = http.createServer(app);
 
-initializeWebSocket(server);
 
-const title = 'Alert di Test';
-  const date = new Date().toLocaleDateString();
-  const startTime = new Date().toLocaleTimeString();
-  const userNome = 'usernameDiTest'; 
+const sendSseMessage = (data) => {
+  clients.forEach((client) => {
+    client.write(`data: ${JSON.stringify(data)}\n\n`);
+  });
+};
 
-sendAlertNotification(title, date, startTime, userNome);
+let clients = []; 
+
+// Endpoint SSE
+app.get('/sse', (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('Access-Control-Allow-Origin', '*'); 
+
+  console.log('Client connesso per SSE');
+
+  // Aggiungi il client all'elenco
+  clients.push(res);
+
+  // Rimuovi il client quando la connessione si chiude
+  req.on('close', () => {
+    console.log('Connessione SSE chiusa');
+    clients = clients.filter((client) => client !== res);
+  });
+});
 
 
 
