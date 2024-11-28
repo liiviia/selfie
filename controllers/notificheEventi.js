@@ -6,6 +6,7 @@ const moment = require('moment-timezone');
 const { sendNotifEmail } = require('../services/emailService');
 const {sendNotifEmailActivity} = require('../services/emailService');
 const { sendAlertNotification } = require('../websocketServer'); 
+const {sendSseMessage} = require('../controllers/SSE');
 const sentNotifications = new Set();
 
 const getTimeMachineDate1 = async () => {
@@ -81,8 +82,14 @@ const sendNotification = async (event) => {
       }
 
       for (const recipient of recipients) {
-       // sendAlertNotification(event.title, event.date, event.startTime, recipient);
-       console.log("qua devo mandare l'alert al frontend");
+        const alertData = {
+          title: event.title,
+          date: event.date,
+          startTime: event.startTime,
+          userNome: recipient,
+        };
+        sendSseMessage(alertData); // Invia l'alert ai client connessi
+        console.log("Alert inviato al frontend:", alertData);
       }
 
 

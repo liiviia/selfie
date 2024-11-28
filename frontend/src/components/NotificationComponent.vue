@@ -10,45 +10,35 @@
 </template>
 
 <script>
-import io from 'socket.io-client';
-
 export default {
   data() {
     return {
-      alerts: [], 
-      socket: null,
+      alerts: [],
     };
   },
   created() {
-    this.socket = io('http://site232432.tw.cs.unibo.it:8000', {
-      transports: ['websocket'], 
-    });
+    // Connetti al server SSE
+    const eventSource = new EventSource('http://site232432.tw.cs.unibo.it:8000/sse');
 
-    this.socket.on('connect_error', (error) => {
-      console.log('Errore di connessione:', error);
-    });
-
-    this.socket.on('alert', (data) => {
+    // Ascolta i messaggi dal server
+    eventSource.onmessage = (event) => {
+      const data = JSON.parse(event.data);
       console.log('Alert ricevuto:', data);
 
-      const loggedInUser = localStorage.getItem('username'); 
+      const loggedInUser = localStorage.getItem('username'); // Verifica l'utente loggato
 
       if (data.userNome === loggedInUser) {
         alert(`TITOLO: ${data.title}\nOra di inizio: ${data.startTime}\nDi utente: ${data.userNome}`);
-        this.alerts.push(data); 
+        this.alerts.push(data); // Aggiungi l'alert alla lista
       }
-    });
+    };
 
-    this.socket.on('connect', () => {
-      console.log('Connesso al server WebSocket');
-    });
-  },
-  unmounted() {
-    if (this.socket) {
-      this.socket.disconnect();
-    }
+    eventSource.onerror = (error) => {
+      console.error('Errore SSE:', error);
+    };
   },
 };
+
 </script>
 
 <style scoped>
