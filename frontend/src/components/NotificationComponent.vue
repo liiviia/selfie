@@ -22,7 +22,7 @@ export default {
   methods: {
     startPolling() {
       setInterval(() => {
-        fetch('/api/alerts/get-latest-alert')
+        fetch('/api/send-test-alert')
           .then(response => {
             if (!response.ok) {
               throw new Error('Errore nella risposta');
