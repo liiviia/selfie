@@ -35,10 +35,11 @@ export default {
 
               if (filteredAlerts.length > 0) {
                 this.alerts = filteredAlerts;  // Aggiorna gli alert ricevuti
-                filteredAlerts.forEach(alert => {
-                  // Mostra un alert di tipo popup del browser per ogni alert ricevuto
-                  alert(`Evento: ${alert.title}\nData: ${new Date(alert.date).toLocaleDateString()}\nOrario: ${alert.startTime}`);
-                });
+                filteredAlerts.forEach(alertItem => {
+  // Usa la funzione alert predefinita di JavaScript per mostrare l'alert
+  alert(`Evento: ${alertItem.title}\nData: ${new Date(alertItem.date).toLocaleDateString()}\nOrario: ${alertItem.startTime}`);
+});
+
               }
             } else {
               console.log('Nessun alert trovato.');
