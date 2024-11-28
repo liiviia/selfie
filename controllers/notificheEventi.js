@@ -81,7 +81,8 @@ const sendNotification = async (event) => {
       }
 
       for (const recipient of recipients) {
-        sendAlertNotification(event.title, event.date, event.startTime, recipient);
+       // sendAlertNotification(event.title, event.date, event.startTime, recipient);
+       console.log("qua devo mandare l'alert al frontend");
       }
 
 
