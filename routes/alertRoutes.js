@@ -6,7 +6,6 @@ const { getLatestAlerts } = require('../controllers/alertController');
 router.get('/get-latest-alert', getLatestAlerts);
 
 router.get('/send-test-alert', (req, res) => {
-    // Dati dell'alert di prova
     const testAlert = {
       title: 'Alert di prova',
       date: new Date(),
@@ -14,10 +13,10 @@ router.get('/send-test-alert', (req, res) => {
       userNome: 'Test User',
     };
   
-    // Aggiungi l'alert
+    console.log("Alert di prova inviato:", testAlert);
     addAlert(testAlert.title, testAlert.date, testAlert.startTime, testAlert.userNome);
   
-    res.json({ message: 'Alert di prova inviato!' });
+    res.json({ message: 'Alert di prova inviato!' });  // Assicurati che questa sia una risposta JSON corretta
   });
 
 module.exports = router;

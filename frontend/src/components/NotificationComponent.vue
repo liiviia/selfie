@@ -10,19 +10,38 @@
 </template>
 
 <script>
-setInterval(() => {
-  fetch('/api/alerts/get-latest-alert') // Percorso per ottenere gli alert
-    .then(response => response.json())
-    .then(data => {
-      if (data.alerts && data.alerts.length > 0) {
-        // Mostra gli alert nel frontend (es. con una notifica)
-        data.alerts.forEach(alert => {
-          alert(`Alert ricevuto: ${alert.title}\nData: ${alert.date}\nOra di inizio: ${alert.startTime}`);
-        });
-      }
-    })
-    .catch(err => console.error('Errore nel polling:', err));
-}, 5000); // Esegui il polling ogni 5 secondi
+export default {
+  data() {
+    return {
+      alerts: [],  // Stato per memorizzare gli alert ricevuti
+    };
+  },
+  created() {
+    this.startPolling();  // Avvia il polling quando il componente è creato
+  },
+  methods: {
+    startPolling() {
+      setInterval(() => {
+        fetch('/api/alerts/get-latest-alert')
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Errore nella risposta');
+            }
+            return response.json();  // Converti la risposta in JSON
+          })
+          .then(data => {
+            console.log('Alert ricevuti:', data);
+            if (data.alerts && data.alerts.length > 0) {
+              this.alerts = data.alerts;  // Aggiorna gli alert nel data
+            }
+          })
+          .catch(err => {
+            console.error('Errore nel polling:', err);
+          });
+      }, 5000); // Esegui il polling ogni 5 secondi
+    }
+  }
+};
 </script>
 
 <style scoped>
