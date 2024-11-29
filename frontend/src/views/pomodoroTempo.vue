@@ -682,6 +682,7 @@ export default {
       }
 
       if (studyCycles.value <= 0) {
+        saveIncompleteSession();
         statusMessage.value = "Ciclo completato!";
         document.getElementById('timerDisplay').textContent = "00:00";
       }
