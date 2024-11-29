@@ -22,7 +22,7 @@
 
   <button v-if="event.participants.includes(currentUser) && event.author !== currentUser" 
           @click="rejectEvent(event._id)" 
-          class="delete-btn-c">🗑️ Rifiuta Evento</button>
+          class="delete-btn-cq">🗑️ Rifiuta Evento</button>
 
           <button @click="exportToIcal(event)" class="export-btn">📅 Esporta</button>
 </div>
@@ -695,6 +695,16 @@ hr {
   font-size: 1.2em;
   color: #e74c3c; 
 }
+.delete-btn-cq {
+  position: absolute; 
+  bottom: 10px;
+  right: 10px; 
+  background: none;
+  border: none; 
+  cursor: pointer; 
+  font-size: 1.2em;
+  color: #e74c3c; 
+}
 .delete-btn {
   position: absolute;
   background: none;
@@ -742,6 +752,10 @@ hr {
     bottom: -10px;
     right: 100px;
   }
+  .delete-btn-cq {
+    bottom: -10px;
+    right: 100px;
+  }
 
 
   .delete-btn {
@@ -749,6 +763,10 @@ hr {
   }
   .delete-btn-c {
     bottom: -10px;
+  }
+  .delete-btn-cq {
+    bottom: -10px;
+    right: 100px;
   }
   .completed-btn {
     right: 100px;  
