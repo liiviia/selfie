@@ -117,15 +117,15 @@
 
 
       <div class="section pomodorosScaduti-section">
-        <h3>I TUOI POMODORI INCOMPLETI</h3>
+        <h3>POMODORI INCOMPLETI</h3>
       <div v-if="incompleteSessions.length > 0">
       <div v-for="session in incompleteSessions" :key="session._id" class="item-container">
         <p>Data: {{ formatDate(session.giorno) }}</p>
         <p>Tempo rimanente: {{ Math.floor(session.remainingTime / 60) }}:{{ session.remainingTime % 60 }}</p>
         <p>Cicli rimanenti: {{ session.studyCycles }}</p>
-         <button @click="resumePomodoro(session)" class="action-button">Riprendi Sessione</button>
+         <button @click="resumePomodoro(session)" class="action-button" style="color: #e74c3c;">Riprendi Sessione</button>
          <button @click="discardPomodoro(session)" class="action-button">
-          <span class="trash-icon">🗑️ </span>Scarta
+          <span class="trash-icon" style="color: #e74c3c;">🗑️ </span>Scarta
          </button> 
       </div>
     </div>
