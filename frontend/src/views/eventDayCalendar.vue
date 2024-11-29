@@ -124,8 +124,8 @@
         <p>Tempo rimanente: {{ Math.floor(session.remainingTime / 60) }}:{{ session.remainingTime % 60 }}</p>
         <p>Cicli rimanenti: {{ session.studyCycles }}</p>
          <button @click="resumePomodoro(session)" class="action-button" style="background:#f4a460;">Riprendi Sessione</button>
-         <button @click="discardPomodoro(session)" class="action-button">
-          <span class="trash-icon" style="background: none;">🗑️ </span>
+         <button @click="discardPomodoro(session)" class=".delete-btn-cqx">
+          <span class=".delete-btn-cqx" style="background: none;">🗑️ </span>
          </button> 
       </div>
     </div>
@@ -704,6 +704,13 @@ hr {
   cursor: pointer; 
   font-size: 1.2em;
   color: #e74c3c; 
+}
+.delete-btn-cqx {
+  background: none;
+  border: none; 
+  cursor: pointer; 
+  font-size: 1.2em;
+  color: #e74c3c;
 }
 .delete-btn {
   position: absolute;
