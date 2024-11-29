@@ -156,6 +156,10 @@ exports.getPomodorosByDate = async (req, res) => {
       giorno: { $gte: startDate, $lte: endDate }
     });
 
+    if (pomodoros.length === 0) {
+      return res.status(200).json({ message: 'Nessun pomodoro trovato per questa data' });
+    }
+
     const formattedPomodoros = pomodoros.map(pomodoro => ({
       ...pomodoro.toObject(),
       giorno: pomodoro.giorno ? pomodoro.giorno.toISOString() : null
