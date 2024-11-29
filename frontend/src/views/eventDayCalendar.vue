@@ -2,7 +2,7 @@
    <div>
     <h2 class="main-title">Eventi, Attività e Pomodori per {{ formatDate(queryDate) }}</h2>
      <div class="section events-section full-width">
-      <h3>I TUOI EVENTI:</h3>
+      <h3>EVENTI DI QUESTO GIORNO:</h3>
       <div v-if="events.length > 0">
         <div v-for="event in events" :key="event._id" class="item-container">
   <h4><span style="font-size: 0.9em;">Titolo:</span> {{ event.title }}</h4>
@@ -37,7 +37,7 @@
 
     <div class="content-container">
       <div class="section activities-section">
-        <h3>LE TUE ATTIVITÀ:</h3>
+        <h3>ATTIVITÀ CHE SCADONO QUESTO GIORNO:</h3>
         <div v-if="activities.length > 0">
           <div v-for="activity in activities" :key="activity._id" class="item-container"
           :class="{ completed: activity.completed }">
@@ -86,7 +86,7 @@
 
     <div class="content-container">
       <div class="section pomodoros-section">
-    <h3>I TUOI POMODORI:</h3>
+    <h3>POMODORI PER QUESTO GIORNO:</h3>
     <div v-if="pomodoros.length > 0">
       <div v-for="pomodoro in pomodoros" :key="pomodoro._id" class="item-container">
         <h4>Pomodoro Sessione</h4>
