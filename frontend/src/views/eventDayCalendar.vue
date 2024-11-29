@@ -125,7 +125,7 @@
         <p>Cicli rimanenti: {{ session.studyCycles }}</p>
          <button @click="resumePomodoro(session)" class="action-button" style="background:#f4a460;">Riprendi Sessione</button>
          <button @click="discardPomodoro(session)" class="action-button">
-          <span class="trash-icon">🗑️ </span>
+          <span class="trash-icon" style="background: none;">🗑️ </span>
          </button> 
       </div>
     </div>
