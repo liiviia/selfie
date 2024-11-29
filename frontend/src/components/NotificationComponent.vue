@@ -25,7 +25,6 @@ export default {
 
       const token = sessionStorage.getItem('token');
       if (!token) {
-        console.warn('Token non trovato. L’utente non è autenticato.');
         return; 
       }
       try {
