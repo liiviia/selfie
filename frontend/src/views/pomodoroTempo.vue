@@ -201,15 +201,15 @@ export default {
    saveIncompleteSession(); 
 });*/
 
-
-
-onBeforeRouteLeave( async(to, from, next) => {
-      console.log("Navigazione in uscita da questa pagina...");
-      await saveIncompleteSession(); 
-      next(); 
-    });
-
-
+onBeforeRouteLeave(async (to, from, next) => {
+  console.log("Navigazione in uscita da questa pagina...");
+  try {
+    await saveIncompleteSession();
+  } catch (error) {
+    console.error("Errore durante il salvataggio della sessione:", error);
+  }
+  next();  // La navigazione continua comunque
+});
     const route = useRoute();
 
     const newPom = ref({
