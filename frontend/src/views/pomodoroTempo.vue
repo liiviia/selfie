@@ -202,12 +202,7 @@ export default {
 });*/
 
 onBeforeRouteLeave( (to, from, next) => {
-  console.log("Navigazione in uscita da questa pagina...");
-  try {
      saveIncompleteSession();
-  } catch (error) {
-    console.error("Errore durante il salvataggio della sessione:", error);
-  }
   next();  // La navigazione continua comunque
 });
     const route = useRoute();
