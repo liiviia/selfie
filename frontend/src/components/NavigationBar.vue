@@ -56,7 +56,7 @@
               </a>
               <ul class="dropdown-menu" aria-labelledby="eventDropdown">
                 <li><a class="dropdown-item" href="/addEvent">Aggiungi evento</a></li>
-                <li><a class="dropdown-item" href="/eventsE">Lista eventi</a></li>
+            <!--    <li><a class="dropdown-item" href="/eventsE">Lista eventi</a></li> -->
               </ul>
             </li>
             <li class="nav-item dropdown">
@@ -65,12 +65,12 @@
               </a>
               <ul class="dropdown-menu" aria-labelledby="activityDropdown">
                 <li><a class="dropdown-item" href="/addActivities">Aggiungi attività</a></li>
-                <li><a class="dropdown-item" href="/ActivitiesPage">Lista attività</a></li>
+             <!--   <li><a class="dropdown-item" href="/ActivitiesPage">Lista attività</a></li> -->
               </ul>
             </li>
             <li class="nav-item"><a class="nav-link" href="/calendarEvent">Calendario</a></li>
             <li class="nav-item"><a class="nav-link" href="/pomodoroTempo">Pomodoro</a></li>
-            <li class="nav-item"><a class="nav-link" href="/pomSession">Sessioni Pomodoro</a></li>
+           <!-- <li class="nav-item"><a class="nav-link" href="/pomSession">Sessioni Pomodoro</a></li> -->
           </ul>
           <button class="btn btn-dark mt-3" @click="logout">Logout</button>
         </div>
@@ -151,8 +151,8 @@ import moment from 'moment-timezone';
         const response = await axios.get('/api/getTime-machine'); 
         console.log("get time machine", response.data);
 
-        const localDate = moment(response.data.date).tz('Europe/Rome', true).format();
-        console.log("Data convertita nel fuso orario locale:", localDate);
+     //   const localDate = moment(response.data.date).tz('Europe/Rome', true).format();
+      //  console.log("Data convertita nel fuso orario locale:", localDate);
     } catch (error) {
         console.error('Errore nella richiesta GET:', error);
     }
