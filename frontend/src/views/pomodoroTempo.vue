@@ -186,13 +186,11 @@ export default {
   setup() {
 
 
-    const saveBeforeLeaving = () => {
-        saveIncompleteSession();
-    };
+   
 
-    onBeforeRouteLeave((to, from, next) => {
+    onBeforeRouteLeave(async (to, from, next) => {
       console.log("Navigazione in uscita da questa pagina...");
-      saveBeforeLeaving(); // Chiama la funzione per salvare la sessione
+      await saveIncompleteSession(); // Chiama la funzione per salvare la sessione
       next(); // Continua la navigazione
     });
 
