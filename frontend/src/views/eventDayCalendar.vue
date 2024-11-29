@@ -16,7 +16,7 @@
     gruppo composto da: {{ event.participants.join(', ') }}
   </p>
 
-  <button v-if="event.author === currentUser" @click="confirmDeleteEvent(event._id)" class="delete-btn" style="bottom: 10px;">🗑️ Elimina Evento</button>
+  <button v-if="event.author === currentUser" @click="confirmDeleteEvent(event._id)" class="delete-btn" style="bottom: 3px;">🗑️ Elimina Evento</button>
 
   
 
@@ -49,7 +49,7 @@
               Gruppo composto da: {{ activity.participants.join(', ') }}
             </p>
             <button v-if="!activity.completed" @click="markAsCompleted(activity)" class="complete-btn" style="background:#f4a460;">Completata</button>
-            <button @click="confirmDeleteActivity(activity._id)" class="delete-btn" style="bottom: 10px;">🗑️</button>
+            <button @click="confirmDeleteActivity(activity._id)" class="delete-btn" style="bottom: 3px;">🗑️</button>
           </div>
         </div>
         <p v-else>Nessuna attività per questa data.</p>
