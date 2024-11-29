@@ -22,7 +22,7 @@
 
   <button v-if="event.participants.includes(currentUser) && event.author !== currentUser" 
           @click="rejectEvent(event._id)" 
-          class="delete-btn">🗑️ Rifiuta Evento</button>
+          class="delete-btn-c">🗑️ Rifiuta Evento</button>
 
           <button @click="exportToIcal(event)" class="export-btn">📅 Esporta</button>
 </div>
