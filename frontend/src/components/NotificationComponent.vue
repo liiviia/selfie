@@ -4,6 +4,8 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   data() {
     return {
@@ -17,25 +19,20 @@ export default {
   methods: {
   startPolling() {
     const token = sessionStorage.getItem('token');
-    setInterval(() => {
-      fetch('/api/get-latest-alert', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Errore nella risposta');
-        }
-        return response.json();
-      })
-      .then(data => {
+    
+    setInterval(async () => {
+      try {
+        const response = await axios.get('/api/get-latest-alert', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        
+        const data = response.data;
         if (data.alerts && data.alerts.length > 0) {
           const username = localStorage.getItem('username');
           const filteredAlerts = data.alerts.filter(alert => alert.userNome.toLowerCase() === username.toLowerCase());
-
+          
           if (filteredAlerts.length > 0) {
             this.alerts = filteredAlerts;
             filteredAlerts.forEach(alertItem => {
@@ -43,13 +40,13 @@ export default {
             });
           }
         }
-      })
-      .catch(err => {
-        console.error('Errore nel polling:', err);
-      });
+      } catch (error) {
+        console.error('Errore nel polling:', error);
+      }
     }, 5000); // Intervallo di 5 secondi
   }
 }
+
 
 };
 </script>
