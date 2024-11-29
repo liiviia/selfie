@@ -738,8 +738,17 @@ hr {
     color: blue;         
   }
 
+  .delete-btn-c {
+    font-size: 0.9em;
+    right: 20px;
+  }
+
+
   .delete-btn {
     bottom: -10px;           
+  }
+  .delete-btn-c {
+    bottom: -10px;
   }
   .completed-btn {
     right: 100px;  
