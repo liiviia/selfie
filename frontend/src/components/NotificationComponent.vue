@@ -29,7 +29,7 @@ export default {
               const username = localStorage.getItem('username');  
               
               const filteredAlerts = data.alerts.filter(alert => alert.userNome.toLowerCase() === username.toLowerCase());
-              console.log('Alert filtrati:', filteredAlerts); 
+             // console.log('Alert filtrati:', filteredAlerts); 
 
               if (filteredAlerts.length > 0) {
                 this.alerts = filteredAlerts;  
@@ -39,7 +39,7 @@ export default {
 
               }
             } else {
-              console.log('Nessun alert trovato.');
+              //console.log('Nessun alert trovato.');
             }
           })
           .catch(err => {
