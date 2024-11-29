@@ -30,5 +30,4 @@ exports.addAlert = (title, date, startTime, userNome) => {
     seen: false,  
   };
   alerts.push(newAlert);
-  console.log("Nuovo alert aggiunto:", newAlert);
 };

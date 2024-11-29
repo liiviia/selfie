@@ -90,7 +90,6 @@ const sendNotification = async (event) => {
           userNome: recipient,
         };
             addAlert(alertData.title, alertData.date, alertData.startTime, alertData.userNome);
-        console.log("Alert aggiunto:", alertData);
       }
     }
     
