@@ -180,9 +180,22 @@
 import { ref, onMounted,  onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
+import { onBeforeRouteLeave } from 'vue-router';
 
 export default {
   setup() {
+
+
+    const saveBeforeLeaving = () => {
+        saveIncompleteSession();
+    };
+
+    onBeforeRouteLeave((to, from, next) => {
+      saveBeforeLeaving(); // Chiama la funzione per salvare la sessione
+      next(); // Continua la navigazione
+    });
+
+
     const route = useRoute();
 
     const newPom = ref({
