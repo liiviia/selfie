@@ -94,7 +94,7 @@
         <p>Tempo di studio: {{ pomodoro.tempoStudio }} minuti</p>
         <p>Tempo di pausa: {{ pomodoro.tempoPausa }} minuti</p>
         <p>Ripetizioni: {{ pomodoro.ripetizioni }}</p>
-        <button @click="confirmDeletePomodoro(pomodoro._id)" class="delete-btn">🗑️</button>
+        <button @click="confirmDeletePomodoro(pomodoro._id)" class="delete-btn-cq">🗑️</button>
         
         <button
   v-if="isSameDay(queryDate, timeMachine) && !pomodoro.isStarted"
