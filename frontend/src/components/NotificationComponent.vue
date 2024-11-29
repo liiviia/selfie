@@ -18,14 +18,16 @@ export default {
   },
   methods: {
   startPolling() {
-    const token = sessionStorage.getItem('token');
 
-    if (!token) {
+    
+    
+    setInterval(async () => {
+
+      const token = sessionStorage.getItem('token');
+      if (!token) {
         console.warn('Token non trovato. L’utente non è autenticato.');
         return; 
       }
-    
-    setInterval(async () => {
       try {
         const response = await axios.get('/api/get-latest-alert', {
           headers: {
