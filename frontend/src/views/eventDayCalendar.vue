@@ -753,8 +753,9 @@ hr {
     right: 100px;
   }
   .delete-btn-cq {
+    font-size: 0.9em;
     bottom: -10px;
-    right: -100px;
+    right: -50px;
   }
 
 
