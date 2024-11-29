@@ -70,8 +70,11 @@
             <p>Data scadenza: {{ formatDate(activity.deadline) }}</p>
             <p>Descrizione: {{ activity.description }}</p>
             <div>
-           <button @click="discardActivity(activity._id)" class="delete-btn" style="position: absolute; bottom: 10px; right: 10px;">Scarta</button>
-           <button v-if="!activity.completed" @click="markAsCompleted(activity)" class="delete-btn" style="position: absolute; bottom: 30px; right: 10px;">Completata</button>
+              <div>
+  <button @click="discardActivity(activity._id)" class="delete-btn discard-btn">Scarta</button>
+  <button v-if="!activity.completed" @click="markAsCompleted(activity)" class="delete-btn completed-btn">Completata</button>
+</div>
+
            </div>
 
           </div>
@@ -682,7 +685,7 @@ hr {
   position: relative; 
 }
 
-.delete-btn {
+/*.delete-btn {
   position: absolute; 
   bottom: 10px;
   right: 10px; 
@@ -691,6 +694,23 @@ hr {
   cursor: pointer; 
   font-size: 1.2em;
   color: #e74c3c; 
+}*/
+.delete-btn {
+  position: absolute;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2em;
+  color: #e74c3c;
+}
+.discard-btn {
+  bottom: 10px;
+  right: 10px;
+}
+
+.completed-btn {
+  bottom: 30px;
+  right: 10px;
 }
 .export-btn {
   position: absolute; 
@@ -713,13 +733,17 @@ hr {
 
 @media (max-width: 768px) {
   .delete-btn, .export-btn {
-    font-size: 0.9em;        /* Ridotto font-size */
+    font-size: 0.9em;        
     right: 20px;   
-    color: blue;         /* Spostati più a destra */
+    color: blue;         
   }
 
   .delete-btn {
-    bottom: -10px;           /* Spostato più in alto */
+    bottom: -10px;           
+  }
+  .completed-btn {
+    bottom: 50px; /* Più in basso */
+    right: 30px;  /* Più a sinistra */
   }
 
   .export-btn {
