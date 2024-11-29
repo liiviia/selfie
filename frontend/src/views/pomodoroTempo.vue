@@ -201,10 +201,10 @@ export default {
    saveIncompleteSession(); 
 });*/
 
-onBeforeRouteLeave(async (to, from, next) => {
+onBeforeRouteLeave( (to, from, next) => {
   console.log("Navigazione in uscita da questa pagina...");
   try {
-    await saveIncompleteSession();
+     saveIncompleteSession();
   } catch (error) {
     console.error("Errore durante il salvataggio della sessione:", error);
   }
