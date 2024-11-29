@@ -70,6 +70,7 @@
             <p>Data scadenza: {{ formatDate(activity.deadline) }}</p>
             <p>Descrizione: {{ activity.description }}</p>
             <button @click="discardActivity(activity._id)" class="delete-btn">Scarta</button>
+            <button v-if="!activity.completed" @click="markAsCompleted(activity)" class="complete-btn" style="background:#f4a460;">Completata</button>
           </div>
         </div>
         <p v-else>Nessuna attività incompleta trovata.</p>
