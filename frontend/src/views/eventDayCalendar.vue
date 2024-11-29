@@ -742,8 +742,8 @@ hr {
     bottom: -10px;           
   }
   .completed-btn {
-    bottom: 50px; /* Più in basso */
-    right: 30px;  /* Più a sinistra */
+    bottom: 100px; 
+    right: 100px;  
   }
 
   .export-btn {
