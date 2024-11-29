@@ -134,6 +134,18 @@ export default {
     const users = ref([]);
     
     const createEvent = async () => {
+
+      const currentDate = new Date();
+  const eventDate = new Date(newEvent.value.date);
+
+  // Imposta la data di oggi a mezzogiorno (per ignorare l'orario)
+  currentDate.setHours(0, 0, 0, 0);
+
+  // Se la data dell'evento è nel passato
+  if (eventDate < currentDate) {
+      alert("Data non valida"); 
+    return; // Esci dalla funzione senza inviare il modulo
+  }
       try {
         const token = sessionStorage.getItem('token');
         const author = newEvent.value.author;
