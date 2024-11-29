@@ -181,7 +181,6 @@ import { ref, onMounted,  onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
 //import { onBeforeUnmount } from 'vue';
-import { onBeforeRouteLeave } from 'vue-router';
 
 
 export default {
@@ -196,28 +195,6 @@ export default {
 
   
 });
-
-/*onBeforeUnmount(() => {
-   saveIncompleteSession(); 
-});*/
-
-onBeforeRouteLeave(async (to, from, next) => {
-  console.log("Navigazione in uscita da questa pagina...");
-  
-  try {
-    // Aspetta che la funzione saveIncompleteSession finisca
-    await saveIncompleteSession(); 
-    
-    // Ritarda la navigazione per un tempo extra (ad esempio, 500 ms) se necessario
-    setTimeout(() => {
-      next();  // Permetti la navigazione
-    }, 3000); // Ritardo di 500 ms, modifica questo valore se necessario
-  } catch (error) {
-    console.error("Errore durante il salvataggio della sessione:", error);
-    next();  // Continua la navigazione anche se c'è un errore
-  }
-});
-
 
 
 
