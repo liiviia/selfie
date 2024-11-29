@@ -101,13 +101,11 @@ export default {
       const currentDate = new Date();
   const activityDate = new Date(newActivity.value.deadline);
 
-  // Imposta la data di oggi a mezzogiorno (per ignorare l'orario)
   currentDate.setHours(0, 0, 0, 0);
 
-  // Se la data dell'evento è nel passato
   if (activityDate < currentDate) {
       alert("Data non valida"); 
-    return; // Esci dalla funzione senza inviare il modulo
+    return; 
   }
 
       try {
