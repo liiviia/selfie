@@ -187,11 +187,17 @@ export default {
 
    
 
-    onBeforeUnmount(async (to, from, next) => {
-      console.log("Navigazione in uscita da questa pagina...");
-      await saveIncompleteSession(); // Chiama la funzione per salvare la sessione
-      next(); // Continua la navigazione
-    });
+    
+    window.addEventListener('beforeunload', () => {
+      // Usa una funzione wrapper per passare `pomodoro`
+      saveIncompleteSession(); // Chiama la funzione per salvare la sessione
+
+  
+});
+
+onBeforeUnmount(() => {
+   saveIncompleteSession(); // Chiama la funzione per salvare la sessione
+});
 
 
     const route = useRoute();
