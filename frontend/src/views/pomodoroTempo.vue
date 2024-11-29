@@ -182,6 +182,8 @@ import { useRoute } from 'vue-router';
 import axios from 'axios';
 //import { onBeforeUnmount } from 'vue';
 import { onBeforeRouteLeave } from 'vue-router';
+
+
 export default {
   setup() {
 
@@ -190,8 +192,7 @@ export default {
 
     
     window.addEventListener('beforeunload', () => {
-      // Usa una funzione wrapper per passare `pomodoro`
-      saveIncompleteSession(); // Chiama la funzione per salvare la sessione
+      saveIncompleteSession(); 
 
   
 });
@@ -200,10 +201,12 @@ export default {
    saveIncompleteSession(); 
 });*/
 
-onBeforeRouteLeave(async (to, from, next) => {
+
+
+onBeforeRouteLeave( async(to, from, next) => {
       console.log("Navigazione in uscita da questa pagina...");
-      await saveIncompleteSession(); // Chiama la funzione per salvare la sessione
-      next(); // Continua la navigazione
+      await saveIncompleteSession(); 
+      next(); 
     });
 
 
