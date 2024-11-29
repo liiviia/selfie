@@ -180,7 +180,7 @@
 import { ref, onMounted,  onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
-import { onBeforeUnmount } from 'vue';
+//import { onBeforeUnmount } from 'vue';
 import { onBeforeRouteLeave } from 'vue-router';
 export default {
   setup() {
@@ -196,9 +196,9 @@ export default {
   
 });
 
-onBeforeUnmount(() => {
-   saveIncompleteSession(); // Chiama la funzione per salvare la sessione
-});
+/*onBeforeUnmount(() => {
+   saveIncompleteSession(); 
+});*/
 
 onBeforeRouteLeave(async (to, from, next) => {
       console.log("Navigazione in uscita da questa pagina...");
