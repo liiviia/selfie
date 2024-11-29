@@ -181,7 +181,7 @@ import { ref, onMounted,  onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
 import { onBeforeUnmount } from 'vue';
-import { onBeforeRouteLeave } from 'vue';
+import { onBeforeRouteLeave } from 'vue-router';
 export default {
   setup() {
 
