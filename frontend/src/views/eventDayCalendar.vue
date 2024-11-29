@@ -742,7 +742,6 @@ hr {
     bottom: -10px;           
   }
   .completed-btn {
-    bottom: 100px; 
     right: 100px;  
   }
 
