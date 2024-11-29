@@ -347,7 +347,7 @@ export default {
 
 
 
-     const fetchPoms = async () => {
+    /* const fetchPoms = async () => {
       try {
         const token = sessionStorage.getItem('token');
         const username = localStorage.getItem('username');
@@ -371,7 +371,7 @@ export default {
         console.error('Errore durante il recupero delle sessioni Pomodoro:', error);
       }
     }
-
+*/
 
     const fetchEvents = async () => {
       try {
@@ -540,7 +540,7 @@ const query = queryDate.value;
    };
 
     onMounted(() => {
-      fetchPoms();
+    //  fetchPoms();
       fetchEvents();
       fetchActivities();
       fetchOverdueActivities();
