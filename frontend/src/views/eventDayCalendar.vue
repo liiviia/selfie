@@ -739,8 +739,8 @@ hr {
   }
 
   .delete-btn-c {
-    font-size: 0.9em;
-    right: 20px;
+    bottom: -10px;
+    right: 100px;
   }
 
 
