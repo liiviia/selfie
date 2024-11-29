@@ -180,7 +180,7 @@
 import { ref, onMounted,  onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
-//import { onBeforeUnmount } from 'vue';
+import { onBeforeUnmount } from 'vue';
 
 
 export default {
@@ -195,6 +195,12 @@ export default {
 
   
 });
+
+onBeforeUnmount(() => {
+   saveIncompleteSession(); 
+});
+
+
 
 
 
