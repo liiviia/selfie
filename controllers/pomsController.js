@@ -202,7 +202,7 @@ exports.getUncompletedPomodoros = async (req, res) => {
       return res.status(400).json({ message: 'Username è necessario' });
     }
 
-    const pomodoro = await Pom.findOne({ username, remainingTime: { $gt: 0 } }).sort({ updatedAt: -1 });
+    const pomodoro = await Pom.findOne({ username, remainingTime: { $gt: 0 } });
     
     if (pomodoro) {
       res.status(200).json(pomodoro);
