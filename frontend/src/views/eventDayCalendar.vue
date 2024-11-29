@@ -753,7 +753,7 @@ hr {
     right: 100px;
   }
   .delete-btn-cq {
-    bottom: -10px;
+    bottom: -50px;
     right: 100px;
   }
 
@@ -764,16 +764,12 @@ hr {
   .delete-btn-c {
     bottom: -10px;
   }
-  .delete-btn-cq {
-    bottom: -10px;
-    right: 100px;
-  }
   .completed-btn {
     right: 100px;  
   }
 
   .export-btn {
-    bottom: -10px;          /* Spostato più in alto */
+    bottom: -10px;          
     right: 150px;
   }
   .content-container {
