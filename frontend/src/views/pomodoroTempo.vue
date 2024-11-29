@@ -181,6 +181,7 @@ import { ref, onMounted,  onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
 import { onBeforeUnmount } from 'vue';
+import { onBeforeRouteLeave } from 'vue';
 export default {
   setup() {
 
@@ -198,6 +199,12 @@ export default {
 onBeforeUnmount(() => {
    saveIncompleteSession(); // Chiama la funzione per salvare la sessione
 });
+
+onBeforeRouteLeave(async (to, from, next) => {
+      console.log("Navigazione in uscita da questa pagina...");
+      await saveIncompleteSession(); // Chiama la funzione per salvare la sessione
+      next(); // Continua la navigazione
+    });
 
 
     const route = useRoute();
