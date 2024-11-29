@@ -71,7 +71,7 @@
             <p>Descrizione: {{ activity.description }}</p>
             <div>
   <button @click="discardActivity(activity._id)" class="delete-btn" style="position: absolute; bottom: 10px; right: 10px;">Scarta</button>
-  <button v-if="!activity.completed" @click="markAsCompleted(activity)" class="delete-btn" style="position: absolute; bottom: 50px; right: 10px;">Completata</button>
+  <button v-if="!activity.completed" @click="markAsCompleted(activity)" class="delete-btn" style="position: absolute; bottom: 30px; right: 10px;">Completata</button>
 </div>
 
           </div>
