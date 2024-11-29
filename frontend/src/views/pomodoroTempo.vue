@@ -180,15 +180,14 @@
 import { ref, onMounted,  onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
-import { onBeforeRouteLeave } from 'vue-router';
-
+import { onBeforeUnmount } from 'vue';
 export default {
   setup() {
 
 
    
 
-    onBeforeRouteLeave(async (to, from, next) => {
+    onBeforeUnmount(async (to, from, next) => {
       console.log("Navigazione in uscita da questa pagina...");
       await saveIncompleteSession(); // Chiama la funzione per salvare la sessione
       next(); // Continua la navigazione
