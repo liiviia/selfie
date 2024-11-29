@@ -16,7 +16,7 @@
     gruppo composto da: {{ event.participants.join(', ') }}
   </p>
 
-  <button v-if="event.author === currentUser" @click="confirmDeleteEvent(event._id)" class="delete-btn-c" >🗑️ Elimina Evento</button>
+  <button v-if="event.author === currentUser" @click="confirmDeleteEvent(event._id)" class="delete-btn-cq" >🗑️ Elimina Evento</button>
 
   
 
