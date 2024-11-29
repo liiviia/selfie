@@ -340,6 +340,18 @@ export default {
 
 
     const aggiungiPomodoro = async () => {
+
+      const currentDate = new Date();
+  const pomDate = new Date(newPom.value.giorno);
+
+  currentDate.setHours(0, 0, 0, 0);
+
+  if (pomDate < currentDate) {
+      alert("Data non valida"); 
+    return; 
+  }
+
+
   try {
     const token = sessionStorage.getItem('token');
     const currentDate = new Date();

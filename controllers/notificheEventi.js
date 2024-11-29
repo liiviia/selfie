@@ -238,9 +238,6 @@ const calculateNotificationTimeActivity = (activity) => {
   notificationTimes.push(moment(activity.deadline).add(6, 'hours').valueOf());
 
   notificationTimes.push(moment(activity.deadline).add(9, 'hours').valueOf());
-
-  notificationTimes.push(moment(activity.deadline).add(10, 'hours').valueOf());
-
   
   return notificationTimes;
 };
