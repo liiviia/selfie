@@ -748,7 +748,7 @@ hr {
 }
 
 
-@media (max-width: 768px) {
+@media (max-width: 600px) {
   .delete-btn, .export-btn {
     font-size: 0.9em;        
     right: 20px;   

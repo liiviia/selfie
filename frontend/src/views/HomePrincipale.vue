@@ -1032,7 +1032,7 @@ export default {
 }
 
 
-@media (max-width: 768px) {
+@media (max-width: 600px) {
   .home-preview {
     margin-top: 30px; 
   }
