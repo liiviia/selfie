@@ -52,8 +52,12 @@ export default {
           password: ''
         };
       } catch (error) {
-        this.message = 'Errore durante la registrazione.';
-        console.log('Errore:', error);
+        if (error.response && error.response.status === 400) {
+          this.message = 'Nome utente già presente. Scegli un altro nome utente.';
+        } else {
+          this.message = 'Errore durante la registrazione.';
+        }
+        console.error('Errore:', error);
       }
     }
   }
