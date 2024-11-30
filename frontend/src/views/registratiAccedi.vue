@@ -156,7 +156,7 @@ export default {
 }
 
 .message {
-  color: #fff;
+  color: black;
   text-align: center;
   margin-top: 10px;
 }
