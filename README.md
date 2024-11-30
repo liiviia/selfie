@@ -1,5 +1,3 @@
-# Progetto: Gestione Attività e Alert
-
 - PROGETTO SELFIE
   . È stato sviluppato utilizzando **Node.js** per il backend e **Vue.js** per il frontend, con MongoDB come database.
 
