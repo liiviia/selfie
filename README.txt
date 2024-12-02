@@ -44,3 +44,14 @@ All'interno di /frontend, troviamo la sottocartella src, che contiene:
   - Registrazione: Permette agli utenti di creare un nuovo account.
   - Login: Consente agli utenti di autenticarsi nell'applicazione.
   - Home Principale: Mostra una panoramica delle attività e degli alert.
+
+
+
+
+Divisone compiti dei membri del gruppo:
+
+ -massimili.fioravant2@studio.unibo.it :
+    sviluppo backend ( rotte , gestione notifiche , salvataggio eventi, attività...)
+
+ .livia.difrancesco@studio.unibo.it :
+   sviluppo fronted ( chiamate al backend, view , css , pagine responsive ...)
