@@ -757,7 +757,7 @@ hr {
 
   .delete-btn-c {
     bottom: -10px;
-    right: 100px;
+    right: 200px;
   }
   .delete-btn-cq {
     font-size: 0.9em;
@@ -769,9 +769,7 @@ hr {
   .delete-btn {
     bottom: -10px;           
   }
-  .delete-btn-c {
-    bottom: -10px;
-  }
+ 
   .completed-btn {
     right: 100px;  
   }

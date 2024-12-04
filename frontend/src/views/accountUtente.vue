@@ -1,7 +1,7 @@
 <template>
   <div class="account-utente">
     <div class="teext">
-      <h1>Pagina Account Utente</h1>
+      <h1>Account</h1>
     </div>
     
     <div class="personal-data">
