@@ -5,8 +5,6 @@ const authenticateToken = require('../middleware/authenticateToken');
 
 router.put('/updatePassword', authenticateToken, accountController.updatePassword);
 
-router.delete('/deleteAccount', authenticateToken, accountController.deleteAccount);
-
 router.get('/users', authenticateToken, accountController.getAllUsers);
 
 router.get('users1' , authenticateToken , accountController.getUsers) ;

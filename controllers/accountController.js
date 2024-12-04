@@ -26,22 +26,6 @@ exports.updatePassword = async (req, res) => {
   }
 };
 
-exports.deleteAccount = async (req, res) => {
-  const { username } = req.body;
-
-  try {
-    const user = await User.findOneAndDelete({ username });
-    if (!user) {
-      return res.status(404).json({ message: 'Utente non trovato' });
-    }
-
-    res.status(200).json({ message: 'Account eliminato con successo' });
-  } catch (error) {
-    console.error('Errore durante l\'eliminazione dell\'account:', error);
-    res.status(500).json({ message: 'Errore interno del server' });
-  }
-};
-
 
 exports.getAllUsers = async (req, res) => {
   try {

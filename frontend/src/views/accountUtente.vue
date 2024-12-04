@@ -25,10 +25,10 @@
       </form>
     </div>
 
-    <div class="delete-account">
+ <!--   <div class="delete-account">
       <h2>Elimina Account</h2>
       <button class="btn btn-danger" @click="confirmDeleteAccount">Elimina Account</button>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -74,34 +74,7 @@ export default {
   }
 },
 
-    
-    async deleteAccount() {
-      try {
-        const token = sessionStorage.getItem('token');
-        const response = await axios.delete('/api/deleteAccount', {
-          headers: {
-           Authorization: `Bearer ${token}` 
-      },
-          data: { username: this.username }
-        });
-        
-        this.successMessage = response.data.message || 'Account eliminato con successo!';
-        this.errorMessage = '';
-        
-        localStorage.clear();
-        this.$router.push('/'); 
-      } catch (error) {
-        this.errorMessage = error.response?.data?.message || 'Errore durante l\'eliminazione dell\'account.';
-        console.log("errore", error);
-        this.successMessage = '';
-      }
-    },
-
-    confirmDeleteAccount() {
-      if (confirm('Sei sicuro di voler eliminare il tuo account? Questa azione è irreversibile.')) {
-        this.deleteAccount();
-      }
-    }
+  
   }
 };
 </script>
