@@ -49,7 +49,7 @@
               Gruppo composto da: {{ activity.participants.join(', ') }}
             </p>
             <button v-if="!activity.completed" @click="markAsCompleted(activity)" class="complete-btn" style="background:#f4a460;">Completata</button>
-            <button @click="confirmDeleteActivity(activity._id)" class="delete-btn-c" >🗑️</button>
+            <button @click="confirmDeleteActivity(activity._id)" class="delete-btn-cq" >🗑️</button>
           </div>
         </div>
         <p v-else>Nessuna attività per questa data.</p>
