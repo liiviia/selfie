@@ -69,6 +69,8 @@ const sendNotification = async (event) => {
         console.log(`Email inviata a: ${emailRicevente}`);
       }
     }
+
+
     
 
     if (event.notificationMechanism.includes('alert')) {
@@ -129,7 +131,11 @@ const checkAndSendNotifications = async () => {
 
  
 
-const events = await Event.find();
+  const events = await Event.find({
+    notificationMechanism: { $in: ['alert', 'email'] }
+  });
+  
+  
 //console.log("eeee", events);
 
 

@@ -47,7 +47,7 @@ const eventSchema = new mongoose.Schema({
   },
   notificationMechanism: { 
     type: [String],
-    enum: ['system', 'email', 'alert'],
+    enum: ['no', 'email', 'alert'],
     default: [],
   },
   notificationTime: {

@@ -47,6 +47,7 @@
         <div>
           <input type="checkbox" value="email" v-model="newEvent.notificationMechanism" /> Email
           <input type="checkbox" value="alert" v-model="newEvent.notificationMechanism" /> Alert
+          <input type="checkbox" value="no" v-model="newEvent.notificationMechanism" />nessuna notifica
         </div>
         <div>
           <label for="notificationTime">Tempo di Notifica (minuti prima):</label>
