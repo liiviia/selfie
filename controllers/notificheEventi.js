@@ -132,8 +132,12 @@ const checkAndSendNotifications = async () => {
  
 
   const events = await Event.find({
-    notificationMechanism: { $in: ['alert', 'email'] }
+    notificationMechanism: { 
+      $in: ['alert', 'email'], 
+      $nin: ['no']             
+    }
   });
+  
   
   
 //console.log("eeee", events);
