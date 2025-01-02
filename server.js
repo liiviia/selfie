@@ -29,22 +29,13 @@ const port = 8000;
 const server = http.createServer(app);
 
 
-
-
-
-
-
 app.use(cors({
   origin: 'http://site232432.tw.cs.unibo.it',
   methods: ['GET', 'POST'],
   credentials: true,
 }));
 
-
-
 connectDB();
-
-
 
 const incrementTimeMachine = () => {
   const currentTime = moment(timeMachineConfig.getTimeMachineDate()).tz('Europe/Rome');
@@ -57,25 +48,30 @@ setInterval(incrementTimeMachine, 1000);
 
 startNotificationMonitoring();
 
-cron.schedule('0 0 * * *', async () => { 
+cron.schedule('0 0 * * *', async () => { // Eseguito ogni giorno a mezzanotte
   try {
     console.log('Esecuzione del controllo sessioni incomplete...');
 
-    const currentTime = moment(timeMachineConfig.getTimeMachineDate()).tz('Europe/Rome');
-    currentTime.setHours(0, 0, 0, 0);
+    // Determina il tempo da usare (normale o simulato)
+    const currentTime = timeMachineConfig.isActive()
+      ? moment(timeMachineConfig.getTimeMachineDate()).tz('Europe/Rome')
+      : moment().tz('Europe/Rome');
 
-    // Per trovare sessioni incomplete
+    const startOfDay = currentTime.clone().startOf('day'); // Mezzanotte del giorno attuale
+    const endOfDay = currentTime.clone().endOf('day'); // Fine giornata
+
+    // Trova sessioni incomplete
     const incompleteSessions = await Pom.find({
-      giorno: { $lte: currentTime },
+      giorno: { $gte: startOfDay.toDate(), $lte: endOfDay.toDate() },
       $or: [
         { remainingTime: { $gt: 0 } },
         { studyCycles: { $gt: 0 } }
       ]
     });
 
-    // Per aggiornre tutte le sessioni incomplete
+    // Aggiorna le sessioni trovate
     for (const session of incompleteSessions) {
-      session.isStarted = true; // Se è iniziata 
+      session.isIncomplete = true; // Segna come incompleta
       await session.save();
     }
 
