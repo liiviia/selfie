@@ -56,12 +56,12 @@ cron.schedule('0 0 * * *', async () => {
   try {
     console.log('Esecuzione del controllo sessioni incomplete...');
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const currentTime = moment(timeMachineConfig.getTimeMachineDate()).tz('Europe/Rome');
+    currentTime.setHours(0, 0, 0, 0);
 
     // Per trovare sessioni incomplete
     const incompleteSessions = await Pom.find({
-      giorno: { $lte: today },
+      giorno: { $lte: currentTime },
       $or: [
         { remainingTime: { $gt: 0 } },
         { studyCycles: { $gt: 0 } }
