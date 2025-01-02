@@ -399,7 +399,7 @@ export default {
       }
     };
 
-    const fetchIncompleteSessions = async () => {
+   const fetchIncompleteSessions = async () => {
   const token = sessionStorage.getItem('token');
   const username = localStorage.getItem('username');
 
@@ -409,7 +409,15 @@ export default {
       params: { username },
     });
 
-    const queryDateValue = queryDate.value; // Ottieni la data query
+    console.log('Risposta API sessioni incomplete:', response.data);
+
+    if (!Array.isArray(response.data)) {
+      console.error('Dati API non validi: non è un array');
+      incompleteSessions.value = []; 
+      return;
+    }
+
+    const queryDateValue = queryDate.value; 
     const queryDateMs = queryDateValue ? new Date(queryDateValue).valueOf() : null;
 
     incompleteSessions.value = response.data.filter((session) => {
@@ -423,8 +431,10 @@ export default {
     });
   } catch (error) {
     console.error('Errore nel recupero delle sessioni incomplete:', error);
+    incompleteSessions.value = []; 
   }
 };
+
 
 // Corretto onMounted
 onMounted(() => {
