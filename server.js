@@ -2,6 +2,8 @@ const express = require('express');
 const path = require('path');
 const connectDB = require('./config/dbConnection');
 const cors = require('cors');
+
+
 const authRoutes = require('./routes/authRoutes');
 const noteRoutes = require('./routes/noteRoutes');
 const pomsRoutes = require('./routes/pomsRouter');
@@ -28,10 +30,6 @@ const server = http.createServer(app);
 
 
 
-
-
-
-
 app.use(cors({
   origin: 'http://site232432.tw.cs.unibo.it',
   methods: ['GET', 'POST'],
@@ -41,7 +39,6 @@ app.use(cors({
 
 
 connectDB();
-
 
 
 const incrementTimeMachine = () => {
