@@ -80,7 +80,7 @@ cron.schedule('0 0 * * *', async () => {
   }
 });
 
-// prova pull
+
 
 app.use(express.json());  
 app.use('/api/auth', authRoutes);

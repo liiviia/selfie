@@ -47,7 +47,7 @@ exports.getNotificationsForUser = async (req, res) => {
     }
 };
   
-// prova pull
+
 
 exports.deleteNotification = async (req, res) => {
     const { id } = req.params; 
