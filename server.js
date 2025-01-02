@@ -28,7 +28,6 @@ const port = 8000;
 
 const server = http.createServer(app);
 
-
 app.use(cors({
   origin: 'http://site232432.tw.cs.unibo.it',
   methods: ['GET', 'POST'],
