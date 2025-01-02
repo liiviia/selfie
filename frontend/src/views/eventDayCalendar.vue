@@ -400,55 +400,59 @@ export default {
     };
 
     const fetchIncompleteSessions = async () => {
-      const token = sessionStorage.getItem('token');
-      const username = localStorage.getItem('username');
+  const token = sessionStorage.getItem('token');
+  const username = localStorage.getItem('username');
 
-      try {
-        const response = await axios.get('/api/poms/incomplete', {
-          headers: { Authorization: `Bearer ${token}` },
-          params: { username }
-        });
-
-       
-
-const query = queryDate.value; 
-    const queryDateMs = query ? new Date(query).valueOf() : null;
-        
-        incompleteSessions.value = (Array.isArray(response.data) ? response.data : [response.data]).filter(session => {
-          return (
-          session.studyCycles > 0 && 
-          session.remainingTime > 0 &&
-          session.tempoStudio && 
-          session.tempoPausa &&
-          new Date(session.giorno.valueOf()) <= queryDateMs 
-      );
+  try {
+    const response = await axios.get('/api/poms/incomplete', {
+      headers: { Authorization: `Bearer ${token}` },
+      params: { username },
     });
 
-      } catch (error) {
-        console.error('Errore nel recupero delle sessioni incomplete:', error);
-      }
-    };
+    const queryDateValue = queryDate.value; // Ottieni la data query
+    const queryDateMs = queryDateValue ? new Date(queryDateValue).valueOf() : null;
+
+    incompleteSessions.value = response.data.filter((session) => {
+      return (
+        session.studyCycles > 0 &&
+        session.remainingTime > 0 &&
+        session.tempoStudio &&
+        session.tempoPausa &&
+        (!queryDateMs || new Date(session.giorno).valueOf() <= queryDateMs)
+      );
+    });
+  } catch (error) {
+    console.error('Errore nel recupero delle sessioni incomplete:', error);
+  }
+};
+
+// Corretto onMounted
+onMounted(() => {
+  fetchEvents();
+  fetchActivities();
+  fetchOverdueActivities();
+  fetchIncompleteSessions();
+  setInterval(getTimeMachine, 1000);
+});
+
 
     const resumePomodoro = (session) => {
-    const plainSession = JSON.parse(JSON.stringify(session));
-
-    const nuovo = false;
-
-    router.push({
-      path: '/pomodoroTempo',
-      query: {
-        date: new Date(plainSession.giorno).toISOString(),
-        remainingTime: plainSession.remainingTime,
-        studyCycles: plainSession.studyCycles,
-        isStudyPhase: plainSession.isStudyPhase,
-        tempoStudio: plainSession.tempoStudio, 
-        tempoPausa: plainSession.tempoPausa,   
-        ripetizioni: plainSession.ripetizioni, 
-        nuovo: nuovo,
-        nonFare:true,
-    },
-  });
+      router.push({
+        path: '/pomodoroTempo',
+        query: {
+          date: new Date(session.giorno).toISOString(),
+          remainingTime: session.remainingTime,
+          studyCycles: session.studyCycles,
+          isStudyPhase: session.isStudyPhase,
+          tempoStudio: session.tempoStudio,
+          tempoPausa: session.tempoPausa,
+          ripetizioni: session.ripetizioni,
+          nuovo: false,
+          nonFare: true,
+        },
+      });
     };
+
 
     const discardPomodoro = async (session) => {
       const token = sessionStorage.getItem('token');
@@ -545,7 +549,9 @@ const query = queryDate.value;
       fetchActivities();
       fetchOverdueActivities();
       fetchIncompleteSessions();
-      setInterval(getTimeMachine, 1000);    });
+      setInterval(getTimeMachine, 1000);   
+      fetchIncompleteSessions
+      });
 
     return {
       events,
