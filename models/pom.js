@@ -11,6 +11,7 @@ const pomSchema = new mongoose.Schema({
     studyCycles: { type: Number, default: 0 }, 
     ripetizioni: { type: Number },
     isStarted: {type: Boolean, default: false},
+    isIncomplete: {type: Boolean, default: false}, 
 }, { timestamps: true });
 
 
