@@ -288,7 +288,12 @@ router.beforeEach(async (to, from, next) => {
   });
 
     // per salvare quando chiudo sito
-    window.addEventListener('beforeunload', handleSaveSession);
+window.addEventListener('beforeunload', async () => {
+  if (incompleteSessions.value.length > 0) {
+    await saveIncompleteSession();
+    console.log('Sessioni incomplete salvate prima della chiusura.');
+  }
+});
 
 });
 

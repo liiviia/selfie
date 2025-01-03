@@ -117,20 +117,22 @@
 
 
       <div class="section pomodorosScaduti-section">
-        <h3>POMODORI INCOMPLETI</h3>
-      <div v-if="incompleteSessions.length > 0">
-      <div v-for="session in incompleteSessions" :key="session._id" class="item-container">
-        <p>Data: {{ formatDate(session.giorno) }}</p>
-        <p>Tempo rimanente: {{ Math.floor(session.remainingTime / 60) }}:{{ session.remainingTime % 60 }}</p>
-        <p>Cicli rimanenti: {{ session.studyCycles }}</p>
-         <button @click="resumePomodoro(session)" class="action-button" style="background:#f4a460;">Riprendi Sessione</button>
-         <button @click="discardPomodoro(session)" class="action-button" style="all: unset; cursor: pointer;">
-          <span class="trash-icon" style="font-size: 0.9em;  color: inherit;">🗑️ </span>
-         </button> 
-      </div>
+  <h3>POMODORI INCOMPLETI</h3>
+  <div v-if="incompleteSessions.length > 0">
+    <div v-for="session in incompleteSessions" :key="session._id" class="item-container">
+      <p>Data: {{ formatDate(session.giorno) }}</p>
+      <p>Tempo rimanente: {{ Math.floor(session.remainingTime / 60) }}:{{ session.remainingTime % 60 }}</p>
+      <p>Cicli rimanenti: {{ session.studyCycles }}</p>
+      <button @click="resumePomodoro(session)" class="action-button" style="background:#f4a460;">
+        Riprendi Sessione
+      </button>
+      <button @click="discardPomodoro(session)" class="action-button" style="all: unset; cursor: pointer;">
+        <span class="trash-icon" style="font-size: 0.9em; color: inherit;">🗑️</span>
+      </button> 
     </div>
-    <p v-else>nessun pomodoro da portare a termine</p>
   </div>
+  <p v-else>Nessuna sessione da portare a termine</p>
+</div>
 
   </div>
   </div> 
@@ -340,33 +342,6 @@ export default {
 };
 
 
-
-    /* const fetchPoms = async () => {
-      try {
-        const token = sessionStorage.getItem('token');
-        const username = localStorage.getItem('username');
-        const response = await axios.get('/api/poms', {
-          headers: {
-            Authorization: `Bearer ${token}`
-          },
-          params: { username: username }
-        });
-
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        this.poms = response.data.filter(pom => {
-          const sessionDate = new Date(pom.giorno);
-          sessionDate.setHours(0, 0, 0, 0);
-          return sessionDate >= today;
-        });
-
-      } catch (error) {
-        console.error('Errore durante il recupero delle sessioni Pomodoro:', error);
-      }
-    }
-*/
-
     const fetchEvents = async () => {
       try {
         const author = route.query.author;
@@ -395,12 +370,13 @@ export default {
 
 
 
+
 const fetchIncompleteSessions = async () => {
   const token = sessionStorage.getItem('token');
   const username = localStorage.getItem('username');
 
   try {
-    // Chiamata API per recuperare le sessioni incomplete
+    // Recupera sessioni incomplete
     const response = await axios.get('/api/poms/incomplete', {
       headers: { Authorization: `Bearer ${token}` },
       params: { username },
@@ -408,28 +384,17 @@ const fetchIncompleteSessions = async () => {
 
     console.log('Risposta API sessioni incomplete:', response.data);
 
-    // Verifica che la risposta sia valida
     const sessions = Array.isArray(response.data) ? response.data : [];
     if (sessions.length === 0) {
-      console.warn('Nessuna sessione da filtrare.');
+      console.warn('Nessuna sessione trovata.');
       incompleteSessions.value = [];
       return;
     }
 
-    // Filtro delle sessioni incomplete
+    // NON FILTRIAMO, mostriamo tutto quello che arriva
     incompleteSessions.value = sessions.filter((session) => {
-      console.log('Analizzando sessione:', session);
-
-      // Assicurati che `giorno` sia una data valida
-      const sessionDate = new Date(session.giorno).valueOf();
-      if (!session.giorno || isNaN(sessionDate)) {
-        console.warn('Sessione con data non valida:', session);
-        return false;
-      }
-
-      // Controlla che `remainingTime` sia positivo
-      const isValid = session.remainingTime > 0;
-      console.log(`Sessione valida: ${isValid}`, session);
+      const isValid = session.remainingTime > 0; // Mostriamo solo quelle con tempo rimanente positivo
+      console.log(`Sessione valida? ${isValid}`, session);
       return isValid;
     });
 
@@ -440,7 +405,7 @@ const fetchIncompleteSessions = async () => {
     }
   } catch (error) {
     console.error('Errore nel recupero delle sessioni incomplete:', error);
-    incompleteSessions.value = []; // Ripristina lo stato
+    incompleteSessions.value = []; // Ripristina lo stato in caso di errore
   }
 };
 
