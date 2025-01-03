@@ -169,7 +169,16 @@ exports.getPomodorosByDate = async (req, res) => {
 
 exports.saveUncompletedPom = async (req, res) => {
   try {
-    const { username, giorno, remainingTime, isStudyPhase, studyCycles, tempoStudio, tempoPausa, ripetizioni } = req.body;
+    const {
+      username,
+      giorno,
+      remainingTime,
+      isStudyPhase,
+      studyCycles,
+      tempoStudio,
+      tempoPausa,
+      ripetizioni,
+    } = req.body;
 
     if (!giorno) {
       return res.status(400).json({ error: "Il campo 'giorno' è obbligatorio e non può essere nullo." });
@@ -180,21 +189,20 @@ exports.saveUncompletedPom = async (req, res) => {
     const endDate = new Date(giorno);
     endDate.setHours(23, 59, 59, 999);
 
-    const pomodoro = await Pom.findOneAndUpdate(
+    let pomodoro = await Pom.findOneAndUpdate(
       { username, giorno: { $gte: startDate, $lte: endDate } },
-      { 
+      {
         remainingTime,
         isStudyPhase,
         studyCycles,
         giorno: new Date(giorno),
-        tempoStudio,
-        tempoPausa,
-        ripetizioni,
-        isIncomplete: true 
+        tempoStudio, 
+        tempoPausa, 
+        ripetizioni, 
       },
-      { new: true, upsert: true }
+      { new: true, upsert: true } // Aggiorna o crea se non esiste
     );
-    
+
     res.status(200).json({ message: 'Sessione incompleta salvata', pomodoro });
   } catch (error) {
     console.error('Errore nel salvataggio della sessione incompleta:', error);
@@ -203,26 +211,29 @@ exports.saveUncompletedPom = async (req, res) => {
 };
 
 
+
+
+const { getTimeMachineDate } = require('../controllers/timeMachineController'); // Importa il controller Time Machine
+
 exports.getUncompletedPomodoros = async (req, res) => {
   try {
-    const username = req.query.username?.trim();
-    const timeMachineDate = getTimeMachineDate();
-
+    const username = req.query.username.trim();
     if (!username) {
       return res.status(400).json({ message: 'Username è necessario' });
     }
 
+    const timeMachineDate = await getTimeMachineDate();
+    const currentDate = new Date(timeMachineDate || Date.now()); // Usa Time Machine o la data attuale
+
+    console.log('Data attuale utilizzata per il filtro:', currentDate);
+
     const pomodoros = await Pom.find({
       username,
-      isIncomplete: true,
-      giorno: { $lte: timeMachineDate }
+      remainingTime: { $gt: 0 }, 
+      giorno: { $lte: currentDate }, 
     }).sort({ updatedAt: -1 });
 
-    if (pomodoros.length === 0) {
-      return res.status(200).json({ message: 'Nessuna sessione incompleta trovata' });
-    }
-
-    res.status(200).json(pomodoros);
+    res.status(200).json(Array.isArray(pomodoros) ? pomodoros : [pomodoros]);
   } catch (error) {
     console.error('Errore nel recupero delle sessioni incomplete:', error);
     res.status(500).json({ error: 'Errore nel recupero delle sessioni incomplete' });

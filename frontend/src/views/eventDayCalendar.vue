@@ -285,37 +285,31 @@ export default {
     };
 
     const iniziaPomodoro = async (id, remainingTime, date, tempoStudio, tempoPausa, ripetizioni) => {
-  try {
+    try {
     const token = sessionStorage.getItem('token');
-    const response = await axios.post(`/api/iniziaPomodoro/${id}`, {
-      date },
-      {
-      headers: {
-         Authorization: `Bearer ${token}` 
-        }
+    const response = await axios.post(`/api/saveUncompletedPom`, {
+      username: currentUser, 
+      giorno: date,
+      remainingTime,
+      isStudyPhase: true, 
+      studyCycles: ripetizioni, 
+      tempoStudio, 
+      tempoPausa, 
+      ripetizioni, 
+    }, {
+      headers: { Authorization: `Bearer ${token}` },
     });
 
-    if (response.data.success) {
-      router.push({
-        path: '/pomodoroTempo',
-        query: {
-          date: date,
-          remainingTime: remainingTime,
-          isStudyPhase: true,
-          tempoStudio: tempoStudio,
-          tempoPausa: tempoPausa,
-          ripetizioni: ripetizioni,
-          nuovo: true,
-          nonFare: true
-        }
-      });
+    if (response.data.message) {
+      console.log(response.data.message);
     } else {
-         console.log("errore");
+      console.error("Errore durante il salvataggio della sessione Pomodoro.");
     }
   } catch (error) {
     console.error('Errore durante l\'avvio del pomodoro:', error);
   }
 };
+
 
 
 
@@ -399,6 +393,8 @@ export default {
       }
     };
 
+
+
    const fetchIncompleteSessions = async () => {
   const token = sessionStorage.getItem('token');
   const username = localStorage.getItem('username');
@@ -411,29 +407,34 @@ export default {
 
     console.log('Risposta API sessioni incomplete:', response.data);
 
-    if (!Array.isArray(response.data)) {
-      console.error('Dati API non validi: non è un array');
-      incompleteSessions.value = []; 
-      return;
-    }
+    const sessions = Array.isArray(response.data) ? response.data : [response.data];
 
-    const queryDateValue = queryDate.value; 
+    const timeMachineResponse = await axios.get('/api/getTime-machine');
+    const timeMachineDate = new Date(timeMachineResponse.data.timeMachineDate || Date.now());
+    console.log('Data simulata dalla Time Machine:', timeMachineDate);
+
+    const queryDateValue = queryDate.value;
     const queryDateMs = queryDateValue ? new Date(queryDateValue).valueOf() : null;
 
-    incompleteSessions.value = response.data.filter((session) => {
+    incompleteSessions.value = sessions.filter((session) => {
+      const sessionDate = new Date(session.giorno).valueOf();
       return (
         session.studyCycles > 0 &&
         session.remainingTime > 0 &&
         session.tempoStudio &&
         session.tempoPausa &&
-        (!queryDateMs || new Date(session.giorno).valueOf() <= queryDateMs)
+        sessionDate <= timeMachineDate.valueOf() && 
+        (!queryDateMs || sessionDate <= queryDateMs)
       );
     });
+
+    console.log('Sessioni incomplete filtrate:', incompleteSessions.value);
   } catch (error) {
     console.error('Errore nel recupero delle sessioni incomplete:', error);
     incompleteSessions.value = []; 
   }
 };
+
 
 
 // Corretto onMounted
