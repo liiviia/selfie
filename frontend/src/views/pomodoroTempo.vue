@@ -178,7 +178,7 @@
 
 <script>
 import { ref, onMounted,  onUnmounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 import axios from 'axios';
 
 
@@ -186,7 +186,6 @@ export default {
   setup() {
 
 
-    const router = useRouter(); 
     const route = useRoute();
     
 
@@ -300,7 +299,7 @@ window.addEventListener('beforeunload', handleBeforeUnload);
     });
 
     
-const handleBeforeUnload = (event) => {
+const handleBeforeUnload = () => {
   if (remainingTime.value > 0 || studyCycles.value > 0) {
     const sessionData = {
       username: newPom.value.username.trim(),
