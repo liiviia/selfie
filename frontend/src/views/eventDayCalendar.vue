@@ -408,17 +408,16 @@ const fetchIncompleteSessions = async () => {
 
     console.log('Risposta API sessioni incomplete:', response.data);
 
-    // Verifica se la risposta è valida e contiene dati
-    if (!response.data || (typeof response.data === 'object' && response.data.message)) {
-      console.warn('Nessuna sessione valida trovata o risposta non valida:', response.data);
-      incompleteSessions.value = [];
+    // Controlla se l'API restituisce un array o un oggetto con un messaggio
+    const sessions = Array.isArray(response.data) ? response.data : [];
+
+    if (response.data.message) {
+      console.warn('Nessuna sessione valida trovata:', response.data.message);
+      incompleteSessions.value = []; // Imposta a vuoto
       return;
     }
 
-    // Garantisce che i dati siano sempre un array
-    const sessions = Array.isArray(response.data) ? response.data : [response.data];
-
-    // Recupera la data dalla Time Machine
+    // Recupera la data della Time Machine
     const timeMachineResponse = await axios.get('/api/getTime-machine');
     const timeMachineDate = new Date(timeMachineResponse.data.timeMachineDate || Date.now());
     console.log('Data simulata dalla Time Machine:', timeMachineDate);
@@ -427,24 +426,20 @@ const fetchIncompleteSessions = async () => {
     const queryDateValue = queryDate.value;
     const queryDateMs = queryDateValue ? new Date(queryDateValue).valueOf() : null;
 
-    // Filtra le sessioni incomplete
+    // Filtra le sessioni incomplete basandosi sulla Time Machine e altri parametri
     incompleteSessions.value = sessions.filter((session) => {
       const sessionDate = session.giorno ? new Date(session.giorno).valueOf() : null;
 
-      // Verifica i parametri della sessione
       if (!sessionDate) {
         console.warn('Sessione senza data valida:', session);
         return false;
       }
 
-      const isValid = (
+      return (
         session.remainingTime > 0 && // Deve avere tempo rimanente
         sessionDate <= timeMachineDate.valueOf() && // Deve essere prima o uguale alla Time Machine
         (!queryDateMs || sessionDate <= queryDateMs) // Deve essere prima o uguale alla query
       );
-
-      console.log('Sessione filtrata:', session, 'Valida:', isValid);
-      return isValid;
     });
 
     console.log('Sessioni incomplete filtrate:', incompleteSessions.value);
