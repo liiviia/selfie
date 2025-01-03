@@ -52,7 +52,6 @@ export default {
         console.error('Errore nel salvataggio della sessione incompleta:', error);
       }
     },
-  },
 
     confirmDelete(id) {
       if (confirm("Sicuro di voler eliminare questa sessione Pomodoro?")) {
