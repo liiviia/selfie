@@ -408,27 +408,20 @@ const fetchIncompleteSessions = async () => {
 
     console.log('Risposta API sessioni incomplete:', response.data);
 
-    // Controlla se l'API restituisce un array o un oggetto con un messaggio
-    const sessions = Array.isArray(response.data) ? response.data : [];
-
-    if (response.data.message) {
-      console.warn('Nessuna sessione valida trovata:', response.data.message);
-      incompleteSessions.value = []; // Imposta a vuoto
-      return;
-    }
-
-    // Recupera la data della Time Machine
+    // Recupera la data simulata dalla Time Machine
     const timeMachineResponse = await axios.get('/api/getTime-machine');
     const timeMachineDate = new Date(timeMachineResponse.data.timeMachineDate || Date.now());
     console.log('Data simulata dalla Time Machine:', timeMachineDate);
 
-    // Data della query
+    // Controlla se la risposta API è valida
+    const sessions = Array.isArray(response.data) ? response.data : [response.data];
+
+    // Filtra le sessioni incomplete basandosi su Time Machine e queryDate
     const queryDateValue = queryDate.value;
     const queryDateMs = queryDateValue ? new Date(queryDateValue).valueOf() : null;
 
-    // Filtra le sessioni incomplete basandosi sulla Time Machine e altri parametri
     incompleteSessions.value = sessions.filter((session) => {
-      const sessionDate = session.giorno ? new Date(session.giorno).valueOf() : null;
+      const sessionDate = new Date(session.giorno).valueOf();
 
       if (!sessionDate) {
         console.warn('Sessione senza data valida:', session);
@@ -442,12 +435,17 @@ const fetchIncompleteSessions = async () => {
       );
     });
 
+    if (incompleteSessions.value.length === 0) {
+      console.log('Nessuna sessione valida trovata con i filtri applicati.');
+    }
+
     console.log('Sessioni incomplete filtrate:', incompleteSessions.value);
   } catch (error) {
     console.error('Errore nel recupero delle sessioni incomplete:', error);
     incompleteSessions.value = []; // Ripristina lo stato in caso di errore
   }
 };
+
 
    
 
