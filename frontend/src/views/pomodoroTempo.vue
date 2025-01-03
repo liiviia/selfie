@@ -280,36 +280,45 @@ export default {
 
 }
 // per quando salvare sessione incomplete quando cambio pagina 
-router.beforeEach(async (to, from, next) => {
-    if (remainingTime.value > 0 || studyCycles.value > 0) {
-      await saveIncompleteSession();
-    }
-    next();
-  });
+window.addEventListener('beforeunload', handleBeforeUnload);
 
-    // per salvare quando chiudo sito
-window.addEventListener('beforeunload', async () => {
-  if (remainingTime.value > 0 || studyCycles.value > 0) {
-    await saveIncompleteSession();
-    console.log('Sessioni incomplete salvate prima della chiusura.');
+  if (route.query.date && !isNaN(new Date(route.query.date).getTime())) {
+    newPom.value.giorno = new Date(route.query.date).toISOString().split('T')[0];
+  } else {
+    newPom.value.giorno = new Date().toISOString().split('T')[0];
   }
-});
+
+  getUsers();
 
 });
 
 
     onUnmounted(() => {
+       // per salvare quando chiudo sito
+        window.removeEventListener('beforeunload', handleBeforeUnload);
       clearInterval(timerInterval); 
-      // per salvare quando chiudo sito
-      window.removeEventListener('beforeunload', handleSaveSession);
     });
 
     
-const handleSaveSession = async () => {
+const handleBeforeUnload = (event) => {
   if (remainingTime.value > 0 || studyCycles.value > 0) {
-    await saveIncompleteSession();
+    const sessionData = {
+      username: newPom.value.username.trim(),
+      giorno: new Date(newPom.value.giorno).toISOString(),
+      remainingTime: remainingTime.value,
+      isStudyPhase: isStudyPhase.value,
+      studyCycles: studyCycles.value,
+      tempoStudio: newPom.value.tempoStudio,
+      tempoPausa: newPom.value.tempoPausa,
+    };
+
+    // Usa sendBeacon per inviare i dati in modo affidabile
+    navigator.sendBeacon('/api/poms/save-incomplete', JSON.stringify(sessionData));
+    console.log('Sessione incompleta salvata con sendBeacon.');
   }
 };
+
+
 
 const startNewCycle = () => {
   newPom.value.tempoStudio = route.query.tempoStudio ? parseInt(route.query.tempoStudio) : newPom.value.tempoStudio;
@@ -751,22 +760,25 @@ const startNewCycle = () => {
       const username = newPom.value.username.trim();
 
       try {
-        await axios.post('/api/poms/save-incomplete', {
-          username,
-          giorno: new Date(newPom.value.giorno).toISOString(), 
-          remainingTime: remainingTime.value,
-          isStudyPhase: isStudyPhase.value,
-          studyCycles: studyCycles.value,
-          tempoStudio: newPom.value.tempoStudio, 
-          tempoPausa: newPom.value.tempoPausa
-        }, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        console.log('Incomplete session saved.');
-      } catch (error) {
-        console.error('Error saving incomplete session:', error);
-      }
-    };
+        if (remainingTime.value > 0 || studyCycles.value > 0) {
+      await axios.post('/api/poms/save-incomplete', {
+        username,
+        giorno: new Date(newPom.value.giorno).toISOString(),
+        remainingTime: remainingTime.value,
+        isStudyPhase: isStudyPhase.value,
+        studyCycles: studyCycles.value,
+        tempoStudio: newPom.value.tempoStudio,
+        tempoPausa: newPom.value.tempoPausa,
+      }, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      console.log('Sessione incompleta salvata.');
+    }
+  } catch (error) {
+    console.error('Errore nel salvataggio della sessione incompleta:', error);
+  }
+};
+
 
     return {
       newPom,
