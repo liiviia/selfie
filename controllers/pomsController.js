@@ -103,9 +103,6 @@ exports.rifiutaNotifica = async (req, res) => {
 
 
 
-
-
-
 exports.getPoms = async (req, res) => {
   try {
     const username = req.query.username;
@@ -183,12 +180,21 @@ exports.saveUncompletedPom = async (req, res) => {
     const endDate = new Date(giorno);
     endDate.setHours(23, 59, 59, 999);
 
-    let pomodoro = await Pom.findOneAndUpdate(
+    const pomodoro = await Pom.findOneAndUpdate(
       { username, giorno: { $gte: startDate, $lte: endDate } },
-      { remainingTime, isStudyPhase, studyCycles, giorno: new Date(giorno), tempoStudio, tempoPausa, ripetizioni },
+      { 
+        remainingTime,
+        isStudyPhase,
+        studyCycles,
+        giorno: new Date(giorno),
+        tempoStudio,
+        tempoPausa,
+        ripetizioni,
+        isIncomplete: true 
+      },
       { new: true, upsert: true }
     );
-   
+    
     res.status(200).json({ message: 'Sessione incompleta salvata', pomodoro });
   } catch (error) {
     console.error('Errore nel salvataggio della sessione incompleta:', error);
@@ -198,25 +204,31 @@ exports.saveUncompletedPom = async (req, res) => {
 
 
 exports.getUncompletedPomodoros = async (req, res) => {
-  
   try {
-    const username = req.query.username.trim();
+    const username = req.query.username?.trim();
+    const timeMachineDate = getTimeMachineDate();
+
     if (!username) {
       return res.status(400).json({ message: 'Username è necessario' });
     }
 
-    const pomodoro = await Pom.findOne({ username, remainingTime: { $gt: 0 } }).sort({ updatedAt: -1 });
-    
-    if (pomodoro) {
-      res.status(200).json(pomodoro);
-    } else {
-      res.status(200).json({ message: 'Nessuna sessione incompleta trovata' });
+    const pomodoros = await Pom.find({
+      username,
+      isIncomplete: true,
+      giorno: { $lte: timeMachineDate }
+    }).sort({ updatedAt: -1 });
+
+    if (pomodoros.length === 0) {
+      return res.status(200).json({ message: 'Nessuna sessione incompleta trovata' });
     }
+
+    res.status(200).json(pomodoros);
   } catch (error) {
-    console.error('Errore nel recupero delle sessioni incompleta:', error);
-    res.status(500).json({ error: 'Errore nel recupero delle sessioni incompleta' });
+    console.error('Errore nel recupero delle sessioni incomplete:', error);
+    res.status(500).json({ error: 'Errore nel recupero delle sessioni incomplete' });
   }
 };
+
 
 
 exports.deletePom = async (req, res) => {
@@ -249,7 +261,7 @@ exports.iniziaPomodoro = async (req, res) => {
 
     if (!pomodoro.isStarted) {
       pomodoro.isStarted = true;
-
+      pomodoro.isIncomplete = false; 
       await pomodoro.save();
 
       return res.status(200).json({ success: true, message: 'Pomodoro avviato con successo' });
