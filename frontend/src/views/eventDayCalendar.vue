@@ -115,25 +115,23 @@
     </div>
   </div>
 
-
-      <div class="section pomodorosScaduti-section">
-  <h3>POMODORI INCOMPLETI</h3>
-  <div v-if="incompleteSessions.length > 0">
-    <div v-for="session in incompleteSessions" :key="session._id" class="item-container">
-      <p>Data: {{ formatDate(session.giorno) }}</p>
-      <p>Tempo rimanente: {{ Math.floor(session.remainingTime / 60) }}:{{ session.remainingTime % 60 }}</p>
-      <p>Cicli rimanenti: {{ session.studyCycles }}</p>
-      <button @click="resumePomodoro(session)" class="action-button" style="background:#f4a460;">
-        Riprendi Sessione
-      </button>
-      <button @click="discardPomodoro(session)" class="action-button" style="all: unset; cursor: pointer;">
-        <span class="trash-icon" style="font-size: 0.9em; color: inherit;">🗑️</span>
-      </button> 
+<div class="section pomodorosScaduti-section">
+        <h3>POMODORI INCOMPLETI</h3>
+      <div v-if="incompleteSessions.length > 0">
+      <div v-for="session in incompleteSessions" :key="session._id" class="item-container">
+        <p>Data: {{ formatDate(session.giorno) }}</p>
+        <p>Tempo rimanente: {{ Math.floor(session.remainingTime / 60) }}:{{ session.remainingTime % 60 }}</p>
+        <p>Cicli rimanenti: {{ session.studyCycles }}</p>
+         <button @click="resumePomodoro(session)" class="action-button" style="background:#f4a460;">Riprendi Sessione</button>
+         <button @click="discardPomodoro(session)" class="action-button" style="all: unset; cursor: pointer;">
+          <span class="trash-icon" style="font-size: 0.9em;  color: inherit;">🗑️ </span>
+         </button> 
+      </div>
     </div>
+    <p v-else>nessun pomodoro da portare a termine</p>
   </div>
-  <p v-else>Nessuna sessione da portare a termine</p>
-</div>
 
+    
   </div>
   </div> 
 
@@ -369,47 +367,33 @@ export default {
     };
 
 
+ const fetchIncompleteSessions = async () => {
+      const token = sessionStorage.getItem('token');
+      const username = localStorage.getItem('username');
 
+      try {
+        const response = await axios.get('/api/poms/incomplete', {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { username }
+        });
 
-const fetchIncompleteSessions = async () => {
-  const token = sessionStorage.getItem('token');
-  const username = localStorage.getItem('username');
-
-  try {
-    // Recupera sessioni incomplete
-    const response = await axios.get('/api/poms/incomplete', {
-      headers: { Authorization: `Bearer ${token}` },
-      params: { username },
+    const query = queryDate.value; 
+    const queryDateMs = query ? new Date(query).valueOf() : null;
+        
+        incompleteSessions.value = (Array.isArray(response.data) ? response.data : [response.data]).filter(session => {
+          return (
+          session.studyCycles > 0 && 
+          session.remainingTime > 0 &&
+          session.tempoStudio && 
+          session.tempoPausa &&
+          new Date(session.giorno.valueOf()) <= queryDateMs 
+      );
     });
 
-    console.log('Risposta API sessioni incomplete:', response.data);
-
-    const sessions = Array.isArray(response.data) ? response.data : [];
-    if (sessions.length === 0) {
-      console.warn('Nessuna sessione trovata.');
-      incompleteSessions.value = [];
-      return;
-    }
-
-    // NON FILTRIAMO, mostriamo tutto quello che arriva
-    incompleteSessions.value = sessions.filter((session) => {
-      const isValid = session.remainingTime > 0; // Mostriamo solo quelle con tempo rimanente positivo
-      console.log(`Sessione valida? ${isValid}`, session);
-      return isValid;
-    });
-
-    if (incompleteSessions.value.length === 0) {
-      console.log('Nessuna sessione valida trovata.');
-    } else {
-      console.log('Sessioni incomplete filtrate:', incompleteSessions.value);
-    }
-  } catch (error) {
-    console.error('Errore nel recupero delle sessioni incomplete:', error);
-    incompleteSessions.value = []; // Ripristina lo stato in caso di errore
-  }
-};
-
-
+      } catch (error) {
+        console.error('Errore nel recupero delle sessioni incomplete:', error);
+      }
+    };
 
 
 // Corretto onMounted

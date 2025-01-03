@@ -168,44 +168,52 @@ exports.getPomodorosByDate = async (req, res) => {
 };
 
 
-exports.saveIncompleteSession = async (req, res) => {
+exports.saveUncompletedPom = async (req, res) => {
   try {
-    const { username, giorno, tempoStudio, tempoPausa, ripetizioni, remainingTime, isStudyPhase, studyCycles } = req.body;
+    const { username, giorno, remainingTime, isStudyPhase, studyCycles, tempoStudio, tempoPausa, ripetizioni } = req.body;
 
-    if (!username || !giorno) {
-      return res.status(400).json({ message: 'Username e giorno sono obbligatori.' });
+    if (!giorno) {
+      return res.status(400).json({ error: "Il campo 'giorno' è obbligatorio e non può essere nullo." });
     }
 
-    const session = await Pom.findOneAndUpdate(
-      { username, giorno },
-      { tempoStudio, tempoPausa, ripetizioni, remainingTime, isStudyPhase, studyCycles, isIncomplete: true },
-      { upsert: true, new: true }
-    );
+    const startDate = new Date(giorno);
+    startDate.setHours(0, 0, 0, 0);
+    const endDate = new Date(giorno);
+    endDate.setHours(23, 59, 59, 999);
 
-    res.status(200).json({ message: 'Sessione incompleta salvata.', session });
+    let pomodoro = await Pom.findOneAndUpdate(
+      { username, giorno: { $gte: startDate, $lte: endDate } },
+      { remainingTime, isStudyPhase, studyCycles, giorno: new Date(giorno), tempoStudio, tempoPausa, ripetizioni },
+      { new: true, upsert: true }
+    );
+   
+    res.status(200).json({ message: 'Sessione incompleta salvata', pomodoro });
   } catch (error) {
     console.error('Errore nel salvataggio della sessione incompleta:', error);
-    res.status(500).json({ error: 'Errore nel salvataggio della sessione incompleta.' });
+    res.status(500).json({ error: 'Errore nel salvataggio della sessione incompleta' });
   }
 };
 
 
+
 exports.getUncompletedPomodoros = async (req, res) => {
+  
   try {
     const username = req.query.username.trim();
     if (!username) {
       return res.status(400).json({ message: 'Username è necessario' });
     }
 
-    const pomodoros = await Pom.find({
-      username,
-      remainingTime: { $gt: 0 },
-    }).sort({ updatedAt: -1 });
-
-    res.status(200).json(pomodoros);
+    const pomodoro = await Pom.findOne({ username, remainingTime: { $gt: 0 } }).sort({ updatedAt: -1 });
+    
+    if (pomodoro) {
+      res.status(200).json(pomodoro);
+    } else {
+      res.status(200).json({ message: 'Nessuna sessione incompleta trovata' });
+    }
   } catch (error) {
-    console.error('Errore nel recupero delle sessioni incomplete:', error);
-    res.status(500).json({ error: 'Errore nel recupero delle sessioni incomplete' });
+    console.error('Errore nel recupero delle sessioni incompleta:', error);
+    res.status(500).json({ error: 'Errore nel recupero delle sessioni incompleta' });
   }
 };
 
