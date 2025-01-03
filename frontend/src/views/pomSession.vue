@@ -25,33 +25,45 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      poms: []
+      poms: [], 
+      tempoStudio: null, 
+      tempoPausa: null,
+      ripetizioni: null,
+      remainingTime: null,
+      isStudyPhase: null,
+      studyCycles: null,
     };
   },
   methods: {
 
-    async handleBeforeUnload() {
-      const sessionData = {
-        username: localStorage.getItem('username'),
-        giorno: new Date().toISOString(),
-        tempoStudio: this.tempoStudio, // Riferimento ai dati attuali
-        tempoPausa: this.tempoPausa,
-        ripetizioni: this.ripetizioni,
-        remainingTime: this.remainingTime,
-        isStudyPhase: this.isStudyPhase,
-        studyCycles: this.studyCycles,
-      };
+async handleBeforeUnload() {
+  if (!this.remainingTime || !this.tempoStudio || !this.tempoPausa || !this.ripetizioni) {
+    console.warn('Dati incompleti, salvataggio della sessione non eseguito.');
+    return;
+  }
 
-      try {
-        const token = sessionStorage.getItem('token');
-        await axios.post('/api/poms/saveIncomplete', sessionData, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        console.log('Sessione incompleta salvata.');
-      } catch (error) {
-        console.error('Errore nel salvataggio della sessione incompleta:', error);
-      }
-    },
+  const sessionData = {
+    username: localStorage.getItem('username'),
+    giorno: new Date().toISOString(),
+    tempoStudio: this.tempoStudio,
+    tempoPausa: this.tempoPausa,
+    ripetizioni: this.ripetizioni,
+    remainingTime: this.remainingTime,
+    isStudyPhase: this.isStudyPhase,
+    studyCycles: this.studyCycles,
+  };
+
+  try {
+    const token = sessionStorage.getItem('token');
+    await axios.post('/api/poms/saveIncomplete', sessionData, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    console.log('Sessione incompleta salvata.');
+  } catch (error) {
+    console.error('Errore nel salvataggio della sessione incompleta:', error);
+  }
+},
+
 
     confirmDelete(id) {
       if (confirm("Sicuro di voler eliminare questa sessione Pomodoro?")) {
