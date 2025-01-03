@@ -2,7 +2,6 @@ const express = require('express');
 const path = require('path');
 const connectDB = require('./config/dbConnection');
 const cors = require('cors');
-const cron = require('node-cron');
 const authRoutes = require('./routes/authRoutes');
 const noteRoutes = require('./routes/noteRoutes');
 const pomsRoutes = require('./routes/pomsRouter');
@@ -14,7 +13,6 @@ const notificationRoutes = require('./routes/notificationRoutes');
 const timeMachineRoutes = require('./routes/timeMachineRoutes');
 const timeMachineConfig = require('./timeMachineConfig');
 const alertRoutes = require('./routes/alertRoutes');
-const Pom = require('./models/pom'); 
 
 // Aggiungi la rotta per gli alert
 const moment = require('moment-timezone');
@@ -46,42 +44,6 @@ const incrementTimeMachine = () => {
 setInterval(incrementTimeMachine, 1000);
 
 startNotificationMonitoring();
-
-
-cron.schedule('0 0 * * *', async () => { // Lo eseguo ogni giorno a mezzanotte
-  try {
-    console.log('Esecuzione del controllo sessioni incomplete...');
-
-    const currentTime = timeMachineConfig.isActive()
-      ? moment(timeMachineConfig.getTimeMachineDate()).tz('Europe/Rome')
-      : moment().tz('Europe/Rome');
-
-    const allIncompleteSessions = await Pom.find({
-      $or: [
-        { remainingTime: { $gt: 0 } },
-        { studyCycles: { $gt: 0 } }
-      ]
-    });
-
-    let updatedSessionsCount = 0;
-
-    for (const session of allIncompleteSessions) {
-      const sessionDate = moment(session.giorno).tz('Europe/Rome');
-
-      if (sessionDate.isBefore(currentTime, 'day')) {
-        session.isIncomplete = true; 
-        await session.save();
-        updatedSessionsCount++;
-      }
-    }
-
-    console.log(`Controllo completato: ${updatedSessionsCount} sessioni incomplete aggiornate.`);
-  } catch (error) {
-    console.error('Errore durante il controllo delle sessioni incomplete:', error);
-  }
-});
-
-
 
 app.use(express.json());  
 app.use('/api/auth', authRoutes);

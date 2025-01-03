@@ -26,44 +26,9 @@ export default {
   data() {
     return {
       poms: [], 
-      tempoStudio: null, 
-      tempoPausa: null,
-      ripetizioni: null,
-      remainingTime: null,
-      isStudyPhase: null,
-      studyCycles: null,
     };
   },
   methods: {
-
-async handleBeforeUnload() {
-  if (!this.remainingTime || !this.tempoStudio || !this.tempoPausa || !this.ripetizioni) {
-    console.warn('Dati incompleti, salvataggio della sessione non eseguito.');
-    return;
-  }
-
-  const sessionData = {
-    username: localStorage.getItem('username'),
-    giorno: new Date().toISOString(),
-    tempoStudio: this.tempoStudio,
-    tempoPausa: this.tempoPausa,
-    ripetizioni: this.ripetizioni,
-    remainingTime: this.remainingTime,
-    isStudyPhase: this.isStudyPhase,
-    studyCycles: this.studyCycles,
-  };
-
-  try {
-    const token = sessionStorage.getItem('token');
-    await axios.post('/api/poms/saveIncomplete', sessionData, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    console.log('Sessione incompleta salvata.');
-  } catch (error) {
-    console.error('Errore nel salvataggio della sessione incompleta:', error);
-  }
-},
-
 
     confirmDelete(id) {
       if (confirm("Sicuro di voler eliminare questa sessione Pomodoro?")) {
@@ -115,15 +80,6 @@ async handleBeforeUnload() {
       return new Date(date).toLocaleDateString();
     }
   }, 
-
-  mounted() {
-    this.fetchPoms();
-    window.addEventListener('beforeunload', this.handleBeforeUnload);
-  },
-
-   beforeUnmount() {
-    window.removeEventListener('beforeunload', this.handleBeforeUnload);
-  },
 
 };
 </script>

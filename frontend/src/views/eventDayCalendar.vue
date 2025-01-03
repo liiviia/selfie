@@ -400,7 +400,6 @@ const fetchIncompleteSessions = async () => {
   const username = localStorage.getItem('username');
 
   try {
-    // Recupera le sessioni incomplete dall'API
     const response = await axios.get('/api/poms/incomplete', {
       headers: { Authorization: `Bearer ${token}` },
       params: { username },
@@ -408,30 +407,42 @@ const fetchIncompleteSessions = async () => {
 
     console.log('Risposta API sessioni incomplete:', response.data);
 
-    // Recupera la data simulata dalla Time Machine
     const timeMachineResponse = await axios.get('/api/getTime-machine');
-    const timeMachineDate = new Date(timeMachineResponse.data.timeMachineDate || Date.now());
+    let timeMachineDate = new Date(timeMachineResponse?.data?.timeMachineDate || Date.now());
+
+    if (isNaN(timeMachineDate)) {
+      console.error('Time Machine Date non valida. Utilizzo la data attuale.');
+      timeMachineDate = new Date();
+    }
+
     console.log('Data simulata dalla Time Machine:', timeMachineDate);
 
-    // Controlla se la risposta API è valida
-    const sessions = Array.isArray(response.data) ? response.data : [response.data];
+    const sessions = Array.isArray(response.data) ? response.data : [];
+    if (sessions.length === 0) {
+      console.warn('Nessuna sessione da filtrare.');
+      incompleteSessions.value = [];
+      return;
+    }
 
-    // Filtra le sessioni incomplete basandosi su Time Machine e queryDate
     const queryDateValue = queryDate.value;
-    const queryDateMs = queryDateValue ? new Date(queryDateValue).valueOf() : null;
+    const queryDateMs = queryDateValue && !isNaN(new Date(queryDateValue)) 
+      ? new Date(queryDateValue).valueOf() 
+      : null;
+
+    console.log('Query Date:', queryDateValue);
 
     incompleteSessions.value = sessions.filter((session) => {
       const sessionDate = new Date(session.giorno).valueOf();
 
-      if (!sessionDate) {
+      if (!session.giorno || isNaN(sessionDate)) {
         console.warn('Sessione senza data valida:', session);
         return false;
       }
 
       return (
-        session.remainingTime > 0 && // Deve avere tempo rimanente
-        sessionDate <= timeMachineDate.valueOf() && // Deve essere prima o uguale alla Time Machine
-        (!queryDateMs || sessionDate <= queryDateMs) // Deve essere prima o uguale alla query
+        session.remainingTime > 0 && 
+        sessionDate <= timeMachineDate.valueOf() && 
+        (!queryDateMs || sessionDate <= queryDateMs) 
       );
     });
 
@@ -442,12 +453,10 @@ const fetchIncompleteSessions = async () => {
     console.log('Sessioni incomplete filtrate:', incompleteSessions.value);
   } catch (error) {
     console.error('Errore nel recupero delle sessioni incomplete:', error);
-    incompleteSessions.value = []; // Ripristina lo stato in caso di errore
+    incompleteSessions.value = []; 
   }
 };
 
-
-   
 
 
 

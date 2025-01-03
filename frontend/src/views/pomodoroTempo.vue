@@ -278,18 +278,34 @@ export default {
   }
 
 }
+// per quando salvare sessione incomplete quando cambio pagina 
+router.beforeEach(async (to, from, next) => {
+    if (remainingTime.value > 0 || studyCycles.value > 0) {
+      await saveIncompleteSession();
+    }
+    next();
+  });
+
+    // per salvare quando chiudo sito
+    window.addEventListener('beforeunload', handleSaveSession);
 
 });
 
 
-
-
-
     onUnmounted(() => {
       clearInterval(timerInterval); 
+      // per salvare quando chiudo sito
+      window.removeEventListener('beforeunload', handleSaveSession);
     });
 
-    const startNewCycle = () => {
+    
+const handleSaveSession = async () => {
+  if (remainingTime.value > 0 || studyCycles.value > 0) {
+    await saveIncompleteSession();
+  }
+};
+
+const startNewCycle = () => {
   newPom.value.tempoStudio = route.query.tempoStudio ? parseInt(route.query.tempoStudio) : newPom.value.tempoStudio;
   newPom.value.tempoPausa = route.query.tempoPausa ? parseInt(route.query.tempoPausa) : newPom.value.tempoPausa;
   newPom.value.ripetizioni = route.query.ripetizioni ? parseInt(route.query.ripetizioni) : newPom.value.ripetizioni;
