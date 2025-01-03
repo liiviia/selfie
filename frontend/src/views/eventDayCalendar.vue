@@ -400,6 +400,7 @@ const fetchIncompleteSessions = async () => {
   const username = localStorage.getItem('username');
 
   try {
+    // Chiamata API per recuperare le sessioni incomplete
     const response = await axios.get('/api/poms/incomplete', {
       headers: { Authorization: `Bearer ${token}` },
       params: { username },
@@ -407,6 +408,7 @@ const fetchIncompleteSessions = async () => {
 
     console.log('Risposta API sessioni incomplete:', response.data);
 
+    // Verifica che la risposta sia valida
     const sessions = Array.isArray(response.data) ? response.data : [];
     if (sessions.length === 0) {
       console.warn('Nessuna sessione da filtrare.');
@@ -414,33 +416,34 @@ const fetchIncompleteSessions = async () => {
       return;
     }
 
+    // Filtro delle sessioni incomplete
     incompleteSessions.value = sessions.filter((session) => {
-      console.log('Analisi sessione:', session);
+      console.log('Analizzando sessione:', session);
 
+      // Assicurati che `giorno` sia una data valida
       const sessionDate = new Date(session.giorno).valueOf();
       if (!session.giorno || isNaN(sessionDate)) {
-        console.warn('Sessione senza data valida:', session);
+        console.warn('Sessione con data non valida:', session);
         return false;
       }
 
-      const isValid = session.remainingTime > 0; // Controlla solo se `remainingTime` è positivo
-      console.log(
-        `Sessione valida? ${isValid}`,
-        `remainingTime: ${session.remainingTime}`
-      );
+      // Controlla che `remainingTime` sia positivo
+      const isValid = session.remainingTime > 0;
+      console.log(`Sessione valida: ${isValid}`, session);
       return isValid;
     });
 
     if (incompleteSessions.value.length === 0) {
-      console.log('Nessuna sessione valida trovata con i filtri applicati.');
+      console.log('Nessuna sessione valida trovata.');
+    } else {
+      console.log('Sessioni incomplete filtrate:', incompleteSessions.value);
     }
-
-    console.log('Sessioni incomplete filtrate:', incompleteSessions.value);
   } catch (error) {
     console.error('Errore nel recupero delle sessioni incomplete:', error);
-    incompleteSessions.value = []; 
+    incompleteSessions.value = []; // Ripristina lo stato
   }
 };
+
 
 
 
