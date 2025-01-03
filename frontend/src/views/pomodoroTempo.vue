@@ -300,7 +300,7 @@ export default {
 
     
 
-const handleBeforeUnload = async () => {
+const handleBeforeUnload = () => {
   if (remainingTime.value > 0 || studyCycles.value > 0) {
     const sessionData = {
       username: newPom.value.username.trim(),
@@ -312,21 +312,17 @@ const handleBeforeUnload = async () => {
       tempoPausa: newPom.value.tempoPausa,
     };
 
-    try {
-      const blob = new Blob([JSON.stringify(sessionData)], { type: 'application/json' });
-      const success = navigator.sendBeacon('/api/poms/save-incomplete', blob);
+    const blob = new Blob([JSON.stringify(sessionData)], { type: 'application/json' });
+    const success = navigator.sendBeacon('/api/poms/save-incomplete', blob);
 
-      if (!success) {
-        console.log('Fallback: usando axios per salvare i dati.');
-        await axios.post('/api/poms/save-incomplete', sessionData, {
-          headers: { Authorization: `Bearer ${sessionStorage.getItem('token')}` },
-        });
-      }
-    } catch (error) {
-      console.error('Errore durante il salvataggio della sessione:', error);
+    if (!success) {
+      console.error('Errore nel salvataggio della sessione con sendBeacon.');
+    } else {
+      console.log('Sessione incompleta salvata correttamente prima della chiusura.');
     }
   }
 };
+
 
 
 

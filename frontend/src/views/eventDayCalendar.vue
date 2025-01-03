@@ -367,7 +367,7 @@ export default {
     };
 
 
- const fetchIncompleteSessions = async () => {
+ /*const fetchIncompleteSessions = async () => {
       const token = sessionStorage.getItem('token');
       const username = localStorage.getItem('username');
 
@@ -393,7 +393,25 @@ export default {
       } catch (error) {
         console.error('Errore nel recupero delle sessioni incomplete:', error);
       }
-    };
+    };*/
+
+    const fetchIncompleteSessions = async () => {
+  const token = sessionStorage.getItem('token');
+  const username = localStorage.getItem('username');
+
+  try {
+    const response = await axios.get('/api/poms/incomplete', {
+      headers: { Authorization: `Bearer ${token}` },
+      params: { username },
+    });
+
+    incompleteSessions.value = response.data.filter(session => session.remainingTime > 0 && session.studyCycles > 0);
+    console.log('Sessioni incomplete recuperate:', incompleteSessions.value);
+  } catch (error) {
+    console.error('Errore nel recupero delle sessioni incomplete:', error);
+  }
+};
+
 
 
 // Corretto onMounted
@@ -403,6 +421,11 @@ onMounted(() => {
   fetchOverdueActivities();
   fetchIncompleteSessions();
   setInterval(getTimeMachine, 1000);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('beforeunload', handleBeforeUnload);
 });
 
 
