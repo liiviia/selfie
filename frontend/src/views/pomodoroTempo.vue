@@ -279,7 +279,7 @@ export default {
 
 }
 // per quando salvare sessione incomplete quando cambio pagina 
-window.addEventListener('beforeunload', handleBeforeUnload);
+ window.addEventListener('beforeunload', handleBeforeUnload);
 
   if (route.query.date && !isNaN(new Date(route.query.date).getTime())) {
     newPom.value.giorno = new Date(route.query.date).toISOString().split('T')[0];
@@ -299,7 +299,8 @@ window.addEventListener('beforeunload', handleBeforeUnload);
     });
 
     
-const handleBeforeUnload = () => {
+
+const handleBeforeUnload = async () => {
   if (remainingTime.value > 0 || studyCycles.value > 0) {
     const sessionData = {
       username: newPom.value.username.trim(),
@@ -311,11 +312,22 @@ const handleBeforeUnload = () => {
       tempoPausa: newPom.value.tempoPausa,
     };
 
-    // Usa sendBeacon per inviare i dati in modo affidabile
-    navigator.sendBeacon('/api/poms/save-incomplete', JSON.stringify(sessionData));
-    console.log('Sessione incompleta salvata con sendBeacon.');
+    try {
+      const blob = new Blob([JSON.stringify(sessionData)], { type: 'application/json' });
+      const success = navigator.sendBeacon('/api/poms/save-incomplete', blob);
+
+      if (!success) {
+        console.log('Fallback: usando axios per salvare i dati.');
+        await axios.post('/api/poms/save-incomplete', sessionData, {
+          headers: { Authorization: `Bearer ${sessionStorage.getItem('token')}` },
+        });
+      }
+    } catch (error) {
+      console.error('Errore durante il salvataggio della sessione:', error);
+    }
   }
 };
+
 
 
 
