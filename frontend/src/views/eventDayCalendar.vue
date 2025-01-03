@@ -407,7 +407,6 @@ const fetchIncompleteSessions = async () => {
 
     console.log('Risposta API sessioni incomplete:', response.data);
 
-    // Assicurati che la risposta sia un array
     const sessions = Array.isArray(response.data) ? response.data : [];
     if (sessions.length === 0) {
       console.warn('Nessuna sessione da filtrare.');
@@ -415,18 +414,21 @@ const fetchIncompleteSessions = async () => {
       return;
     }
 
-    console.log('Query Date:', queryDate.value);
-
-    // Filtra solo sessioni con tempo rimanente maggiore di 0
     incompleteSessions.value = sessions.filter((session) => {
-      const sessionDate = new Date(session.giorno).valueOf();
+      console.log('Analisi sessione:', session);
 
+      const sessionDate = new Date(session.giorno).valueOf();
       if (!session.giorno || isNaN(sessionDate)) {
         console.warn('Sessione senza data valida:', session);
         return false;
       }
 
-      return session.remainingTime > 0; // Mantieni solo sessioni con tempo rimanente
+      const isValid = session.remainingTime > 0; // Controlla solo se `remainingTime` è positivo
+      console.log(
+        `Sessione valida? ${isValid}`,
+        `remainingTime: ${session.remainingTime}`
+      );
+      return isValid;
     });
 
     if (incompleteSessions.value.length === 0) {
@@ -439,7 +441,6 @@ const fetchIncompleteSessions = async () => {
     incompleteSessions.value = []; 
   }
 };
-
 
 
 
