@@ -178,7 +178,7 @@
 
 <script>
 import { ref, onMounted,  onUnmounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
 
 
@@ -186,8 +186,9 @@ export default {
   setup() {
 
 
-
+    const router = useRouter(); 
     const route = useRoute();
+    
 
     const newPom = ref({
       username: localStorage.getItem('username') || 'Guest',
