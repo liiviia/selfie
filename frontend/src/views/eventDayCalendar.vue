@@ -395,11 +395,13 @@ export default {
 
 
 
+
    const fetchIncompleteSessions = async () => {
   const token = sessionStorage.getItem('token');
   const username = localStorage.getItem('username');
 
   try {
+    // Recupera le sessioni incomplete dall'API
     const response = await axios.get('/api/poms/incomplete', {
       headers: { Authorization: `Bearer ${token}` },
       params: { username },
@@ -407,33 +409,45 @@ export default {
 
     console.log('Risposta API sessioni incomplete:', response.data);
 
+    // Garantisce che i dati siano sempre un array
     const sessions = Array.isArray(response.data) ? response.data : [response.data];
 
+    // Recupera la data dalla Time Machine
     const timeMachineResponse = await axios.get('/api/getTime-machine');
     const timeMachineDate = new Date(timeMachineResponse.data.timeMachineDate || Date.now());
     console.log('Data simulata dalla Time Machine:', timeMachineDate);
 
+    // Data della query
     const queryDateValue = queryDate.value;
     const queryDateMs = queryDateValue ? new Date(queryDateValue).valueOf() : null;
 
+    // Filtra le sessioni incomplete
     incompleteSessions.value = sessions.filter((session) => {
-      const sessionDate = new Date(session.giorno).valueOf();
-      return (
-        session.studyCycles > 0 &&
-        session.remainingTime > 0 &&
-        session.tempoStudio &&
-        session.tempoPausa &&
-        sessionDate <= timeMachineDate.valueOf() && 
-        (!queryDateMs || sessionDate <= queryDateMs)
+      const sessionDate = session.giorno ? new Date(session.giorno).valueOf() : null;
+
+      // Verifica i parametri della sessione
+      if (!sessionDate) {
+        console.warn('Sessione senza data valida:', session);
+        return false;
+      }
+
+      const isValid = (
+        session.remainingTime > 0 && // Deve avere tempo rimanente
+        sessionDate <= timeMachineDate.valueOf() && // Deve essere prima o uguale alla Time Machine
+        (!queryDateMs || sessionDate <= queryDateMs) // Deve essere prima o uguale alla query
       );
+
+      console.log('Sessione filtrata:', session, 'Valida:', isValid);
+      return isValid;
     });
 
     console.log('Sessioni incomplete filtrate:', incompleteSessions.value);
   } catch (error) {
     console.error('Errore nel recupero delle sessioni incomplete:', error);
-    incompleteSessions.value = []; 
+    incompleteSessions.value = []; // Ripristina lo stato in caso di errore
   }
 };
+
 
 
 
