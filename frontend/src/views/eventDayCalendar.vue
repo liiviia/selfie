@@ -302,6 +302,20 @@ export default {
 
     if (response.data.message) {
       console.log(response.data.message);
+      
+      router.push({
+        path: '/pomodoroTempo',
+        query: {
+          date: date,
+          remainingTime,
+          studyCycles: ripetizioni ,
+          isStudyPhase: true,
+          tempoStudio,
+          tempoPausa,
+          ripetizioni,
+        },
+      });
+
     } else {
       console.error("Errore durante il salvataggio della sessione Pomodoro.");
     }

@@ -278,43 +278,15 @@ export default {
   }
 
 }
-// per quando salvare sessione incomplete quando cambio pagina 
- window.addEventListener('beforeunload', handleBeforeUnload);
 
 });
 
 
     onUnmounted(() => {
-       // per salvare quando chiudo sito
-       window.removeEventListener('beforeunload', handleBeforeUnload);
       clearInterval(timerInterval); 
     });
 
-    
-
-const handleBeforeUnload = () => {
-      if (remainingTime.value > 0 || studyCycles.value > 0) {
-        const sessionData = {
-          username: newPom.value.username.trim(),
-          giorno: new Date(newPom.value.giorno).toISOString(),
-          remainingTime: remainingTime.value,
-          isStudyPhase: isStudyPhase.value,
-          studyCycles: studyCycles.value,
-          tempoStudio: newPom.value.tempoStudio,
-          tempoPausa: newPom.value.tempoPausa,
-        };
-
-        const blob = new Blob([JSON.stringify(sessionData)], { type: 'application/json' });
-        const success = navigator.sendBeacon('/api/poms/save-incomplete', blob);
-
-        if (!success) {
-          console.error('Errore nel salvataggio della sessione con sendBeacon.');
-        } else {
-          console.log('Sessione incompleta salvata correttamente prima della chiusura.');
-        }
-      }
-    };
-
+  
 
 
 
