@@ -281,47 +281,39 @@ export default {
 // per quando salvare sessione incomplete quando cambio pagina 
  window.addEventListener('beforeunload', handleBeforeUnload);
 
-  if (route.query.date && !isNaN(new Date(route.query.date).getTime())) {
-    newPom.value.giorno = new Date(route.query.date).toISOString().split('T')[0];
-  } else {
-    newPom.value.giorno = new Date().toISOString().split('T')[0];
-  }
-
-  getUsers();
-
 });
 
 
     onUnmounted(() => {
        // per salvare quando chiudo sito
-        window.removeEventListener('beforeunload', handleBeforeUnload);
+       window.removeEventListener('beforeunload', handleBeforeUnload);
       clearInterval(timerInterval); 
     });
 
     
 
 const handleBeforeUnload = () => {
-  if (remainingTime.value > 0 || studyCycles.value > 0) {
-    const sessionData = {
-      username: newPom.value.username.trim(),
-      giorno: new Date(newPom.value.giorno).toISOString(),
-      remainingTime: remainingTime.value,
-      isStudyPhase: isStudyPhase.value,
-      studyCycles: studyCycles.value,
-      tempoStudio: newPom.value.tempoStudio,
-      tempoPausa: newPom.value.tempoPausa,
+      if (remainingTime.value > 0 || studyCycles.value > 0) {
+        const sessionData = {
+          username: newPom.value.username.trim(),
+          giorno: new Date(newPom.value.giorno).toISOString(),
+          remainingTime: remainingTime.value,
+          isStudyPhase: isStudyPhase.value,
+          studyCycles: studyCycles.value,
+          tempoStudio: newPom.value.tempoStudio,
+          tempoPausa: newPom.value.tempoPausa,
+        };
+
+        const blob = new Blob([JSON.stringify(sessionData)], { type: 'application/json' });
+        const success = navigator.sendBeacon('/api/poms/save-incomplete', blob);
+
+        if (!success) {
+          console.error('Errore nel salvataggio della sessione con sendBeacon.');
+        } else {
+          console.log('Sessione incompleta salvata correttamente prima della chiusura.');
+        }
+      }
     };
-
-    const blob = new Blob([JSON.stringify(sessionData)], { type: 'application/json' });
-    const success = navigator.sendBeacon('/api/poms/save-incomplete', blob);
-
-    if (!success) {
-      console.error('Errore nel salvataggio della sessione con sendBeacon.');
-    } else {
-      console.log('Sessione incompleta salvata correttamente prima della chiusura.');
-    }
-  }
-};
 
 
 
