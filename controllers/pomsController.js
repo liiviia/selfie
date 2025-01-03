@@ -197,23 +197,18 @@ exports.getUncompletedPomodoros = async (req, res) => {
       return res.status(400).json({ message: 'Username è necessario' });
     }
 
-    const timeMachineDate = await getTimeMachineDate();
-    const currentDate = new Date(timeMachineDate || Date.now()); // Usa Time Machine o la data attuale
-
-    console.log('Data attuale utilizzata per il filtro:', currentDate);
-
     const pomodoros = await Pom.find({
       username,
-      remainingTime: { $gt: 0 }, 
-      giorno: { $lte: currentDate }, 
+      remainingTime: { $gt: 0 },
     }).sort({ updatedAt: -1 });
 
-    res.status(200).json(Array.isArray(pomodoros) ? pomodoros : [pomodoros]);
+    res.status(200).json(pomodoros);
   } catch (error) {
     console.error('Errore nel recupero delle sessioni incomplete:', error);
     res.status(500).json({ error: 'Errore nel recupero delle sessioni incomplete' });
   }
 };
+
 
 
 

@@ -407,16 +407,7 @@ const fetchIncompleteSessions = async () => {
 
     console.log('Risposta API sessioni incomplete:', response.data);
 
-    const timeMachineResponse = await axios.get('/api/getTime-machine');
-    let timeMachineDate = new Date(timeMachineResponse?.data?.timeMachineDate || Date.now());
-
-    if (isNaN(timeMachineDate)) {
-      console.error('Time Machine Date non valida. Utilizzo la data attuale.');
-      timeMachineDate = new Date();
-    }
-
-    console.log('Data simulata dalla Time Machine:', timeMachineDate);
-
+    // Assicurati che la risposta sia un array
     const sessions = Array.isArray(response.data) ? response.data : [];
     if (sessions.length === 0) {
       console.warn('Nessuna sessione da filtrare.');
@@ -424,13 +415,9 @@ const fetchIncompleteSessions = async () => {
       return;
     }
 
-    const queryDateValue = queryDate.value;
-    const queryDateMs = queryDateValue && !isNaN(new Date(queryDateValue)) 
-      ? new Date(queryDateValue).valueOf() 
-      : null;
+    console.log('Query Date:', queryDate.value);
 
-    console.log('Query Date:', queryDateValue);
-
+    // Filtra solo sessioni con tempo rimanente maggiore di 0
     incompleteSessions.value = sessions.filter((session) => {
       const sessionDate = new Date(session.giorno).valueOf();
 
@@ -439,11 +426,7 @@ const fetchIncompleteSessions = async () => {
         return false;
       }
 
-      return (
-        session.remainingTime > 0 && 
-        sessionDate <= timeMachineDate.valueOf() && 
-        (!queryDateMs || sessionDate <= queryDateMs) 
-      );
+      return session.remainingTime > 0; // Mantieni solo sessioni con tempo rimanente
     });
 
     if (incompleteSessions.value.length === 0) {
