@@ -289,7 +289,7 @@ router.beforeEach(async (to, from, next) => {
 
     // per salvare quando chiudo sito
 window.addEventListener('beforeunload', async () => {
-  if (incompleteSessions.value.length > 0) {
+  if (remainingTime.value > 0 || studyCycles.value > 0) {
     await saveIncompleteSession();
     console.log('Sessioni incomplete salvate prima della chiusura.');
   }
