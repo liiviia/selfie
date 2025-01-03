@@ -167,53 +167,28 @@ exports.getPomodorosByDate = async (req, res) => {
   }
 };
 
-exports.saveUncompletedPom = async (req, res) => {
-  try {
-    const {
-      username,
-      giorno,
-      remainingTime,
-      isStudyPhase,
-      studyCycles,
-      tempoStudio,
-      tempoPausa,
-      ripetizioni,
-    } = req.body;
 
-    if (!giorno) {
-      return res.status(400).json({ error: "Il campo 'giorno' è obbligatorio e non può essere nullo." });
+exports.saveIncompleteSession = async (req, res) => {
+  try {
+    const { username, giorno, tempoStudio, tempoPausa, ripetizioni, remainingTime, isStudyPhase, studyCycles } = req.body;
+
+    if (!username || !giorno) {
+      return res.status(400).json({ message: 'Username e giorno sono obbligatori.' });
     }
 
-    const startDate = new Date(giorno);
-    startDate.setHours(0, 0, 0, 0);
-    const endDate = new Date(giorno);
-    endDate.setHours(23, 59, 59, 999);
-
-    let pomodoro = await Pom.findOneAndUpdate(
-      { username, giorno: { $gte: startDate, $lte: endDate } },
-      {
-        remainingTime,
-        isStudyPhase,
-        studyCycles,
-        giorno: new Date(giorno),
-        tempoStudio, 
-        tempoPausa, 
-        ripetizioni, 
-      },
-      { new: true, upsert: true } // Aggiorna o crea se non esiste
+    const session = await Pom.findOneAndUpdate(
+      { username, giorno },
+      { tempoStudio, tempoPausa, ripetizioni, remainingTime, isStudyPhase, studyCycles, isIncomplete: true },
+      { upsert: true, new: true }
     );
 
-    res.status(200).json({ message: 'Sessione incompleta salvata', pomodoro });
+    res.status(200).json({ message: 'Sessione incompleta salvata.', session });
   } catch (error) {
     console.error('Errore nel salvataggio della sessione incompleta:', error);
-    res.status(500).json({ error: 'Errore nel salvataggio della sessione incompleta' });
+    res.status(500).json({ error: 'Errore nel salvataggio della sessione incompleta.' });
   }
 };
 
-
-
-
-const { getTimeMachineDate } = require('../controllers/timeMachineController'); // Importa il controller Time Machine
 
 exports.getUncompletedPomodoros = async (req, res) => {
   try {

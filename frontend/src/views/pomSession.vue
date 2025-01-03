@@ -29,6 +29,31 @@ export default {
     };
   },
   methods: {
+
+    async handleBeforeUnload() {
+      const sessionData = {
+        username: localStorage.getItem('username'),
+        giorno: new Date().toISOString(),
+        tempoStudio: this.tempoStudio, // Riferimento ai dati attuali
+        tempoPausa: this.tempoPausa,
+        ripetizioni: this.ripetizioni,
+        remainingTime: this.remainingTime,
+        isStudyPhase: this.isStudyPhase,
+        studyCycles: this.studyCycles,
+      };
+
+      try {
+        const token = sessionStorage.getItem('token');
+        await axios.post('/api/poms/saveIncomplete', sessionData, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        console.log('Sessione incompleta salvata.');
+      } catch (error) {
+        console.error('Errore nel salvataggio della sessione incompleta:', error);
+      }
+    },
+  },
+
     confirmDelete(id) {
       if (confirm("Sicuro di voler eliminare questa sessione Pomodoro?")) {
         this.deletePomodoro(id); 
@@ -79,9 +104,16 @@ export default {
       return new Date(date).toLocaleDateString();
     }
   }, 
+
   mounted() {
     this.fetchPoms();
-  }
+    window.addEventListener('beforeunload', this.handleBeforeUnload);
+  },
+
+   beforeUnmount() {
+    window.removeEventListener('beforeunload', this.handleBeforeUnload);
+  },
+
 };
 </script>
 

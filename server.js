@@ -47,34 +47,35 @@ setInterval(incrementTimeMachine, 1000);
 
 startNotificationMonitoring();
 
-cron.schedule('0 0 * * *', async () => { // Eseguito ogni giorno a mezzanotte
+
+cron.schedule('0 0 * * *', async () => { // Lo eseguo ogni giorno a mezzanotte
   try {
     console.log('Esecuzione del controllo sessioni incomplete...');
 
-    // Determina il tempo da usare (normale o simulato)
     const currentTime = timeMachineConfig.isActive()
       ? moment(timeMachineConfig.getTimeMachineDate()).tz('Europe/Rome')
       : moment().tz('Europe/Rome');
 
-    const startOfDay = currentTime.clone().startOf('day'); // Mezzanotte del giorno attuale
-    const endOfDay = currentTime.clone().endOf('day'); // Fine giornata
-
-    // Trova sessioni incomplete
-    const incompleteSessions = await Pom.find({
-      giorno: { $gte: startOfDay.toDate(), $lte: endOfDay.toDate() },
+    const allIncompleteSessions = await Pom.find({
       $or: [
         { remainingTime: { $gt: 0 } },
         { studyCycles: { $gt: 0 } }
       ]
     });
 
-    // Aggiorna le sessioni trovate
-    for (const session of incompleteSessions) {
-      session.isIncomplete = true; // Segna come incompleta
-      await session.save();
+    let updatedSessionsCount = 0;
+
+    for (const session of allIncompleteSessions) {
+      const sessionDate = moment(session.giorno).tz('Europe/Rome');
+
+      if (sessionDate.isBefore(currentTime, 'day')) {
+        session.isIncomplete = true; 
+        await session.save();
+        updatedSessionsCount++;
+      }
     }
 
-    console.log(`Controllo completato: ${incompleteSessions.length} sessioni incomplete aggiornate.`);
+    console.log(`Controllo completato: ${updatedSessionsCount} sessioni incomplete aggiornate.`);
   } catch (error) {
     console.error('Errore durante il controllo delle sessioni incomplete:', error);
   }
