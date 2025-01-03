@@ -302,17 +302,19 @@ export default {
 
     if (response.data.message) {
       console.log(response.data.message);
-      
+
       router.push({
         path: '/pomodoroTempo',
         query: {
-          date: date,
+          date: new Date(date).toISOString(),
           remainingTime,
-          studyCycles: ripetizioni ,
+          studyCycles: ripetizioni,
           isStudyPhase: true,
           tempoStudio,
           tempoPausa,
           ripetizioni,
+          nuovo: true,
+          nonFare: false,
         },
       });
 
