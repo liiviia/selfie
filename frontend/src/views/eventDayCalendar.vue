@@ -395,8 +395,7 @@ export default {
 
 
 
-
-   const fetchIncompleteSessions = async () => {
+const fetchIncompleteSessions = async () => {
   const token = sessionStorage.getItem('token');
   const username = localStorage.getItem('username');
 
@@ -408,6 +407,13 @@ export default {
     });
 
     console.log('Risposta API sessioni incomplete:', response.data);
+
+    // Verifica se la risposta è valida e contiene dati
+    if (!response.data || (typeof response.data === 'object' && response.data.message)) {
+      console.warn('Nessuna sessione valida trovata o risposta non valida:', response.data);
+      incompleteSessions.value = [];
+      return;
+    }
 
     // Garantisce che i dati siano sempre un array
     const sessions = Array.isArray(response.data) ? response.data : [response.data];
@@ -448,6 +454,7 @@ export default {
   }
 };
 
+   
 
 
 
