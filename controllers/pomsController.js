@@ -297,28 +297,31 @@ exports.iniziaPomodoro = async (req, res) => {
 
 
 
-exports.markUnstartedSessions = async (currentDate = new Date()) => {
-  if (!(currentDate instanceof Date) || isNaN(currentDate)) {
-    throw new Error('currentDate non è un oggetto Date valido');
-  }
-
+exports.markUnstartedSessions = async () => {
   try {
+    const currentDate = timeMachineConfig.isActive()
+      ? timeMachineConfig.getTimeMachineDate()
+      : new Date();
+
+      await markUnstartedSessions(currentDate);
+
     const result = await Pom.updateMany(
       {
-        stato: 'pianificata',
-        isStarted: false,
-        giorno: { $lt: currentDate } // Usa la data fornita
+        stato: 'pianificata', // Solo sessioni pianificate
+        isStarted: false, // Non avviate
+        giorno: { $lt: currentDate }, // Data inferiore all'attuale
       },
       {
-        $set: { stato: 'mai_avviata' }
+        $set: { stato: 'mai_avviata' }, // Aggiorna a "mai_avviata"
       }
     );
 
-    console.log('Sessioni aggiornate:', result);
+    console.log('Sessioni aggiornate a mai_avviata:', result);
   } catch (error) {
     console.error('Errore durante l\'aggiornamento delle sessioni non avviate:', error);
   }
 };
+
 
 
 
@@ -336,10 +339,10 @@ exports.getUnstartedSessions = async (req, res) => {
       ? timeMachineConfig.getTimeMachineDate()
       : new Date();
 
-    const sessions = await Pom.find({ 
-      username, 
-      stato: 'mai_avviata',
-      giorno: { $lt: currentDate } 
+    const sessions = await Pom.find({
+      username,
+      stato: 'mai_avviata', // Cerca sessioni "mai avviate"
+      giorno: { $lt: currentDate }, // Solo sessioni passate
     }).sort({ giorno: -1 });
 
     console.log('Sessioni trovate:', sessions);
