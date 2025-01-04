@@ -298,12 +298,16 @@ exports.iniziaPomodoro = async (req, res) => {
 
 
 exports.markUnstartedSessions = async (currentDate = new Date()) => {
+  if (!(currentDate instanceof Date) || isNaN(currentDate)) {
+    throw new Error('currentDate non è un oggetto Date valido');
+  }
+
   try {
     const result = await Pom.updateMany(
       {
         stato: 'pianificata',
         isStarted: false,
-        giorno: { $lt: currentDate } 
+        giorno: { $lt: currentDate } // Usa la data fornita
       },
       {
         $set: { stato: 'mai_avviata' }
@@ -315,6 +319,7 @@ exports.markUnstartedSessions = async (currentDate = new Date()) => {
     console.error('Errore durante l\'aggiornamento delle sessioni non avviate:', error);
   }
 };
+
 
 
 
