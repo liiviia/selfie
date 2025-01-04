@@ -85,7 +85,7 @@
   </div>
 
     <div class="pomodoro-container">
-      <div class="section pomodoros-section">
+  <div class="section pomodoros-section">
     <h3>POMODORI PER QUESTO GIORNO:</h3>
     <div v-if="pomodoros.length > 0">
       <div v-for="pomodoro in pomodoros" :key="pomodoro._id" class="item-container">
@@ -95,16 +95,13 @@
         <p>Tempo di pausa: {{ pomodoro.tempoPausa }} minuti</p>
         <p>Ripetizioni: {{ pomodoro.ripetizioni }}</p>
         <button @click="confirmDeletePomodoro(pomodoro._id)" class="delete-btn-cq">🗑️</button>
-        
         <button
-  v-if="isSameDay(queryDate, timeMachine) && !pomodoro.isStarted"
-  @click="iniziaPomodoro(pomodoro._id,  pomodoro.remainingTime, pomodoro.giorno, pomodoro.tempoStudio, pomodoro.tempoPausa, pomodoro.ripetizioni)"
->
-  Inizia il pomodoro
-</button>
-
-<p v-else-if="pomodoro.isStarted">Pomodoro già avviato</p>
-
+          v-if="isSameDay(queryDate, timeMachine) && !pomodoro.isStarted"
+          @click="iniziaPomodoro(pomodoro._id, pomodoro.remainingTime, pomodoro.giorno, pomodoro.tempoStudio, pomodoro.tempoPausa, pomodoro.ripetizioni)"
+        >
+          Inizia il pomodoro
+        </button>
+        <p v-else-if="pomodoro.isStarted">Pomodoro già avviato</p>
       </div>
     </div>
     <p v-else>Nessun pomodoro per questa data.</p>
@@ -115,42 +112,41 @@
     </div>
   </div>
 
-<div class="section pomodorosScaduti-section">
-        <h3>POMODORI INCOMPLETI</h3>
-      <div v-if="incompleteSessions.length > 0">
+  <div class="section pomodorosScaduti-section">
+    <h3>POMODORI INCOMPLETI</h3>
+    <div v-if="incompleteSessions.length > 0">
       <div v-for="session in incompleteSessions" :key="session._id" class="item-container">
         <p>Data: {{ formatDate(session.giorno) }}</p>
         <p>Tempo rimanente: {{ Math.floor(session.remainingTime / 60) }}:{{ session.remainingTime % 60 }}</p>
         <p>Cicli rimanenti: {{ session.studyCycles }}</p>
-         <button @click="resumePomodoro(session)" class="action-button" style="background:#f4a460;">Riprendi Sessione</button>
-         <button @click="discardPomodoro(session)" class="action-button" style="all: unset; cursor: pointer;">
-          <span class="trash-icon" style="font-size: 0.9em;  color: inherit;">🗑️ </span>
-         </button> 
+        <button @click="resumePomodoro(session)" class="action-button" style="background:#f4a460;">Riprendi Sessione</button>
+        <button @click="discardPomodoro(session)" class="action-button" style="all: unset; cursor: pointer;">
+          <span class="trash-icon" style="font-size: 0.9em; color: inherit;">🗑️</span>
+        </button>
       </div>
     </div>
     <p v-else>nessun pomodoro da portare a termine</p>
   </div>
 
   <div class="section unstarted-pomodoros-section">
-  <h3>POMODORI NON AVVIATI</h3>
-  <div v-if="unstartedSessions && unstartedSessions.length > 0">
-      {{ console.log('Rendering unstartedSessions:', unstartedSessions) }}
-    <div v-for="session in unstartedSessions" :key="session._id" class="item-container">
-      <h4>Sessione non avviata</h4>
-      <p>Data: {{ formatDate(session.giorno) }}</p>
-      <p>Tempo di studio: {{ session.tempoStudio }} minuti</p>
-      <p>Tempo di pausa: {{ session.tempoPausa }} minuti</p>
-      <p>Ripetizioni: {{ session.ripetizioni }}</p>
-      <button @click="iniziaPomodoro(session._id, session.remainingTime, session.giorno, session.tempoStudio, session.tempoPausa, session.ripetizioni)"
-              class="action-button"
-              style="background:#f4a460;">
-        Inizia Sessione
-      </button>
+    <h3>POMODORI NON AVVIATI</h3>
+    <div v-if="unstartedSessions && unstartedSessions.length > 0">
+      <div v-for="session in unstartedSessions" :key="session._id" class="item-container">
+        <h4>Sessione non avviata</h4>
+        <p>Data: {{ formatDate(session.giorno) }}</p>
+        <p>Tempo di studio: {{ session.tempoStudio }} minuti</p>
+        <p>Tempo di pausa: {{ session.tempoPausa }} minuti</p>
+        <p>Ripetizioni: {{ session.ripetizioni }}</p>
+        <button @click="iniziaPomodoro(session._id, session.remainingTime, session.giorno, session.tempoStudio, session.tempoPausa, session.ripetizioni)"
+                class="action-button" style="background:#f4a460;">
+          Inizia Sessione
+        </button>
+      </div>
     </div>
+    <p v-else>Nessun pomodoro non avviato trovato.</p>
   </div>
-  <p v-else>Nessun pomodoro non avviato trovato.</p>
 </div>
-</div>
+
 
 
   </div>
