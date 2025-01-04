@@ -341,7 +341,9 @@ exports.markUnstartedSessions = async (currentDate) => {
 
 exports.getUnstartedSessions = async (req, res) => {
   try {
-    console.log('Mocking risposta...');
+    console.log('getUnstartedSessions è stato invocato.');
+    console.log('Headers ricevuti:', req.headers);
+    console.log('Query Params ricevuti:', req.query);
 
     res.status(200).json([
       { _id: '1', username: 'testUser', giorno: '2025-01-06T00:00:00Z', stato: 'mai_avviata' },
