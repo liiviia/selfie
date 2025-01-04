@@ -695,15 +695,17 @@ button:hover {
 }
 
 .section {
-  flex: 1 1 300px; /* Permette la stessa dimensione minima */
-  max-width: 30%; /* Ogni blocco occupa un massimo del 30% della larghezza */
-  text-align: center;
-  padding: 20px;
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s;
+   margin-right: 100px;
+  min-width: 500px;
+  flex: 1.5; 
+  padding: 25px;
+  border: 1px solid #ddd; 
+  border-radius: 10px; 
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); 
+  background-color: rgba(255, 255, 255, 0.8); 
+  display: flex; 
+  flex-direction: column; 
+  justify-content: space-between; 
 }
 
 .section:hover {
@@ -907,12 +909,6 @@ hr {
   gap: 20px; /* Spaziatura tra i blocchi */
   margin: 40px auto;
   max-width: 1200px;
-}
-
-.section h3 {
-  font-size: 1.5em;
-  margin-bottom: 20px;
-  color: #333;
 }
 
 
