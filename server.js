@@ -27,11 +27,6 @@ const app = express();
 
 initializeScheduler();
 
-const updateUnstartedSessions = () => {
-  console.log('Esecuzione aggiornamento delle sessioni non avviate...');
-  markUnstartedSessions();
-};
-
 
 const port = 8000;
 

@@ -437,35 +437,20 @@ const iniziaPomodoro = async (id, remainingTime, date, tempoStudio, tempoPausa, 
     };
 
 
+
 const fetchUnstartedSessions = async () => {
   try {
     const token = sessionStorage.getItem('token');
     const username = localStorage.getItem('username');
-
-    console.log('Token:', token);
-    console.log('Username:', username);
-
-    console.log('Invio richiesta a /api/getSessioniNonPartite...');
-const response = await axios.get('https://site232432.tw.cs.unibo.it/api/getSessioniNonPartite', {
-headers: { Authorization: `Bearer ${token}` },
+    const response = await axios.get('/api/getSessioniNonPartite', {
+      headers: { Authorization: `Bearer ${token}` },
       params: { username },
     });
-
-    console.log('Risposta ricevuta:', response);
-
-    if (response.status === 200 && Array.isArray(response.data)) {
-      unstartedSessions.value = [...response.data];
-      console.log('Sessioni non avviate:', unstartedSessions.value);
-    } else {
-      console.warn('Risposta inattesa dalla API:', response.data);
-      unstartedSessions.value = [];
-    }
+    unstartedSessions.value = response.data || [];
   } catch (error) {
-    console.error('Errore nel recupero delle sessioni non avviate:', error);
-    unstartedSessions.value = [];
+    console.error('Errore nel recupero delle sessioni mai avviate:', error);
   }
 };
-
 
 
 

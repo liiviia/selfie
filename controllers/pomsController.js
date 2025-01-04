@@ -320,6 +320,7 @@ exports.getUnstartedSessions = async (req, res) => {
     }
 
     const sessions = await Pom.find({ username, stato: 'mai_avviata' }).sort({ giorno: -1 });
+
     res.status(200).json(sessions);
   } catch (error) {
     console.error('Errore durante il recupero delle sessioni mai avviate:', error);
