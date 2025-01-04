@@ -902,31 +902,43 @@ hr {
 }
 
 .pomodoro-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
+  display: flex; /* Utilizza Flexbox per disporli orizzontalmente */
+  justify-content: space-between; /* Spaziatura uniforme */
+  align-items: flex-start; /* Allinea gli elementi all'inizio verticalmente */
+  flex-wrap: wrap; /* Permette di andare a capo in modalità responsive */
   gap: 20px; /* Spaziatura tra i blocchi */
-  margin: 40px auto;
+  margin: 0 auto; /* Centrare il contenitore */
   max-width: 1200px;
 }
 
 .pomodoro-container .section {
-  flex: 1 1 calc(33% - 20px); 
-  max-width: calc(33% - 20px); 
-  background-color: rgba(255, 255, 255, 0.9); 
-  border: 1px solid #ddd; 
-  border-radius: 10px; 
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); 
-  padding: 20px; 
-  text-align: center; 
-  transition: transform 0.2s ease; 
+   flex: 1 1 calc(33.33% - 20px); /* Ogni sezione occupa un terzo dello spazio con gap */
+  max-width: calc(33.33% - 20px); /* Larghezza massima */
+  min-width: 250px; /* Larghezza minima per evitare sovrapposizioni */
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  text-align: center;
+  transition: transform 0.2s ease;
 }
 
 .pomodoro-container h3 {
   margin-bottom: 20px; 
   font-size: 1.5em;
   color: #333;
+}
+
+@media (max-width: 768px) {
+  .pomodoro-container {
+    flex-direction: column; /* Dispone i contenitori in verticale */
+  }
+
+  .pomodoro-container .section {
+    flex: 1 1 100%; /* Ogni blocco occupa il 100% */
+    max-width: 100%; /* Disabilita larghezza massima */
+  }
 }
 
 </style>
