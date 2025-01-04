@@ -131,6 +131,26 @@
     <p v-else>nessun pomodoro da portare a termine</p>
   </div>
 
+  <div class="section unstarted-pomodoros-section">
+  <h3>POMODORI NON AVVIATI</h3>
+  <div v-if="unstartedSessions.length > 0">
+    <div v-for="session in unstartedSessions" :key="session._id" class="item-container">
+      <h4>Sessione non avviata</h4>
+      <p>Data: {{ formatDate(session.giorno) }}</p>
+      <p>Tempo di studio: {{ session.tempoStudio }} minuti</p>
+      <p>Tempo di pausa: {{ session.tempoPausa }} minuti</p>
+      <p>Ripetizioni: {{ session.ripetizioni }}</p>
+      <button @click="iniziaPomodoro(session._id, session.remainingTime, session.giorno, session.tempoStudio, session.tempoPausa, session.ripetizioni)"
+              class="action-button"
+              style="background:#f4a460;">
+        Inizia Sessione
+      </button>
+    </div>
+  </div>
+  <p v-else>Nessun pomodoro non avviato trovato.</p>
+</div>
+
+
     
   </div>
   </div> 
@@ -156,6 +176,8 @@ export default {
     const currentUser = localStorage.getItem('username') ;
     const queryDate = computed(() => route.query.date);
     const timeMachine = ref();
+    const unstartedSessions = ref([]);
+
 
     const confirmDeleteActivity = (id) => {
       if (confirm("Sicuro di voler eliminare questa Attività?")) {
@@ -419,6 +441,21 @@ const iniziaPomodoro = async (id, remainingTime, date, tempoStudio, tempoPausa, 
     };
 
 
+const fetchUnstartedSessions = async () => {
+  try {
+    const token = sessionStorage.getItem('token');
+    const username = localStorage.getItem('username');
+    const response = await axios.get('/api/getSessioniNonPartite', {
+      headers: { Authorization: `Bearer ${token}` },
+      params: { username },
+    });
+    unstartedSessions.value = response.data || [];
+  } catch (error) {
+    console.error('Errore nel recupero delle sessioni mai avviate:', error);
+  }
+};
+
+
 
 // Corretto onMounted
 onMounted(() => {
@@ -426,6 +463,7 @@ onMounted(() => {
   fetchActivities();
   fetchOverdueActivities();
   fetchIncompleteSessions();
+  fetchUnstartedSessions();
   setInterval(getTimeMachine, 1000);
 });
 
@@ -837,5 +875,16 @@ hr {
   content: '✔️ '; 
   margin-right: 8px; 
 }
+
+.unstarted-pomodoros-section {
+  flex: 1.5;
+  background-color: rgba(255, 255, 204, 0.8);
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 25px;
+  margin-bottom: 20px;
+}
+
 
 </style>

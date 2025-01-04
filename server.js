@@ -13,6 +13,7 @@ const notificationRoutes = require('./routes/notificationRoutes');
 const timeMachineRoutes = require('./routes/timeMachineRoutes');
 const timeMachineConfig = require('./timeMachineConfig');
 const alertRoutes = require('./routes/alertRoutes');
+const { initializeScheduler } = require('./scheduler');
 
 // Aggiungi la rotta per gli alert
 const moment = require('moment-timezone');
@@ -22,6 +23,9 @@ const http = require('http');
 require('dotenv').config({ path: __dirname + '/.env' });
 
 const app = express();
+
+initializeScheduler();
+
 const port = 8000;
 
 const server = http.createServer(app);
