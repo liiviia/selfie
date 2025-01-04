@@ -447,7 +447,7 @@ const fetchUnstartedSessions = async () => {
   try {
     const token = sessionStorage.getItem('token');
     const username = localStorage.getItem('username');
-    
+
     const response = await axios.get('/api/getSessioniNonPartite', {
       headers: { Authorization: `Bearer ${token}` },
       params: { username },
@@ -455,16 +455,17 @@ const fetchUnstartedSessions = async () => {
 
     if (response.status === 200 && Array.isArray(response.data)) {
       unstartedSessions.value = [...response.data];
-      console.log('Sessioni non avviate aggiornate:', unstartedSessions.value);
+      console.log('Sessioni non avviate:', unstartedSessions.value);
     } else {
-      console.warn('Dati inattesi ricevuti dalla API:', response.data);
+      console.warn('Risposta inattesa dalla API:', response.data);
       unstartedSessions.value = [];
     }
   } catch (error) {
-    console.error('Errore nel recupero delle sessioni mai avviate:', error);
+    console.error('Errore nel recupero delle sessioni non avviate:', error);
     unstartedSessions.value = [];
   }
 };
+
 
 
 

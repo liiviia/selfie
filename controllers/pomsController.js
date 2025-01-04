@@ -298,68 +298,42 @@ exports.iniziaPomodoro = async (req, res) => {
 // salvare quelle non avviate
 exports.markUnstartedSessions = async (currentDate) => {
   try {
-    const { username } = req.query;
+    const now = new Date();
 
-    // Assicurati che il parametro username sia presente
-    if (!username) {
-      return res.status(400).json({ error: 'Username mancante' });
-    }
+    const updatedSessions = await Pom.updateMany(
+      { giorno: { $lt: now }, isStarted: false },
+      { stato: 'mai_avviata' }
+    );
 
-    // Recupera le sessioni mai avviate
-    const unstartedSessions = await Pom.find({ 
-      username, 
-      stato: 'mai_avviata',
-      isStarted: false 
-    });
-
-    res.status(200).json(unstartedSessions);
+    console.log('Sessioni aggiornate come non avviate:', updatedSessions);
   } catch (error) {
-    console.error('Errore nel recupero delle sessioni mai avviate:', error);
-    res.status(500).json({ error: 'Errore interno del server' });
+    console.error('Errore durante l\'aggiornamento delle sessioni non avviate:', error);
   }
-};
+}; 
 
 
     
 // Per recuperarmi le sess avviate 
 exports.getUnstartedSessions = async (req, res) => {
   try {
-    const username = req.query.username;
+    const username = req.query.username; // Ottieni username dalla query
     if (!username) {
       return res.status(400).json({ message: 'Username è necessario' });
     }
 
-    const sessions = await Pom.find({ username, stato: 'mai_avviata' }).sort({ giorno: -1 });
+    const sessions = await Pom.find({
+      username,
+      stato: 'mai_avviata',
+      giorno: { $lt: new Date() }, // Sessioni con giorno minore della data attuale
+    }).sort({ giorno: -1 });
 
-    if (!sessions || sessions.length === 0) {
+    if (sessions.length === 0) {
       return res.status(404).json({ message: 'Nessuna sessione non avviata trovata' });
     }
 
     res.status(200).json(sessions);
   } catch (error) {
-    console.error('Errore durante il recupero delle sessioni non avviate:', error);
-    res.status(500).json({ error: 'Errore durante il recupero delle sessioni non avviate' });
-  }
-};
-
-
-const completeSession = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const session = await Pom.findByIdAndUpdate(
-      id,
-      { $set: { stato: "completata" } },
-      { new: true }
-    );
-
-    if (!session) {
-      return res.status(404).json({ error: "Sessione non trovata" });
-    }
-
-    res.status(200).json({ message: "Sessione completata con successo", session });
-  } catch (error) {
-    console.error("Errore nel completare la sessione:", error);
-    res.status(500).json({ error: "Errore nel completare la sessione" });
+    console.error('Errore durante il recupero delle sessioni mai avviate:', error);
+    res.status(500).json({ error: 'Errore durante il recupero delle sessioni mai avviate' });
   }
 };
