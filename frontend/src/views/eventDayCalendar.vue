@@ -284,24 +284,32 @@ export default {
       }
     };
 
-    const iniziaPomodoro = async (id, remainingTime, date, tempoStudio, tempoPausa, ripetizioni, session) => {
-    try {
+    
+const iniziaPomodoro = async (id, remainingTime, date, tempoStudio, tempoPausa, ripetizioni, session = {}) => {
+  try {
     const token = sessionStorage.getItem('token');
     const response = await axios.post('/api/poms/save-incomplete', {
-      username: currentUser, 
+      username: currentUser,
       giorno: date,
       remainingTime,
-      isStudyPhase: true, 
-      studyCycles: ripetizioni, 
-      tempoStudio, 
-      tempoPausa, 
-      ripetizioni, 
+      isStudyPhase: true,
+      studyCycles: ripetizioni,
+      tempoStudio,
+      tempoPausa,
+      ripetizioni,
     }, {
       headers: { Authorization: `Bearer ${token}` },
     });
 
     if (response.data.message) {
       console.log(response.data.message);
+
+      session.remainingTime = session.remainingTime || remainingTime;
+      session.studyCycles = session.studyCycles || ripetizioni;
+      session.isStudyPhase = session.isStudyPhase !== undefined ? session.isStudyPhase : true;
+      session.tempoStudio = session.tempoStudio || tempoStudio;
+      session.tempoPausa = session.tempoPausa || tempoPausa;
+      session.ripetizioni = session.ripetizioni || ripetizioni;
 
       router.push({
         path: '/pomodoroTempo',
@@ -317,7 +325,6 @@ export default {
           nonFare: true,
         },
       });
-
     } else {
       console.error("Errore durante il salvataggio della sessione Pomodoro.");
     }
