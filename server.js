@@ -25,9 +25,6 @@ require('dotenv').config({ path: __dirname + '/.env' });
 
 const app = express();
 
-initializeScheduler();
-
-
 const port = 8000;
 
 const server = http.createServer(app);
@@ -39,6 +36,8 @@ app.use(cors({
 }));
 
 connectDB();
+
+initializeScheduler();
 
 const incrementTimeMachine = () => {
   const currentTime = moment(timeMachineConfig.getTimeMachineDate()).tz('Europe/Rome');
