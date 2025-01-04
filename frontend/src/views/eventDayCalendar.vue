@@ -446,7 +446,10 @@ const fetchUnstartedSessions = async () => {
       headers: { Authorization: `Bearer ${token}` },
       params: { username },
     });
+    
     unstartedSessions.value = response.data || [];
+  
+    console.log('Risposta ricevuta dalla API:', response.data);
   } catch (error) {
     console.error('Errore nel recupero delle sessioni mai avviate:', error);
   }
