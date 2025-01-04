@@ -296,18 +296,30 @@ exports.iniziaPomodoro = async (req, res) => {
 };
 
 // salvare quelle non avviate
-  exports.markUnstartedSessions = async (currentDate) => {
-    try {
-      console.log(`Esecuzione markUnstartedSessions per la data: ${currentDate}`);
-      const updatedSessions = await Pom.updateMany(
-        { giorno: { $lt: currentDate }, isStarted: false },
-        { $set: { stato: 'mai_avviata' } }
-      );
-      console.log(`Sessioni aggiornate: ${updatedSessions.modifiedCount}`);
-    } catch (error) {
-      console.error('Errore durante l\'aggiornamento delle sessioni non avviate:', error);
-    }
-  };
+const Pom = require('../models/pom'); // Importa il modello Pom
+
+exports.markUnstartedSessions = async () => {
+  try {
+    const now = new Date(); // Data e ora corrente
+
+    // Aggiorna tutte le sessioni che soddisfano le condizioni
+    const result = await Pom.updateMany(
+      {
+        stato: 'pianificata',    // Stato corrente è "pianificata"
+        isStarted: false,       // Non è mai stata avviata
+        giorno: { $lt: now }    // La data `giorno` è già passata
+      },
+      {
+        $set: { stato: 'mai_avviata' } // Imposta lo stato a "mai_avviata"
+      }
+    );
+
+    console.log('Sessioni aggiornate:', result);
+  } catch (error) {
+    console.error('Errore durante l\'aggiornamento delle sessioni non avviate:', error);
+  }
+};
+
 
 
     
