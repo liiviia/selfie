@@ -84,7 +84,7 @@
     </div>
   </div>
 
-    <div class="content-container">
+    <div class="pomodoro-container">
       <div class="section pomodoros-section">
     <h3>POMODORI PER QUESTO GIORNO:</h3>
     <div v-if="pomodoros.length > 0">
@@ -150,12 +150,10 @@
   </div>
   <p v-else>Nessun pomodoro non avviato trovato.</p>
 </div>
+</div>
 
 
-
-    
   </div>
-  </div> 
 
 </template>
 
@@ -650,12 +648,9 @@ onMounted(() => {
 
 
 .center-container {
-   display: flex;
+  display: flex;
   justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 20px; 
-  margin: 20px;
+  padding: 20px;
 }
 
 .content-container {
@@ -700,21 +695,19 @@ button:hover {
 }
 
 .section {
-  margin-right: 100px;
-  min-width: 500px;
-  flex: 1.5; 
-  padding: 25px;
-  border: 1px solid #ddd; 
-  border-radius: 10px; 
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); 
-  background-color: rgba(255, 255, 255, 0.8); 
-  display: flex; 
-  flex-direction: column; 
-  justify-content: space-between; 
+  flex: 1 1 300px; /* Permette la stessa dimensione minima */
+  max-width: 30%; /* Ogni blocco occupa un massimo del 30% della larghezza */
+  text-align: center;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
 }
 
 .section:hover {
-  transform: scale(1.02); 
+  transform: scale(1.05); 
 }
 
 .activities-section {
@@ -726,15 +719,7 @@ button:hover {
 }
 
 .pomodoros-section {
- flex: 1;
-  min-width: 300px; 
-  max-width: 400px; 
-  background-color: rgba(255, 255, 255, 0.9);
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  text-align: center;
+  background-color: rgba(255, 230, 230, 0.8);
 }
 
 hr {
@@ -862,14 +847,12 @@ hr {
 }
 
 .item-container {
-  background-color: rgba(255, 255, 255, 0.9);
-  border: 1px solid #ddd; 
-  border-radius: 8px; 
-  padding: 15px; 
-  margin-bottom: 15px; 
+ background: rgba(255, 255, 255, 0.8);
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 15px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  position: relative; 
-  transition: border-color 0.3s ease; 
 }
 
 .item-container.overdue {
@@ -914,6 +897,22 @@ hr {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   padding: 25px;
   margin-bottom: 20px;
+}
+
+.pomodoro-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px; /* Spaziatura tra i blocchi */
+  margin: 40px auto;
+  max-width: 1200px;
+}
+
+.section h3 {
+  font-size: 1.5em;
+  margin-bottom: 20px;
+  color: #333;
 }
 
 
