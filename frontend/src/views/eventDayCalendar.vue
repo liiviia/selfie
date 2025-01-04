@@ -287,7 +287,7 @@ export default {
     const iniziaPomodoro = async (id, remainingTime, date, tempoStudio, tempoPausa, ripetizioni) => {
     try {
     const token = sessionStorage.getItem('token');
-    const response = await axios.post(`/api/saveUncompletedPom`, {
+    const response = await axios.post(`/api/save-incomplete`, {
       username: currentUser, 
       giorno: date,
       remainingTime,
