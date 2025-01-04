@@ -25,8 +25,8 @@ router.delete('/rifiutaNotifica/:id', authenticateToken , pomController.rifiutaN
 
 router.post('/iniziaPomodoro/:id' , authenticateToken , pomController.iniziaPomodoro);
 
-router.post('/poms/sessioniNonPartite', authenticateToken, pomController.markUnstartedSessions); 
+router.post('/sessioniNonPartite', authenticateToken, pomController.markUnstartedSessions); 
 
-router.get('/poms/getSessioniNonPartite' ,authenticateToken, pomController.getUnstartedSessions); 
+router.get('/getSessioniNonPartite' ,authenticateToken, pomController.getUnstartedSessions); 
 
 module.exports = router;
