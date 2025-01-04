@@ -15,7 +15,8 @@ exports.createPom = async (req, res) => {
       cicliRimanenti, 
       remainingTime, 
       isStudyPhase, 
-      studyCycles
+      studyCycles, 
+      stato:"pianificata", 
     });
 
     const savedPom = await newPom.save();
@@ -342,3 +343,23 @@ exports.getUnstartedSessions = async (req, res) => {
   }
 };
 
+const completeSession = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const session = await Pom.findByIdAndUpdate(
+      id,
+      { $set: { stato: "completata" } },
+      { new: true }
+    );
+
+    if (!session) {
+      return res.status(404).json({ error: "Sessione non trovata" });
+    }
+
+    res.status(200).json({ message: "Sessione completata con successo", session });
+  } catch (error) {
+    console.error("Errore nel completare la sessione:", error);
+    res.status(500).json({ error: "Errore nel completare la sessione" });
+  }
+};
