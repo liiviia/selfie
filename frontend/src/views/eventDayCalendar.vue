@@ -134,6 +134,7 @@
   <div class="section unstarted-pomodoros-section">
   <h3>POMODORI NON AVVIATI</h3>
   <div v-if="unstartedSessions && unstartedSessions.length > 0">
+      {{ console.log('Rendering unstartedSessions:', unstartedSessions) }}
     <div v-for="session in unstartedSessions" :key="session._id" class="item-container">
       <h4>Sessione non avviata</h4>
       <p>Data: {{ formatDate(session.giorno) }}</p>
@@ -446,17 +447,27 @@ const fetchUnstartedSessions = async () => {
   try {
     const token = sessionStorage.getItem('token');
     const username = localStorage.getItem('username');
+    
     const response = await axios.get('/api/getSessioniNonPartite', {
       headers: { Authorization: `Bearer ${token}` },
       params: { username },
     });
-    unstartedSessions.value = Array.isArray(response.data) ? response.data : [];
-    console.log('Sessioni non avviate recuperate:', unstartedSessions.value);
+
+    if (Array.isArray(response.data)) {
+      // Copia i dati nell'array per garantire la reattività
+      unstartedSessions.value = [...response.data];
+      console.log('Sessioni non avviate aggiornate:', unstartedSessions.value);
+    } else {
+      console.warn('Dati inattesi ricevuti dalla API:', response.data);
+      unstartedSessions.value = []; // Valore vuoto se i dati non sono un array
+    }
   } catch (error) {
     console.error('Errore nel recupero delle sessioni mai avviate:', error);
     unstartedSessions.value = []; // Imposta un valore vuoto in caso di errore
   }
 };
+
+
 
 
 
@@ -466,6 +477,7 @@ onMounted(() => {
   fetchActivities();
   fetchOverdueActivities();
   fetchIncompleteSessions();
+    console.log('Componente montato - caricamento sessioni non avviate...');
   fetchUnstartedSessions();
   setInterval(getTimeMachine, 1000);
 });
