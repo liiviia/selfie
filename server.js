@@ -14,6 +14,7 @@ const timeMachineRoutes = require('./routes/timeMachineRoutes');
 const timeMachineConfig = require('./timeMachineConfig');
 const alertRoutes = require('./routes/alertRoutes');
 const { initializeScheduler } = require('./scheduler');
+const { markUnstartedSessions } = require('./controllers/pomsController');
 
 // Aggiungi la rotta per gli alert
 const moment = require('moment-timezone');
@@ -25,6 +26,15 @@ require('dotenv').config({ path: __dirname + '/.env' });
 const app = express();
 
 initializeScheduler();
+
+const updateUnstartedSessions = () => {
+  console.log('Esecuzione aggiornamento delle sessioni non avviate...');
+  markUnstartedSessions();
+};
+
+// ogni 1 minuto
+setInterval(updateUnstartedSessions, 60 * 1000);
+
 
 const port = 8000;
 
@@ -42,6 +52,8 @@ const incrementTimeMachine = () => {
   const currentTime = moment(timeMachineConfig.getTimeMachineDate()).tz('Europe/Rome');
   const updatedTime = currentTime.add(1, 'seconds').toDate();
   timeMachineConfig.setTimeMachineDate(updatedTime);
+
+  markUnstartedSessions();
 
 };
 
