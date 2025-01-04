@@ -284,7 +284,7 @@ export default {
       }
     };
 
-    const iniziaPomodoro = async (id, remainingTime, date, tempoStudio, tempoPausa, ripetizioni) => {
+    const iniziaPomodoro = async (id, remainingTime, date, tempoStudio, tempoPausa, ripetizioni, session) => {
     try {
     const token = sessionStorage.getItem('token');
     const response = await axios.post('/api/poms/save-incomplete', {
@@ -307,14 +307,14 @@ export default {
         path: '/pomodoroTempo',
         query: {
           date: new Date(date).toISOString(),
-          remainingTime,
-          studyCycles: ripetizioni,
-          isStudyPhase: true,
-          tempoStudio,
-          tempoPausa,
-          ripetizioni,
-          nuovo: true,
-          nonFare: false,
+          remainingTime: session.remainingTime,
+          studyCycles: session.studyCycles,
+          isStudyPhase: session.isStudyPhase,
+          tempoStudio: session.tempoStudio,
+          tempoPausa: session.tempoPausa,
+          ripetizioni: session.ripetizioni,
+          nuovo: false,
+          nonFare: true,
         },
       });
 
