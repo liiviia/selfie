@@ -27,6 +27,6 @@ router.post('/iniziaPomodoro/:id' , authenticateToken , pomController.iniziaPomo
 
 router.post('/poms/sessioniNonPartite', authenticateToken, pomController.markUnstartedSessions); 
 
-router.get('/poms/getSessioniNonPartite' ,authenticateToken,pomController.getUnstartedSessions); 
+router.get('/poms/getSessioniNonPartite' ,authenticateToken, pomController.getUnstartedSessions); 
 
 module.exports = router;
