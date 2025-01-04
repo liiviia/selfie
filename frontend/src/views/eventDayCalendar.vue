@@ -446,8 +446,8 @@ const fetchUnstartedSessions = async () => {
     console.log('Username:', username);
 
     console.log('Invio richiesta a /api/getSessioniNonPartite...');
-    const response = await axios.get('/api/getSessioniNonPartite', {
-      headers: { Authorization: `Bearer ${token}` },
+const response = await axios.get('https://site232432.tw.cs.unibo.it/api/getSessioniNonPartite', {
+headers: { Authorization: `Bearer ${token}` },
       params: { username },
     });
 

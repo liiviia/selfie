@@ -27,9 +27,6 @@ router.post('/iniziaPomodoro/:id' , authenticateToken , pomController.iniziaPomo
 
 router.post('/sessioniNonPartite', authenticateToken, pomController.markUnstartedSessions); 
 
-app.get('/api/getSessioniNonPartite', (req, res, next) => {
-    console.log('Richiesta ricevuta a /api/getSessioniNonPartite');
-    next();
-  }, getUnstartedSessions);
-  
+router.get('/getSessioniNonPartite' ,authenticateToken, pomController.getUnstartedSessions); 
+
 module.exports = router;
