@@ -32,9 +32,6 @@ const updateUnstartedSessions = () => {
   markUnstartedSessions();
 };
 
-// ogni 1 minuto
-setInterval(updateUnstartedSessions, 60 * 1000);
-
 
 const port = 8000;
 
@@ -53,25 +50,31 @@ const incrementTimeMachine = () => {
   const updatedTime = currentTime.add(1, 'seconds').toDate();
   timeMachineConfig.setTimeMachineDate(updatedTime);
 
-  markUnstartedSessions();
-
 };
 
 setInterval(incrementTimeMachine, 1000);
+
+setInterval(async () => {
+  console.log('Esecuzione job aggiornamento sessioni non avviate...');
+  await markUnstartedSessions();
+  console.log('Aggiornamento completato.');
+}, 60 * 1000);
+
 
 startNotificationMonitoring();
 
 app.use(express.json());  
 app.use('/api/auth', authRoutes);
-app.use('/api', noteRoutes);
-app.use('/api', pomsRoutes);
-app.use('/api', eventRoutes);
-app.use('/api', activityRoutes);
-app.use('/api', alertRoutes);
-app.use('/api', registerRoutes);
-app.use('/api', accountRoutes);
-app.use('/api', timeMachineRoutes);
+app.use('/api/notes', noteRoutes);
+app.use('/api/poms', pomsRoutes);
+app.use('/api/events', eventRoutes);
+app.use('/api/activities', activityRoutes);
+app.use('/api/alerts', alertRoutes);
+app.use('/api/register', registerRoutes);
+app.use('/api/accounts', accountRoutes);
+app.use('/api/time-machine', timeMachineRoutes);
 app.use('/api/notifications', notificationRoutes);
+
 
 app.use(express.static(path.join(__dirname, 'frontend/frontend/dist')));
 

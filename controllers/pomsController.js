@@ -313,8 +313,6 @@ exports.iniziaPomodoro = async (req, res) => {
     
 // Per recuperarmi le sess avviate 
 exports.getUnstartedSessions = async (req, res) => {
-  console.log(`dio cane`);
-
   try {
     const username = req.query.username;
     if (!username) {
