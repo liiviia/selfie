@@ -1,5 +1,5 @@
 const schedule = require('node-schedule');
-const { markUnstartedSessions } = require('./controllers/pomodoroController');
+const { markUnstartedSessions } = require('./controllers/pomsController');
 const timeMachineConfig = require('./timeMachineConfig');
 
 function initializeScheduler() {
