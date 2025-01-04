@@ -911,5 +911,22 @@ hr {
   max-width: 1200px;
 }
 
+.pomodoro-container .section {
+  flex: 1 1 calc(33% - 20px); 
+  max-width: calc(33% - 20px); 
+  background-color: rgba(255, 255, 255, 0.9); 
+  border: 1px solid #ddd; 
+  border-radius: 10px; 
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); 
+  padding: 20px; 
+  text-align: center; 
+  transition: transform 0.2s ease; 
+}
+
+.pomodoro-container h3 {
+  margin-bottom: 20px; 
+  font-size: 1.5em;
+  color: #333;
+}
 
 </style>
