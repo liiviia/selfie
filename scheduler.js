@@ -3,6 +3,9 @@ const { markUnstartedSessions } = require('./controllers/pomodoroController');
 const timeMachineConfig = require('./timeMachineConfig');
 
 function initializeScheduler() {
+
+  const jobInterval = 60000;
+
   setInterval(async () => {
     console.log('Esecuzione job basato sull\'orario attuale o Time Machine...');
     try {
@@ -18,7 +21,7 @@ function initializeScheduler() {
     } catch (error) {
       console.error('Errore durante il job di verifica sessioni:', error);
     }
-  }, 1000); 
+  }, jobInterval); 
 }
 
 module.exports = { initializeScheduler };
