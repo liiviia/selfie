@@ -898,26 +898,24 @@ hr {
 }
 
 .pomodoro-container {
-   display: flex; /* Disporre le sezioni orizzontalmente */
-  justify-content: space-between; /* Spaziatura uniforme */
-  align-items: flex-start; /* Allinea gli elementi in alto */
-  gap: 20px; /* Spaziatura tra i contenitori */
-  margin: 40px auto; /* Centrare il contenitore */
-  max-width: 1200px; /* Imposta una larghezza massima */
-  flex-wrap: wrap; /* Permette di andare a capo su schermi più piccoli */
+  display: flex;
+  justify-content: space-around; /* Distribuisce gli elementi con spazio uniforme */
+  flex-wrap: wrap; /* Consente di andare in verticale su schermi piccoli */
+  gap: 20px; /* Spaziatura tra le sezioni */
+  margin: 20px auto; /* Centrare il contenitore */
+  max-width: 1200px; /* Limita la larghezza massima */
 }
 
 .pomodoro-container .section {
-  flex: 1 1 calc(33.33% - 20px); /* Ogni sezione occupa 1/3 dello spazio con gap */
-  max-width: calc(33.33% - 20px); /* Imposta una larghezza massima */
-  min-width: 250px; /* Imposta una larghezza minima per evitare sovrapposizioni */
-  background-color: rgba(255, 255, 255, 0.9); /* Colore di sfondo */
-  border: 1px solid #ddd; /* Bordo */
-  border-radius: 10px; /* Angoli arrotondati */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Ombreggiatura */
-  padding: 20px; /* Spaziatura interna */
-  text-align: center; /* Centrare il contenuto */
-  transition: transform 0.2s ease; /* Effetto hover */
+  flex: 1; /* Gli elementi occupano lo stesso spazio disponibile */
+  min-width: 300px; /* Dimensione minima di ogni sezione */
+  max-width: 400px; /* Dimensione massima di ogni sezione */
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  text-align: center; /* Centra il contenuto */
 }
 
 .pomodoro-container h3 {
