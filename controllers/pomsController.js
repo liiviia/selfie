@@ -1,7 +1,7 @@
 const Pom = require('../models/pom');
 const User = require('../models/User');
 const notificationPom = require('../models/notificationPom');
-const { getTimeMachineDate } = require('../controllers/timeMachineController'); 
+const timeMachineConfig = require('../timeMachineConfig');
 
 exports.createPom = async (req, res) => {
   try {
@@ -295,22 +295,18 @@ exports.iniziaPomodoro = async (req, res) => {
   }
 };
 
-// salvare quelle non avviate
-const Pom = require('../models/pom'); // Importa il modello Pom
 
-exports.markUnstartedSessions = async () => {
+
+exports.markUnstartedSessions = async (currentDate = new Date()) => {
   try {
-    const now = new Date(); // Data e ora corrente
-
-    // Aggiorna tutte le sessioni che soddisfano le condizioni
     const result = await Pom.updateMany(
       {
-        stato: 'pianificata',    // Stato corrente è "pianificata"
-        isStarted: false,       // Non è mai stata avviata
-        giorno: { $lt: now }    // La data `giorno` è già passata
+        stato: 'pianificata',
+        isStarted: false,
+        giorno: { $lt: currentDate } 
       },
       {
-        $set: { stato: 'mai_avviata' } // Imposta lo stato a "mai_avviata"
+        $set: { stato: 'mai_avviata' }
       }
     );
 
@@ -326,17 +322,25 @@ exports.markUnstartedSessions = async () => {
 // Per recuperarmi le sess avviate 
 exports.getUnstartedSessions = async (req, res) => {
   try {
-    const username = req.query.username.trim();
+    const username = req.query.username?.trim();
     if (!username) {
       return res.status(400).json({ message: 'Username è necessario' });
     }
 
-    const sessions = await Pom.find({ username, stato: 'mai_avviata' }).sort({ giorno: -1 });
+    const currentDate = timeMachineConfig.isActive()
+      ? timeMachineConfig.getTimeMachineDate()
+      : new Date();
+
+    const sessions = await Pom.find({ 
+      username, 
+      stato: 'mai_avviata',
+      giorno: { $lt: currentDate } 
+    }).sort({ giorno: -1 });
+
     console.log('Sessioni trovate:', sessions);
-    res.status(200).json(pomodoro);
+    res.status(200).json(sessions);
   } catch (error) {
     console.error('Errore durante il recupero delle sessioni mai avviate:', error);
     res.status(500).json({ error: 'Errore durante il recupero delle sessioni mai avviate' });
   }
 };
-
