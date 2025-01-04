@@ -196,41 +196,33 @@ exports.getPomodorosByDate = async (req, res) => {
 
 exports.saveUncompletedPom = async (req, res) => {
   try {
+    console.log('Richiesta ricevuta con i dati:', req.body);
+
     const { username, giorno, remainingTime, isStudyPhase, studyCycles, tempoStudio, tempoPausa, ripetizioni } = req.body;
 
-    // Validazione dei campi
     if (!username || !giorno || !remainingTime || !tempoStudio || !tempoPausa || !ripetizioni) {
-      return res.status(400).json({ error: "Tutti i campi sono obbligatori." });
+      return res.status(400).json({ error: 'Tutti i campi sono obbligatori.' });
     }
 
-    // Validazione del formato della data
-    if (isNaN(new Date(giorno))) {
-      return res.status(400).json({ error: "Il campo 'giorno' deve essere una data valida." });
-    }
-
-    // Calcolo intervallo del giorno
     const startDate = new Date(giorno);
     startDate.setHours(0, 0, 0, 0);
     const endDate = new Date(giorno);
     endDate.setHours(23, 59, 59, 999);
 
-    // Salvataggio o aggiornamento del documento
     const pomodoro = await Pom.findOneAndUpdate(
       { username, giorno: { $gte: startDate, $lte: endDate } },
       { remainingTime, isStudyPhase, studyCycles, giorno: new Date(giorno), tempoStudio, tempoPausa, ripetizioni },
       { new: true, upsert: true }
     );
 
-    // Risposta positiva
-    res.status(200).json({ 
-      message: 'Sessione incompleta salvata con successo', 
-      data: pomodoro 
-    });
+    console.log('Pomodoro salvato:', pomodoro);
+    res.status(200).json({ message: 'Sessione incompleta salvata con successo', data: pomodoro });
   } catch (error) {
-    console.error('Errore dettagliato:', error.message, error.stack);
+    console.error('Errore nel salvataggio della sessione incompleta:', error);
     res.status(500).json({ error: 'Errore nel salvataggio della sessione incompleta', details: error.message });
   }
 };
+
 
 
 
