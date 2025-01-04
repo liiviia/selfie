@@ -899,23 +899,23 @@ hr {
 
 .pomodoro-container {
   display: flex;
-  justify-content: space-around; /* Distribuisce gli elementi con spazio uniforme */
-  flex-wrap: wrap; /* Consente di andare in verticale su schermi piccoli */
-  gap: 20px; /* Spaziatura tra le sezioni */
-  margin: 20px auto; /* Centrare il contenitore */
-  max-width: 1200px; /* Limita la larghezza massima */
+  justify-content: space-around; 
+  flex-wrap: wrap; 
+  gap: 20px; 
+  margin: 20px auto; 
+  max-width: 1200px; 
 }
 
 .pomodoro-container .section {
-  flex: 1; /* Gli elementi occupano lo stesso spazio disponibile */
-  min-width: 300px; /* Dimensione minima di ogni sezione */
-  max-width: 400px; /* Dimensione massima di ogni sezione */
+  flex: 1; 
+  min-width: 300px; 
+  max-width: 400px; 
   background-color: rgba(255, 255, 255, 0.9);
   border: 1px solid #ddd;
   border-radius: 10px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   padding: 20px;
-  text-align: center; /* Centra il contenuto */
+  text-align: center; 
 }
 
 .pomodoro-container h3 {
@@ -926,13 +926,13 @@ hr {
 
 @media (max-width: 768px) {
   .pomodoro-container {
-    flex-direction: column; /* Disporre le sezioni in verticale */
-    align-items: center; /* Centrare le sezioni */
+    flex-direction: column; 
+    align-items: center; 
   }
 
   .pomodoro-container .section {
-    flex: 1 1 100%; /* Ogni sezione occupa il 100% dello spazio */
-    max-width: 100%; /* Rimuovi la larghezza massima */
+    flex: 1 1 100%; 
+    max-width: 100%;
   }
 }
 
