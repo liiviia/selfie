@@ -314,7 +314,7 @@ exports.markUnstartedSessions = async (currentDate) => {
 
     
 // Per recuperarmi le sess avviate 
-exports.getUnstartedSessions = async (req, res) => {
+/*exports.getUnstartedSessions = async (req, res) => {
   try {
     const username = req.query.username; // Ottieni username dalla query
     if (!username) {
@@ -335,5 +335,20 @@ exports.getUnstartedSessions = async (req, res) => {
   } catch (error) {
     console.error('Errore durante il recupero delle sessioni mai avviate:', error);
     res.status(500).json({ error: 'Errore durante il recupero delle sessioni mai avviate' });
+  }
+};
+*/
+
+exports.getUnstartedSessions = async (req, res) => {
+  try {
+    console.log('Mocking risposta...');
+
+    res.status(200).json([
+      { _id: '1', username: 'testUser', giorno: '2025-01-06T00:00:00Z', stato: 'mai_avviata' },
+      { _id: '2', username: 'testUser', giorno: '2025-01-05T00:00:00Z', stato: 'mai_avviata' },
+    ]);
+  } catch (error) {
+    console.error('Errore mock:', error);
+    res.status(500).json({ error: 'Errore mock' });
   }
 };
