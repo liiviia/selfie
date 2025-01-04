@@ -133,7 +133,7 @@
 
   <div class="section unstarted-pomodoros-section">
   <h3>POMODORI NON AVVIATI</h3>
-  <div v-if="unstartedSessions.length > 0">
+  <div v-if="unstartedSessions && unstartedSessions.length > 0">
     <div v-for="session in unstartedSessions" :key="session._id" class="item-container">
       <h4>Sessione non avviata</h4>
       <p>Data: {{ formatDate(session.giorno) }}</p>
@@ -149,6 +149,7 @@
   </div>
   <p v-else>Nessun pomodoro non avviato trovato.</p>
 </div>
+
 
 
     
@@ -449,13 +450,13 @@ const fetchUnstartedSessions = async () => {
       headers: { Authorization: `Bearer ${token}` },
       params: { username },
     });
-    unstartedSessions.value = response.data || [];
+    unstartedSessions.value = Array.isArray(response.data) ? response.data : [];
+    console.log('Sessioni non avviate recuperate:', unstartedSessions.value);
   } catch (error) {
     console.error('Errore nel recupero delle sessioni mai avviate:', error);
     unstartedSessions.value = []; // Imposta un valore vuoto in caso di errore
   }
 };
-
 
 
 
