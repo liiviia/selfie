@@ -452,8 +452,10 @@ const fetchUnstartedSessions = async () => {
     unstartedSessions.value = response.data || [];
   } catch (error) {
     console.error('Errore nel recupero delle sessioni mai avviate:', error);
+    unstartedSessions.value = []; // Imposta un valore vuoto in caso di errore
   }
 };
+
 
 
 
