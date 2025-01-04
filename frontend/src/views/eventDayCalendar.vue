@@ -448,11 +448,16 @@ const fetchUnstartedSessions = async () => {
     const token = sessionStorage.getItem('token');
     const username = localStorage.getItem('username');
 
-        console.log('Invio richiesta a /api/getSessioniNonPartite...');
+    console.log('Token:', token);
+    console.log('Username:', username);
+
+    console.log('Invio richiesta a /api/getSessioniNonPartite...');
     const response = await axios.get('/api/getSessioniNonPartite', {
       headers: { Authorization: `Bearer ${token}` },
       params: { username },
     });
+
+    console.log('Risposta ricevuta:', response);
 
     if (response.status === 200 && Array.isArray(response.data)) {
       unstartedSessions.value = [...response.data];
@@ -466,8 +471,6 @@ const fetchUnstartedSessions = async () => {
     unstartedSessions.value = [];
   }
 };
-
-
 
 
 
