@@ -298,29 +298,24 @@ exports.iniziaPomodoro = async (req, res) => {
 // salvare quelle non avviate
 exports.markUnstartedSessions = async (currentDate) => {
   try {
-    const today = new Date(currentDate);
-    today.setHours(0, 0, 0, 0);
+    const { username } = req.query;
 
-    const unstartedSessions = await Pom.find({
-      giorno: { $lt: today },
-      isStarted: false,
-    });
-
-    if (unstartedSessions.length === 0) {
-      console.log('Nessuna sessione mai avviata trovata.');
-      return;
+    // Assicurati che il parametro username sia presente
+    if (!username) {
+      return res.status(400).json({ error: 'Username mancante' });
     }
 
-    const updatePromises = unstartedSessions.map((session) => {
-      session.stato = 'mai_avviata';
-      return session.save();
+    // Recupera le sessioni mai avviate
+    const unstartedSessions = await Pom.find({ 
+      username, 
+      stato: 'mai_avviata',
+      isStarted: false 
     });
 
-    await Promise.all(updatePromises);
-
-    console.log(`${unstartedSessions.length} sessioni contrassegnate come mai avviate.`);
+    res.status(200).json(unstartedSessions);
   } catch (error) {
-    console.error('Errore durante il controllo delle sessioni mai avviate:', error);
+    console.error('Errore nel recupero delle sessioni mai avviate:', error);
+    res.status(500).json({ error: 'Errore interno del server' });
   }
 };
 
