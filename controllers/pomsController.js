@@ -314,14 +314,14 @@ exports.iniziaPomodoro = async (req, res) => {
 // Per recuperarmi le sess avviate 
 exports.getUnstartedSessions = async (req, res) => {
   try {
-    const username = req.query.username;
+    const username = req.query.username.trim();
     if (!username) {
       return res.status(400).json({ message: 'Username è necessario' });
     }
 
     const sessions = await Pom.find({ username, stato: 'mai_avviata' }).sort({ giorno: -1 });
     console.log('Sessioni trovate:', sessions);
-    res.status(200).json(sessions);
+    res.status(200).json(pomodoro);
   } catch (error) {
     console.error('Errore durante il recupero delle sessioni mai avviate:', error);
     res.status(500).json({ error: 'Errore durante il recupero delle sessioni mai avviate' });
