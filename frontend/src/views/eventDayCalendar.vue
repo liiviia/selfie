@@ -451,8 +451,8 @@ const fetchUnstartedSessions = async () => {
     console.log('Token:', token);
     console.log('Username:', username);
 
-    console.log('Invio richiesta a /api/getSessioniNonPartite...');
-    const response = await axios.get('/api/getSessioniNonPartite', {
+    console.log('Invio richiesta a /api/poms/getSessioniNonPartite...');
+    const response = await axios.get('/api/poms/getSessioniNonPartite', {
       headers: { Authorization: `Bearer ${token}` },
       params: { username },
     });
