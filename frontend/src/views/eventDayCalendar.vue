@@ -442,6 +442,10 @@ const fetchUnstartedSessions = async () => {
   try {
     const token = sessionStorage.getItem('token');
     const username = localStorage.getItem('username');
+    
+    console.log('Token:', token);
+    console.log('Username:', username);
+    
     const response = await axios.get('/api/getSessioniNonPartite', {
       headers: { Authorization: `Bearer ${token}` },
       params: { username },
