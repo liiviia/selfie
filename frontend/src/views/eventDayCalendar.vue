@@ -650,9 +650,12 @@ onMounted(() => {
 
 
 .center-container {
-  display: flex;
+   display: flex;
   justify-content: center;
-  padding: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px; 
+  margin: 20px;
 }
 
 .content-container {
@@ -723,7 +726,15 @@ button:hover {
 }
 
 .pomodoros-section {
-  background-color: rgba(255, 230, 230, 0.8);
+ flex: 1;
+  min-width: 300px; 
+  max-width: 400px; 
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  text-align: center;
 }
 
 hr {
