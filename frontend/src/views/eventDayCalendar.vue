@@ -13,7 +13,7 @@
   <p>Durata: {{ event.duration }}</p>
   <p v-if="event.type === 'gruppo'" style="color: #FF6347;">
     Evento di gruppo creato da: {{ event.author }} <br>
-    gruppo composto da: {{ event.participants.join(', ') }}
+    gruppo composto da: {{ event.participants ? event.participants.join(', ') : 'Nessun partecipante' }}
   </p>
 
   <button v-if="event.author === currentUser" @click="confirmDeleteEvent(event._id)" class="delete-btn-cq" >🗑️ Elimina Evento</button>
