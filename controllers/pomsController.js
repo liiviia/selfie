@@ -1,7 +1,7 @@
 const Pom = require('../models/pom');
 const User = require('../models/User');
 const notificationPom = require('../models/notificationPom');
-//const timeMachineConfig = require('../timeMachineConfig');
+const { getTimeMachineDate } = require('../controllers/timeMachineController'); 
 
 exports.createPom = async (req, res) => {
   try {
@@ -15,8 +15,7 @@ exports.createPom = async (req, res) => {
       cicliRimanenti, 
       remainingTime, 
       isStudyPhase, 
-      studyCycles, 
-      //stato:"pianificata", 
+      studyCycles
     });
 
     const savedPom = await newPom.save();
@@ -104,6 +103,9 @@ exports.rifiutaNotifica = async (req, res) => {
 
 
 
+
+
+
 exports.getPoms = async (req, res) => {
   try {
     const username = req.query.username;
@@ -168,8 +170,7 @@ exports.getPomodorosByDate = async (req, res) => {
   }
 };
 
-
-/*exports.saveUncompletedPom = async (req, res) => {
+exports.saveUncompletedPom = async (req, res) => {
   try {
     const { username, giorno, remainingTime, isStudyPhase, studyCycles, tempoStudio, tempoPausa, ripetizioni } = req.body;
 
@@ -193,39 +194,7 @@ exports.getPomodorosByDate = async (req, res) => {
     console.error('Errore nel salvataggio della sessione incompleta:', error);
     res.status(500).json({ error: 'Errore nel salvataggio della sessione incompleta' });
   }
-};*/
-
-exports.saveUncompletedPom = async (req, res) => {
-  try {
-    console.log('Richiesta ricevuta con i dati:', req.body);
-
-    const { username, giorno, remainingTime, isStudyPhase, studyCycles, tempoStudio, tempoPausa, ripetizioni } = req.body;
-
-    if (!username || !giorno || !remainingTime || !tempoStudio || !tempoPausa || !ripetizioni) {
-      return res.status(400).json({ error: 'Tutti i campi sono obbligatori.' });
-    }
-
-    const startDate = new Date(giorno);
-    startDate.setHours(0, 0, 0, 0);
-    const endDate = new Date(giorno);
-    endDate.setHours(23, 59, 59, 999);
-
-    const pomodoro = await Pom.findOneAndUpdate(
-      { username, giorno: { $gte: startDate, $lte: endDate } },
-      { remainingTime, isStudyPhase, studyCycles, giorno: new Date(giorno), tempoStudio, tempoPausa, ripetizioni },
-      { new: true, upsert: true }
-    );
-
-    console.log('Pomodoro salvato:', pomodoro);
-    res.status(200).json({ message: 'Sessione incompleta salvata con successo', data: pomodoro });
-  } catch (error) {
-    console.error('Errore nel salvataggio della sessione incompleta:', error);
-    res.status(500).json({ error: 'Errore nel salvataggio della sessione incompleta', details: error.message });
-  }
 };
-
-
-
 
 
 exports.getUncompletedPomodoros = async (req, res) => {
@@ -248,8 +217,6 @@ exports.getUncompletedPomodoros = async (req, res) => {
     res.status(500).json({ error: 'Errore nel recupero delle sessioni incompleta' });
   }
 };
-
-
 
 
 exports.deletePom = async (req, res) => {
@@ -282,7 +249,7 @@ exports.iniziaPomodoro = async (req, res) => {
 
     if (!pomodoro.isStarted) {
       pomodoro.isStarted = true;
-      pomodoro.isIncomplete = false; 
+
       await pomodoro.save();
 
       return res.status(200).json({ success: true, message: 'Pomodoro avviato con successo' });
@@ -296,59 +263,4 @@ exports.iniziaPomodoro = async (req, res) => {
 };
 
 
-
-/*exports.markUnstartedSessions = async () => {
-  try {
-    const currentDate = timeMachineConfig.isActive()
-      ? timeMachineConfig.getTimeMachineDate()
-      : new Date();
-
-      await markUnstartedSessions(currentDate);
-
-    const result = await Pom.updateMany(
-      {
-        stato: 'pianificata', 
-        isStarted: false, 
-        giorno: { $lt: currentDate }, 
-      },
-      {
-        $set: { stato: 'mai_avviata' }, 
-      }
-    );
-
-    console.log('Sessioni aggiornate a mai_avviata:', result);
-  } catch (error) {
-    console.error('Errore durante l\'aggiornamento delle sessioni non avviate:', error);
-  }
-};
-
-
-
-
-
     
-// Per recuperarmi le sess avviate 
-exports.getUnstartedSessions = async (req, res) => {
-  try {
-    const username = req.query.username?.trim();
-    if (!username) {
-      return res.status(400).json({ message: 'Username è necessario' });
-    }
-
-    const currentDate = timeMachineConfig.isActive()
-      ? timeMachineConfig.getTimeMachineDate()
-      : new Date();
-
-    const sessions = await Pom.find({
-      username,
-      stato: 'mai_avviata', // Cerca sessioni "mai avviate"
-      giorno: { $lt: currentDate }, // Solo sessioni passate
-    }).sort({ giorno: -1 });
-
-    console.log('Sessioni trovate:', sessions);
-    res.status(200).json(sessions);
-  } catch (error) {
-    console.error('Errore durante il recupero delle sessioni mai avviate:', error);
-    res.status(500).json({ error: 'Errore durante il recupero delle sessioni mai avviate' });
-  }
-};*/

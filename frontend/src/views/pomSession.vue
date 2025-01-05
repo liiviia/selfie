@@ -25,11 +25,10 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      poms: [], 
+      poms: []
     };
   },
   methods: {
-
     confirmDelete(id) {
       if (confirm("Sicuro di voler eliminare questa sessione Pomodoro?")) {
         this.deletePomodoro(id); 
@@ -80,7 +79,9 @@ export default {
       return new Date(date).toLocaleDateString();
     }
   }, 
-
+  mounted() {
+    this.fetchPoms();
+  }
 };
 </script>
 

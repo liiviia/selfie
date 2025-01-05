@@ -186,8 +186,8 @@ export default {
   setup() {
 
 
+
     const route = useRoute();
-    
 
     const newPom = ref({
       username: localStorage.getItem('username') || 'Guest',
@@ -282,16 +282,14 @@ export default {
 });
 
 
+
+
+
     onUnmounted(() => {
       clearInterval(timerInterval); 
     });
 
-  
-
-
-
-
-const startNewCycle = () => {
+    const startNewCycle = () => {
   newPom.value.tempoStudio = route.query.tempoStudio ? parseInt(route.query.tempoStudio) : newPom.value.tempoStudio;
   newPom.value.tempoPausa = route.query.tempoPausa ? parseInt(route.query.tempoPausa) : newPom.value.tempoPausa;
   newPom.value.ripetizioni = route.query.ripetizioni ? parseInt(route.query.ripetizioni) : newPom.value.ripetizioni;
@@ -731,25 +729,22 @@ const startNewCycle = () => {
       const username = newPom.value.username.trim();
 
       try {
-        if (remainingTime.value > 0 || studyCycles.value > 0) {
-      await axios.post('/api/poms/save-incomplete', {
-        username,
-        giorno: new Date(newPom.value.giorno).toISOString(),
-        remainingTime: remainingTime.value,
-        isStudyPhase: isStudyPhase.value,
-        studyCycles: studyCycles.value,
-        tempoStudio: newPom.value.tempoStudio,
-        tempoPausa: newPom.value.tempoPausa,
-      }, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      console.log('Sessione incompleta salvata.');
-    }
-  } catch (error) {
-    console.error('Errore nel salvataggio della sessione incompleta:', error);
-  }
-};
-
+        await axios.post('/api/poms/save-incomplete', {
+          username,
+          giorno: new Date(newPom.value.giorno).toISOString(), 
+          remainingTime: remainingTime.value,
+          isStudyPhase: isStudyPhase.value,
+          studyCycles: studyCycles.value,
+          tempoStudio: newPom.value.tempoStudio, 
+          tempoPausa: newPom.value.tempoPausa
+        }, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        console.log('Incomplete session saved.');
+      } catch (error) {
+        console.error('Error saving incomplete session:', error);
+      }
+    };
 
     return {
       newPom,

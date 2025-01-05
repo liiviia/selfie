@@ -47,8 +47,6 @@ exports.getNotificationsForUser = async (req, res) => {
     }
 };
   
-
-
 exports.deleteNotification = async (req, res) => {
     const { id } = req.params; 
   
