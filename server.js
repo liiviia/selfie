@@ -2,6 +2,8 @@ const express = require('express');
 const path = require('path');
 const connectDB = require('./config/dbConnection');
 const cors = require('cors');
+const cron = require('node-cron'); // questo
+
 const authRoutes = require('./routes/authRoutes');
 const noteRoutes = require('./routes/noteRoutes');
 const pomsRoutes = require('./routes/pomsRouter');
@@ -13,8 +15,7 @@ const notificationRoutes = require('./routes/notificationRoutes');
 const timeMachineRoutes = require('./routes/timeMachineRoutes');
 const timeMachineConfig = require('./timeMachineConfig');
 const alertRoutes = require('./routes/alertRoutes');
-//const { initializeScheduler } = require('./scheduler');
-//const { markUnstartedSessions } = require('./controllers/pomsController');
+const Pom = require('./models/pom');  // questo
 
 // Aggiungi la rotta per gli alert
 const moment = require('moment-timezone');
@@ -24,7 +25,6 @@ const http = require('http');
 require('dotenv').config({ path: __dirname + '/.env' });
 
 const app = express();
-
 const port = 8000;
 
 const server = http.createServer(app);
@@ -37,8 +37,6 @@ app.use(cors({
 
 connectDB();
 
-//initializeScheduler();
-
 const incrementTimeMachine = () => {
   const currentTime = moment(timeMachineConfig.getTimeMachineDate()).tz('Europe/Rome');
   const updatedTime = currentTime.add(1, 'seconds').toDate();
@@ -48,27 +46,49 @@ const incrementTimeMachine = () => {
 
 setInterval(incrementTimeMachine, 1000);
 
-setInterval(async () => {
-  console.log('Esecuzione job aggiornamento sessioni non avviate...');
-  await markUnstartedSessions();
-  console.log('Aggiornamento completato.');
-}, 60 * 1000);
-
-
 startNotificationMonitoring();
+
+// Questo
+cron.schedule('0 0 * * *', async () => { 
+  try {
+    console.log('Esecuzione del controllo sessioni incomplete...');
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Per trovare sessioni incomplete
+    const incompleteSessions = await Pom.find({
+      giorno: { $lte: today },
+      $or: [
+        { remainingTime: { $gt: 0 } },
+        { studyCycles: { $gt: 0 } }
+      ]
+    });
+
+    // Per aggiornre tutte le sessioni incomplete
+    for (const session of incompleteSessions) {
+      session.isStarted = true; // Se è iniziata 
+      await session.save();
+    }
+
+    console.log(`Controllo completato: ${incompleteSessions.length} sessioni incomplete aggiornate.`);
+  } catch (error) {
+    console.error('Errore durante il controllo delle sessioni incomplete:', error);
+  }
+});
+
 
 app.use(express.json());  
 app.use('/api/auth', authRoutes);
-app.use('/api/notes', noteRoutes);
-app.use('/api/poms', pomsRoutes);
-app.use('/api/events', eventRoutes);
-app.use('/api/activities', activityRoutes);
-app.use('/api/alerts', alertRoutes);
-app.use('/api/register', registerRoutes);
-app.use('/api/accounts', accountRoutes);
-app.use('/api/time-machine', timeMachineRoutes);
+app.use('/api', noteRoutes);
+app.use('/api', pomsRoutes);
+app.use('/api', eventRoutes);
+app.use('/api', activityRoutes);
+app.use('/api', alertRoutes);
+app.use('/api', registerRoutes);
+app.use('/api', accountRoutes);
+app.use('/api', timeMachineRoutes);
 app.use('/api/notifications', notificationRoutes);
-
 
 app.use(express.static(path.join(__dirname, 'frontend/frontend/dist')));
 
