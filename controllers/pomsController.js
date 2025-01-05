@@ -297,7 +297,7 @@ exports.iniziaPomodoro = async (req, res) => {
 
 
 
-exports.markUnstartedSessions = async () => {
+/*exports.markUnstartedSessions = async () => {
   try {
     const currentDate = timeMachineConfig.isActive()
       ? timeMachineConfig.getTimeMachineDate()
@@ -307,12 +307,12 @@ exports.markUnstartedSessions = async () => {
 
     const result = await Pom.updateMany(
       {
-        stato: 'pianificata', // Solo sessioni pianificate
-        isStarted: false, // Non avviate
-        giorno: { $lt: currentDate }, // Data inferiore all'attuale
+        stato: 'pianificata', 
+        isStarted: false, 
+        giorno: { $lt: currentDate }, 
       },
       {
-        $set: { stato: 'mai_avviata' }, // Aggiorna a "mai_avviata"
+        $set: { stato: 'mai_avviata' }, 
       }
     );
 
@@ -351,4 +351,4 @@ exports.getUnstartedSessions = async (req, res) => {
     console.error('Errore durante il recupero delle sessioni mai avviate:', error);
     res.status(500).json({ error: 'Errore durante il recupero delle sessioni mai avviate' });
   }
-};
+};*/

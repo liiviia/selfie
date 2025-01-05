@@ -172,7 +172,7 @@ export default {
     const currentUser = localStorage.getItem('username') ;
     const queryDate = computed(() => route.query.date);
     const timeMachine = ref();
-    const unstartedSessions = ref([]);
+    //const unstartedSessions = ref([]);
 
 
     const confirmDeleteActivity = (id) => {
@@ -438,7 +438,7 @@ const iniziaPomodoro = async (id, remainingTime, date, tempoStudio, tempoPausa, 
 
 
 
-const fetchUnstartedSessions = async () => {
+/*const fetchUnstartedSessions = async () => {
   try {
     const token = sessionStorage.getItem('token');
     const username = localStorage.getItem('username');
@@ -460,7 +460,7 @@ const fetchUnstartedSessions = async () => {
   } catch (error) {
     console.error('Errore nel recupero delle sessioni non avviate:', error);
   }
-};
+};*/
 
 
 
@@ -471,8 +471,7 @@ onMounted(() => {
   fetchActivities();
   fetchOverdueActivities();
   fetchIncompleteSessions();
-    console.log('Componente montato - caricamento sessioni non avviate...');
-  fetchUnstartedSessions();
+ // fetchUnstartedSessions();
   setInterval(getTimeMachine, 1000);
 });
 

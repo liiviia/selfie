@@ -13,8 +13,8 @@ const notificationRoutes = require('./routes/notificationRoutes');
 const timeMachineRoutes = require('./routes/timeMachineRoutes');
 const timeMachineConfig = require('./timeMachineConfig');
 const alertRoutes = require('./routes/alertRoutes');
-const { initializeScheduler } = require('./scheduler');
-const { markUnstartedSessions } = require('./controllers/pomsController');
+//const { initializeScheduler } = require('./scheduler');
+//const { markUnstartedSessions } = require('./controllers/pomsController');
 
 // Aggiungi la rotta per gli alert
 const moment = require('moment-timezone');
@@ -37,7 +37,7 @@ app.use(cors({
 
 connectDB();
 
-initializeScheduler();
+//initializeScheduler();
 
 const incrementTimeMachine = () => {
   const currentTime = moment(timeMachineConfig.getTimeMachineDate()).tz('Europe/Rome');
