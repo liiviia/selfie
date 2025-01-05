@@ -84,8 +84,8 @@
     </div>
   </div>
 
-    <div class="pomodoro-container">
-  <div class="section pomodoros-section">
+    <div class="content-container">
+      <div class="section pomodoros-section">
     <h3>POMODORI PER QUESTO GIORNO:</h3>
     <div v-if="pomodoros.length > 0">
       <div v-for="pomodoro in pomodoros" :key="pomodoro._id" class="item-container">
@@ -95,13 +95,16 @@
         <p>Tempo di pausa: {{ pomodoro.tempoPausa }} minuti</p>
         <p>Ripetizioni: {{ pomodoro.ripetizioni }}</p>
         <button @click="confirmDeletePomodoro(pomodoro._id)" class="delete-btn-cq">🗑️</button>
+        
         <button
-          v-if="isSameDay(queryDate, timeMachine) && !pomodoro.isStarted"
-          @click="iniziaPomodoro(pomodoro._id, pomodoro.remainingTime, pomodoro.giorno, pomodoro.tempoStudio, pomodoro.tempoPausa, pomodoro.ripetizioni)"
-        >
-          Inizia il pomodoro
-        </button>
-        <p v-else-if="pomodoro.isStarted">Pomodoro già avviato</p>
+  v-if="isSameDay(queryDate, timeMachine) && !pomodoro.isStarted"
+  @click="iniziaPomodoro(pomodoro._id,  pomodoro.remainingTime, pomodoro.giorno, pomodoro.tempoStudio, pomodoro.tempoPausa, pomodoro.ripetizioni)"
+>
+  Inizia il pomodoro
+</button>
+
+<p v-else-if="pomodoro.isStarted">Pomodoro già avviato</p>
+
       </div>
     </div>
     <p v-else>Nessun pomodoro per questa data.</p>
@@ -112,44 +115,25 @@
     </div>
   </div>
 
-  <div class="section pomodorosScaduti-section">
-    <h3>POMODORI INCOMPLETI</h3>
-    <div v-if="incompleteSessions.length > 0">
+
+      <div class="section pomodorosScaduti-section">
+        <h3>POMODORI INCOMPLETI</h3>
+      <div v-if="incompleteSessions.length > 0">
       <div v-for="session in incompleteSessions" :key="session._id" class="item-container">
         <p>Data: {{ formatDate(session.giorno) }}</p>
         <p>Tempo rimanente: {{ Math.floor(session.remainingTime / 60) }}:{{ session.remainingTime % 60 }}</p>
         <p>Cicli rimanenti: {{ session.studyCycles }}</p>
-        <button @click="resumePomodoro(session)" class="action-button" style="background:#f4a460;">Riprendi Sessione</button>
-        <button @click="discardPomodoro(session)" class="action-button" style="all: unset; cursor: pointer;">
-          <span class="trash-icon" style="font-size: 0.9em; color: inherit;">🗑️</span>
-        </button>
+         <button @click="resumePomodoro(session)" class="action-button" style="background:#f4a460;">Riprendi Sessione</button>
+         <button @click="discardPomodoro(session)" class="action-button" style="all: unset; cursor: pointer;">
+          <span class="trash-icon" style="font-size: 0.9em;  color: inherit;">🗑️ </span>
+         </button> 
       </div>
     </div>
     <p v-else>nessun pomodoro da portare a termine</p>
   </div>
 
-  <!--<div class="section unstarted-pomodoros-section">
-    <h3>POMODORI NON AVVIATI</h3>
-    <div v-if="unstartedSessions && unstartedSessions.length > 0">
-      <div v-for="session in unstartedSessions" :key="session._id" class="item-container">
-        <h4>Sessione non avviata</h4>
-        <p>Data: {{ formatDate(session.giorno) }}</p>
-        <p>Tempo di studio: {{ session.tempoStudio }} minuti</p>
-        <p>Tempo di pausa: {{ session.tempoPausa }} minuti</p>
-        <p>Ripetizioni: {{ session.ripetizioni }}</p>
-        <button @click="iniziaPomodoro(session._id, session.remainingTime, session.giorno, session.tempoStudio, session.tempoPausa, session.ripetizioni)"
-                class="action-button" style="background:#f4a460;">
-          Inizia Sessione
-        </button>
-      </div>
-    </div>
-    <p v-else>Nessun pomodoro non avviato trovato.</p>
-  </div>-->
-</div>
-
-
-
   </div>
+  </div> 
 
 </template>
 
@@ -172,8 +156,6 @@ export default {
     const currentUser = localStorage.getItem('username') ;
     const queryDate = computed(() => route.query.date);
     const timeMachine = ref();
-    //const unstartedSessions = ref([]);
-
 
     const confirmDeleteActivity = (id) => {
       if (confirm("Sicuro di voler eliminare questa Attività?")) {
@@ -302,55 +284,38 @@ export default {
       }
     };
 
-    
-const iniziaPomodoro = async (id, remainingTime, date, tempoStudio, tempoPausa, ripetizioni, session = {}) => {
+    const iniziaPomodoro = async (id, remainingTime, date, tempoStudio, tempoPausa, ripetizioni) => {
   try {
     const token = sessionStorage.getItem('token');
-    const response = await axios.post('/api/poms/save-incomplete', {
-      username: currentUser,
-      giorno: date,
-      remainingTime,
-      isStudyPhase: true,
-      studyCycles: ripetizioni,
-      tempoStudio,
-      tempoPausa,
-      ripetizioni,
-    }, {
-      headers: { Authorization: `Bearer ${token}` },
+    const response = await axios.post(`/api/iniziaPomodoro/${id}`, {
+      date },
+      {
+      headers: {
+         Authorization: `Bearer ${token}` 
+        }
     });
 
-    if (response.data.message) {
-      console.log(response.data.message);
-
-      session.remainingTime = session.remainingTime || remainingTime;
-      session.studyCycles = session.studyCycles || ripetizioni;
-      session.isStudyPhase = session.isStudyPhase !== undefined ? session.isStudyPhase : true;
-      session.tempoStudio = session.tempoStudio || tempoStudio;
-      session.tempoPausa = session.tempoPausa || tempoPausa;
-      session.ripetizioni = session.ripetizioni || ripetizioni;
-
+    if (response.data.success) {
       router.push({
         path: '/pomodoroTempo',
         query: {
-          date: new Date(date).toISOString(),
-          remainingTime: session.remainingTime,
-          studyCycles: session.studyCycles,
-          isStudyPhase: session.isStudyPhase,
-          tempoStudio: session.tempoStudio,
-          tempoPausa: session.tempoPausa,
-          ripetizioni: session.ripetizioni,
-          nuovo: false,
-          nonFare: true,
-        },
+          date: date,
+          remainingTime: remainingTime,
+          isStudyPhase: true,
+          tempoStudio: tempoStudio,
+          tempoPausa: tempoPausa,
+          ripetizioni: ripetizioni,
+          nuovo: true,
+          nonFare: true
+        }
       });
     } else {
-      console.error("Errore durante il salvataggio della sessione Pomodoro.");
+         console.log("errore");
     }
   } catch (error) {
     console.error('Errore durante l\'avvio del pomodoro:', error);
   }
 };
-
 
 
 
@@ -381,6 +346,33 @@ const iniziaPomodoro = async (id, remainingTime, date, tempoStudio, tempoPausa, 
 };
 
 
+
+    /* const fetchPoms = async () => {
+      try {
+        const token = sessionStorage.getItem('token');
+        const username = localStorage.getItem('username');
+        const response = await axios.get('/api/poms', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+          params: { username: username }
+        });
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        this.poms = response.data.filter(pom => {
+          const sessionDate = new Date(pom.giorno);
+          sessionDate.setHours(0, 0, 0, 0);
+          return sessionDate >= today;
+        });
+
+      } catch (error) {
+        console.error('Errore durante il recupero delle sessioni Pomodoro:', error);
+      }
+    }
+*/
+
     const fetchEvents = async () => {
       try {
         const author = route.query.author;
@@ -407,8 +399,7 @@ const iniziaPomodoro = async (id, remainingTime, date, tempoStudio, tempoPausa, 
       }
     };
 
-
- const fetchIncompleteSessions = async () => {
+    const fetchIncompleteSessions = async () => {
       const token = sessionStorage.getItem('token');
       const username = localStorage.getItem('username');
 
@@ -418,7 +409,9 @@ const iniziaPomodoro = async (id, remainingTime, date, tempoStudio, tempoPausa, 
           params: { username }
         });
 
-    const query = queryDate.value; 
+       
+
+const query = queryDate.value; 
     const queryDateMs = query ? new Date(query).valueOf() : null;
         
         incompleteSessions.value = (Array.isArray(response.data) ? response.data : [response.data]).filter(session => {
@@ -436,63 +429,26 @@ const iniziaPomodoro = async (id, remainingTime, date, tempoStudio, tempoPausa, 
       }
     };
 
-
-
-/*const fetchUnstartedSessions = async () => {
-  try {
-    const token = sessionStorage.getItem('token');
-    const username = localStorage.getItem('username');
-    
-    console.log('Token:', token);
-    console.log('Username:', username);
-
-    const response = await axios.get('/api/getSessioniNonPartite', {
-      headers: { Authorization: `Bearer ${token}` },
-      params: { username },
-    });
-
-    if (response.data) {
-      unstartedSessions.value = response.data; // Aggiorna la lista nel frontend
-      console.log('Sessioni non avviate:', response.data);
-    } else {
-      console.log('Nessuna sessione non avviata trovata.');
-    }
-  } catch (error) {
-    console.error('Errore nel recupero delle sessioni non avviate:', error);
-  }
-};*/
-
-
-
-
-// Corretto onMounted
-onMounted(() => {
-  fetchEvents();
-  fetchActivities();
-  fetchOverdueActivities();
-  fetchIncompleteSessions();
- // fetchUnstartedSessions();
-  setInterval(getTimeMachine, 1000);
-});
-
-
     const resumePomodoro = (session) => {
-      router.push({
-        path: '/pomodoroTempo',
-        query: {
-          date: new Date(session.giorno).toISOString(),
-          remainingTime: session.remainingTime,
-          studyCycles: session.studyCycles,
-          isStudyPhase: session.isStudyPhase,
-          tempoStudio: session.tempoStudio,
-          tempoPausa: session.tempoPausa,
-          ripetizioni: session.ripetizioni,
-          nuovo: false,
-          nonFare: true,
-        },
-      });
-    };
+    const plainSession = JSON.parse(JSON.stringify(session));
 
+    const nuovo = false;
+
+    router.push({
+      path: '/pomodoroTempo',
+      query: {
+        date: new Date(plainSession.giorno).toISOString(),
+        remainingTime: plainSession.remainingTime,
+        studyCycles: plainSession.studyCycles,
+        isStudyPhase: plainSession.isStudyPhase,
+        tempoStudio: plainSession.tempoStudio, 
+        tempoPausa: plainSession.tempoPausa,   
+        ripetizioni: plainSession.ripetizioni, 
+        nuovo: nuovo,
+        nonFare:true,
+    },
+  });
+    };
 
     const discardPomodoro = async (session) => {
       const token = sessionStorage.getItem('token');
@@ -589,9 +545,7 @@ onMounted(() => {
       fetchActivities();
       fetchOverdueActivities();
       fetchIncompleteSessions();
-      setInterval(getTimeMachine, 1000);   
-      fetchIncompleteSessions
-      });
+      setInterval(getTimeMachine, 1000);    });
 
     return {
       events,
@@ -686,7 +640,7 @@ button:hover {
 }
 
 .section {
-   margin-right: 100px;
+  margin-right: 100px;
   min-width: 500px;
   flex: 1.5; 
   padding: 25px;
@@ -700,7 +654,7 @@ button:hover {
 }
 
 .section:hover {
-  transform: scale(1.05); 
+  transform: scale(1.02); 
 }
 
 .activities-section {
@@ -840,12 +794,14 @@ hr {
 }
 
 .item-container {
- background: rgba(255, 255, 255, 0.8);
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 15px;
-  margin-bottom: 15px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid #ddd; 
+  border-radius: 8px; 
+  padding: 15px; 
+  margin-bottom: 15px; 
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  position: relative; 
+  transition: border-color 0.3s ease; 
 }
 
 .item-container.overdue {
@@ -880,55 +836,6 @@ hr {
 .complete-btn:before {
   content: '✔️ '; 
   margin-right: 8px; 
-}
-
-.unstarted-pomodoros-section {
-  flex: 1.5;
-  background-color: rgba(255, 255, 204, 0.8);
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  padding: 25px;
-  margin-bottom: 20px;
-}
-
-.pomodoro-container {
-  display: flex;
-  justify-content: space-around; 
-  flex-wrap: wrap; 
-  gap: 20px; 
-  margin: 20px auto; 
-  max-width: 1200px; 
-}
-
-.pomodoro-container .section {
-  flex: 1; 
-  min-width: 300px; 
-  max-width: 400px; 
-  background-color: rgba(255, 255, 255, 0.9);
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  text-align: center; 
-}
-
-.pomodoro-container h3 {
-  margin-bottom: 20px; 
-  font-size: 1.5em;
-  color: #333;
-}
-
-@media (max-width: 768px) {
-  .pomodoro-container {
-    flex-direction: column; 
-    align-items: center; 
-  }
-
-  .pomodoro-container .section {
-    flex: 1 1 100%; 
-    max-width: 100%;
-  }
 }
 
 </style>
