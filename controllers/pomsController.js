@@ -15,7 +15,8 @@ exports.createPom = async (req, res) => {
       cicliRimanenti, 
       remainingTime, 
       isStudyPhase, 
-      studyCycles
+      studyCycles, 
+      stato: "pianificata", 
     });
 
     const savedPom = await newPom.save();
@@ -263,4 +264,52 @@ exports.iniziaPomodoro = async (req, res) => {
 };
 
 
-    
+// Trovare mai avviata  
+exports.markUnstartedSessions = async (currentDate) => {
+  try {
+    const today = new Date(currentDate);
+    today.setHours(0, 0, 0, 0);
+
+    const unstartedSessions = await Pom.find({
+      giorno: { $lt: today },
+      isStarted: false,
+    });
+
+    if (unstartedSessions.length === 0) {
+      console.log('Nessuna sessione mai avviata trovata.');
+      return;
+    }
+
+    const updatePromises = unstartedSessions.map((session) => {
+      session.stato = 'mai_avviata';
+      return session.save();
+    });
+
+    await Promise.all(updatePromises);
+
+    console.log(`${unstartedSessions.length} sessioni contrassegnate come mai avviate.`);
+  } catch (error) {
+    console.error('Errore durante il controllo delle sessioni mai avviate:', error);
+  }
+};
+
+exports.getUnstartedSessions = async (req, res) => {
+  try {
+    const username = req.query.username;
+    if (!username) {
+      return res.status(400).json({ message: 'Username è necessario' });
+    }
+
+    const sessions = await Pom.find({ username, stato: 'mai_avviata' }).sort({ giorno: -1 });
+
+    if (!sessions.length) {
+      return res.status(404).json({ message: 'Nessuna sessione non avviata trovata' });
+    }
+
+    res.status(200).json(sessions);
+  } catch (error) {
+    console.error('Errore durante il recupero delle sessioni non avviate:', error);
+    res.status(500).json({ error: 'Errore durante il recupero delle sessioni non avviate' });
+  }
+};
+

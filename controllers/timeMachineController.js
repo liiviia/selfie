@@ -37,3 +37,14 @@ exports.resetTimeMachineDate = (req, res) => {
     timeMachineConfig.resetTimeMachineDate();
     res.status(200).json({ message: 'Time Machine resettata alla data di sistema' });
 };
+
+exports.activateTimeMachine = (req, res) => {
+    timeMachineConfig.activate();
+    res.json({ message: 'Time Machine attivata' });
+  };
+  
+  exports.deactivateTimeMachine = (req, res) => {
+    timeMachineConfig.deactivate();
+    res.json({ message: 'Time Machine disattivata, utilizzo orario reale' });
+  };
+  

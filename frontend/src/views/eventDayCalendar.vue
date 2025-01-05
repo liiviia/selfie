@@ -86,7 +86,6 @@
 
     
     <div class="pomodoro-container">
-  <!-- POMODORI PER QUESTO GIORNO -->
   <div class="section pomodoros-section">
     <h3>POMODORI PER QUESTO GIORNO:</h3>
     <div v-if="pomodoros.length > 0">
@@ -114,7 +113,7 @@
     </div>
   </div>
 
-  <!-- POMODORI INCOMPLETI -->
+
   <div class="section pomodorosScaduti-section">
     <h3>POMODORI INCOMPLETI</h3>
     <div v-if="incompleteSessions.length > 0">
@@ -131,7 +130,7 @@
     <p v-else>nessun pomodoro da portare a termine</p>
   </div>
 
-  <!-- POMODORI NON AVVIATI -->
+  
   <div class="section unstarted-pomodoros-section">
     <h3>POMODORI NON AVVIATI</h3>
     <div v-if="unstartedSessions && unstartedSessions.length > 0">
@@ -175,6 +174,8 @@ export default {
     const currentUser = localStorage.getItem('username') ;
     const queryDate = computed(() => route.query.date);
     const timeMachine = ref();
+    const unstartedSessions = ref([]);
+
 
     const confirmDeleteActivity = (id) => {
       if (confirm("Sicuro di voler eliminare questa Attività?")) {
@@ -558,12 +559,29 @@ const query = queryDate.value;
     }
    };
 
+const fetchUnstartedSessions = async () => {
+  try {
+    const token = sessionStorage.getItem('token');
+    const username = localStorage.getItem('username');
+    const response = await axios.get('/api/getSessioniNonPartite', {
+      headers: { Authorization: `Bearer ${token}` },
+      params: { username },
+    });
+    unstartedSessions.value = Array.isArray(response.data) ? response.data : [];
+  } catch (error) {
+    console.error('Errore nel recupero delle sessioni mai avviate:', error);
+    unstartedSessions.value = []; // Assegna un array vuoto in caso di errore
+  }
+};
+
+
     onMounted(() => {
     //  fetchPoms();
       fetchEvents();
       fetchActivities();
       fetchOverdueActivities();
       fetchIncompleteSessions();
+      fetchUnstartedSessions(); 
       setInterval(getTimeMachine, 1000);    });
 
     return {
