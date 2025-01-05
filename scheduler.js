@@ -1,4 +1,4 @@
-const schedule = require('node-schedule');
+/*const schedule = require('node-schedule');
 const { markUnstartedSessions } = require('./controllers/pomsController');
 const timeMachineConfig = require('./timeMachineConfig');
 
@@ -31,3 +31,4 @@ function initializeScheduler() {
 }
 
 module.exports = { initializeScheduler };
+*/

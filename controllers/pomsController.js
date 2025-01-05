@@ -1,7 +1,7 @@
 const Pom = require('../models/pom');
 const User = require('../models/User');
 const notificationPom = require('../models/notificationPom');
-const timeMachineConfig = require('../timeMachineConfig');
+//const timeMachineConfig = require('../timeMachineConfig');
 
 exports.createPom = async (req, res) => {
   try {
@@ -16,7 +16,7 @@ exports.createPom = async (req, res) => {
       remainingTime, 
       isStudyPhase, 
       studyCycles, 
-      stato:"pianificata", 
+      //stato:"pianificata", 
     });
 
     const savedPom = await newPom.save();
