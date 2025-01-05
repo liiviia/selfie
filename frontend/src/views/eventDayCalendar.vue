@@ -128,7 +128,7 @@
     <p v-else>nessun pomodoro da portare a termine</p>
   </div>
 
-  <div class="section unstarted-pomodoros-section">
+  <!--<div class="section unstarted-pomodoros-section">
     <h3>POMODORI NON AVVIATI</h3>
     <div v-if="unstartedSessions && unstartedSessions.length > 0">
       <div v-for="session in unstartedSessions" :key="session._id" class="item-container">
@@ -144,7 +144,7 @@
       </div>
     </div>
     <p v-else>Nessun pomodoro non avviato trovato.</p>
-  </div>
+  </div>-->
 </div>
 
 
