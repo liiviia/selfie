@@ -567,6 +567,8 @@ const fetchUnstartedSessions = async () => {
       headers: { Authorization: `Bearer ${token}` },
       params: { username },
     });
+          console.log("risposta getsessioniNonPartite" , response);
+
     unstartedSessions.value = Array.isArray(response.data) ? response.data : [];
   } catch (error) {
     console.error('Errore nel recupero delle sessioni mai avviate:', error);
