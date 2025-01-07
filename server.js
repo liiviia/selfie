@@ -58,7 +58,6 @@ setInterval(async () => {
   const rawDate = timeMachineConfig.getTimeMachineDate();
   const isoDate = moment(rawDate).toISOString(); 
   const romeTime = moment(isoDate).tz('Europe/Rome');
-  await checkPomodoroAgainstTimeMachine(romeTime); 
 }, 1000); 
 
 setInterval(incrementTimeMachine, 1000);
