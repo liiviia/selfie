@@ -315,39 +315,3 @@ exports.getUnstartedSessions = async (req, res) => {
   }
 };
 
-exports.pomNonCompl = async (req, res) => {
-  try {
-    const username = req.query.username;
-    const timeMachineDate = getTimeMachineDate1();
-    if (!username) {
-      return res.status(400).json({ message: 'Username è necessario' });
-    }
-
-    const sessions = await Pom.find({ 
-      username,
-      giorno: { $lt: timeMachineDate },
-      isStarted: false
-    });
-
-    if (!sessions.length) {
-      return res.status(200).json({ message: 'Nessuna sessione non completata trovata' });
-    }
-    res.status(200).json(sessions);
-  } catch (error) {
-    console.error('Errore durante il recupero delle sessioni non completate:', error);
-    res.status(500).json({ error: 'Errore durante il recupero delle sessioni non completate' });
-  }
-};
-
-const getTimeMachineDate1 = async () => {
-  /*
-  console.log("time machine get return", moment(timeMachineConfig.getTimeMachineDate()).tz('Europe/Rome'))
-
-  return moment(timeMachineConfig.getTimeMachineDate()).tz('Europe/Rome');*/
-  const rawDate = timeMachineConfig.getTimeMachineDate();
-  const isoDate = moment(rawDate).toISOString(); // Assicura che sia in UTC
-  const romeTime = moment(isoDate).tz('Europe/Rome');
-  return romeTime;
-};
-
-
