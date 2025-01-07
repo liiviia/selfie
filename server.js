@@ -16,7 +16,6 @@ const timeMachineConfig = require('./timeMachineConfig');
 const alertRoutes = require('./routes/alertRoutes');
 const Pom = require('./models/pom'); 
 const { checkPomodoroAgainstTimeMachine } = require('./scheduler');
-const timeMachineConfig = require('../timeMachineConfig');
 
 
 // Aggiungi la rotta per gli alert
@@ -47,7 +46,7 @@ app.use(cors({
 
 connectDB();
 
-initializeScheduler(); 
+//initializeScheduler(); 
 
 const incrementTimeMachine = () => {
   const currentTime = moment(timeMachineConfig.getTimeMachineDate()).tz('Europe/Rome');

@@ -422,6 +422,7 @@ export default {
     const fetchIncompleteSessions = async () => {
   const token = sessionStorage.getItem('token');
   const username = localStorage.getItem('username');
+  console.log("query date", queryDate);
   const queryDate = queryDate.value;
   const queryDateMs = queryDate ? new Date(queryDate).valueOf() : null;
 
