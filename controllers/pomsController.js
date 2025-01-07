@@ -265,7 +265,7 @@ exports.iniziaPomodoro = async (req, res) => {
 
 
 // Trovare mai avviata  
-exports.markUnstartedSessions = async (currentDate) => {
+/*exports.markUnstartedSessions = async (currentDate) => {
   try {
     const today = new Date(currentDate);
     today.setHours(0, 0, 0, 0);
@@ -273,9 +273,19 @@ exports.markUnstartedSessions = async (currentDate) => {
     const unstartedSessions = await Pom.find({
       giorno: { $lt: today },
       isStarted: false,
+      stato: 'pianificata' 
     });
 
-    console.log(`${unstartedSessions.length} sessioni contrassegnate come mai avviate.`);
+    const result = await Pom.updateMany(
+      {
+        giorno: { $lt: today },
+        isStarted: false,
+        stato: 'pianificata',
+      },
+      { $set: { stato: 'mai_avviata' } }
+    );
+
+    console.log(`${result.modifiedCount} sessioni contrassegnate come mai avviate.`);
   } catch (error) {
     console.error('Errore durante il controllo delle sessioni mai avviate:', error);
   }
@@ -288,7 +298,10 @@ exports.getUnstartedSessions = async (req, res) => {
       return res.status(400).json({ message: 'Username è necessario' });
     }
 
-    const sessions = await Pom.find({ username, isStarted: 'false' }).sort({ giorno: -1 });
+    const sessions = await Pom.find({
+      username,
+      stato: 'mai_avviata', 
+    }).sort({ giorno: -1 });
 
     if (!sessions.length) {
       return res.status(404).json({ message: 'Nessuna sessione non avviata trovata' });
@@ -299,5 +312,24 @@ exports.getUnstartedSessions = async (req, res) => {
     console.error('Errore durante il recupero delle sessioni non avviate:', error);
     res.status(500).json({ error: 'Errore durante il recupero delle sessioni non avviate' });
   }
-};
+};*/
 
+
+exports.pomNonCompl = async (req, res) => {
+  try {
+    const username = req.query.username;
+    const timeMachineDate = getTimeMachineDate1();
+    if (!username) {
+      return res.status(400).json({ message: 'Username è necessario' });
+    }
+
+    const sessions = await Pom.find({ 
+      username,
+      giorno: { $lt: timeMachineDate },
+      isStarted: false
+    });
+
+    if (!sessions.length) {
+      return res.status(200).json({ message: 'Nessuna sessione non completata trovata' });
+    }
+  }

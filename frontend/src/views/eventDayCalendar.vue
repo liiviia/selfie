@@ -419,7 +419,8 @@ export default {
       }
     };
 
-    const fetchIncompleteSessions = async () => {
+
+  /*const fetchIncompleteSessions = async () => {
       const token = sessionStorage.getItem('token');
       const username = localStorage.getItem('username');
 
@@ -447,7 +448,47 @@ export default {
       } catch (error) {
         console.error('Errore nel recupero delle sessioni incomplete:', error);
       }
-    };
+    };*/
+
+
+    const fetchIncompleteSessions = async () => {
+  const token = sessionStorage.getItem('token');
+  const username = localStorage.getItem('username');
+  const queryDate = queryDate.value;
+  const queryDateMs = queryDate ? new Date(queryDate).valueOf() : null;
+
+  try {
+    // Prima chiamata: recupera le sessioni incomplete
+    const response = await axios.get('/api/poms/incomplete', {
+      headers: { Authorization: `Bearer ${token}` },
+      params: { username }
+    });
+
+    const incompleteData = (Array.isArray(response.data) ? response.data : [response.data]).filter(session => {
+      return (
+        session.studyCycles > 0 &&
+        session.remainingTime > 0 &&
+        session.tempoStudio &&
+        session.tempoPausa &&
+        new Date(session.giorno).valueOf() <= queryDateMs
+      );
+    });
+
+    // Seconda chiamata: recupera le sessioni non completate dal backend
+    const nonCompletedResponse = await axios.get('/api/poms/getPomNonPart', {
+      headers: { Authorization: `Bearer ${token}` },
+      params: { username }
+    });
+
+    const nonCompletedData = Array.isArray(nonCompletedResponse.data) ? nonCompletedResponse.data : [];
+
+    // Concatena i dati delle due chiamate
+    incompleteSessions.value = [...incompleteData, ...nonCompletedData];
+  } catch (error) {
+    console.error('Errore nel recupero delle sessioni:', error);
+  }
+};
+
 
     const resumePomodoro = (session) => {
     const plainSession = JSON.parse(JSON.stringify(session));
@@ -469,6 +510,8 @@ export default {
     },
   });
     };
+
+    
 
     const discardPomodoro = async (session) => {
       const token = sessionStorage.getItem('token');
@@ -559,22 +602,24 @@ export default {
     }
    };
 
-const fetchUnstartedSessions = async () => {
+/*const fetchUnstartedSessions = async () => {
   try {
-    const token = sessionStorage.getItem('token');
-    const username = localStorage.getItem('username');
-    const response = await axios.get('/api/getSessioniNonPartite', {
-      headers: { Authorization: `Bearer ${token}` },
-      params: { username },
-    });
-          console.log("risposta getsessioniNonPartite" , response);
+        const token = sessionStorage.getItem('token');
+        const username = localStorage.getItem('username');
+        const response = await axios.get('/api/getSessioniNonPartite', {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { username },
+        });
 
-    unstartedSessions.value = Array.isArray(response.data) ? response.data : [];
-  } catch (error) {
-    console.error('Errore nel recupero delle sessioni mai avviate:', error);
-    unstartedSessions.value = []; // Assegna un array vuoto in caso di errore
-  }
-};
+        console.log('Risposta:', response.data);
+
+        unstartedSessions.value = Array.isArray(response.data) ? response.data : [];
+      } catch (error) {
+        console.error('Errore nel recupero delle sessioni mai avviate:', error);
+        this.unstartedSessions = []; // Array vuoto in caso di errore
+      }
+};*/
+
 
 
     onMounted(() => {
@@ -583,7 +628,7 @@ const fetchUnstartedSessions = async () => {
       fetchActivities();
       fetchOverdueActivities();
       fetchIncompleteSessions();
-      fetchUnstartedSessions(); 
+      //fetchUnstartedSessions(); 
       setInterval(getTimeMachine, 1000);    });
 
     return {
@@ -591,6 +636,7 @@ const fetchUnstartedSessions = async () => {
       activities,
       pomodoros, 
       incompleteSessions, 
+      unstartedSessions, 
       overdueActivities,
       formatDate,
       queryDate,
