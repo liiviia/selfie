@@ -15,7 +15,7 @@ const timeMachineRoutes = require('./routes/timeMachineRoutes');
 const timeMachineConfig = require('./timeMachineConfig');
 const alertRoutes = require('./routes/alertRoutes');
 const Pom = require('./models/pom'); 
-const {initializeScheduler} = require('scheduler.js'); 
+//const {initializeScheduler} = require('scheduler.js'); 
 
 // Aggiungi la rotta per gli alert
 const moment = require('moment-timezone');
@@ -45,7 +45,7 @@ app.use(cors({
 
 connectDB();
 
-initializeScheduler(); 
+//initializeScheduler(); 
 
 const incrementTimeMachine = () => {
   const currentTime = moment(timeMachineConfig.getTimeMachineDate()).tz('Europe/Rome');
