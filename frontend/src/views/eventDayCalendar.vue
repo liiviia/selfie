@@ -604,8 +604,13 @@ export default {
 
 const fetchUnstartedSessions = async () => {
   try {
+    
         const token = sessionStorage.getItem('token');
         const username = localStorage.getItem('username');
+
+        console.log('Token:', token);
+        console.log('Username:', username);
+
         const response = await axios.get('/api/getSessioniNonPartite', {
           headers: { Authorization: `Bearer ${token}` },
           params: { username },
@@ -616,7 +621,7 @@ const fetchUnstartedSessions = async () => {
         unstartedSessions.value = Array.isArray(response.data) ? response.data : [];
       } catch (error) {
         console.error('Errore nel recupero delle sessioni mai avviate:', error);
-        this.unstartedSessions = []; // Array vuoto in caso di errore
+        unstartedSessions.value = []; 
       }
 };
 
