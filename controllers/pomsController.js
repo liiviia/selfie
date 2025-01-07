@@ -275,18 +275,6 @@ exports.markUnstartedSessions = async (currentDate) => {
       isStarted: false,
     });
 
-    if (unstartedSessions.length === 0) {
-      console.log('Nessuna sessione mai avviata trovata.');
-      return;
-    }
-
-    const updatePromises = unstartedSessions.map((session) => {
-      session.stato = 'mai_avviata';
-      return session.save();
-    });
-
-    await Promise.all(updatePromises);
-
     console.log(`${unstartedSessions.length} sessioni contrassegnate come mai avviate.`);
   } catch (error) {
     console.error('Errore durante il controllo delle sessioni mai avviate:', error);
@@ -300,7 +288,7 @@ exports.getUnstartedSessions = async (req, res) => {
       return res.status(400).json({ message: 'Username è necessario' });
     }
 
-    const sessions = await Pom.find({ username, stato: 'mai_avviata' }).sort({ giorno: -1 });
+    const sessions = await Pom.find({ username, isStarted: 'false' }).sort({ giorno: -1 });
 
     if (!sessions.length) {
       return res.status(404).json({ message: 'Nessuna sessione non avviata trovata' });

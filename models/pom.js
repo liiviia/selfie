@@ -11,7 +11,6 @@ const pomSchema = new mongoose.Schema({
     studyCycles: { type: Number, default: 0 }, 
     ripetizioni: { type: Number },
     isStarted: {type: Boolean, default: false},
-    stato: { type: String, enum: ['pianificata', 'completata', 'mai_avviata'], default: 'pianificata' },
 }, { timestamps: true });
 
 

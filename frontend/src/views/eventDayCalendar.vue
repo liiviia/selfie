@@ -431,7 +431,7 @@ export default {
 
        
 
-const query = queryDate.value; 
+    const query = queryDate.value; 
     const queryDateMs = query ? new Date(query).valueOf() : null;
         
         incompleteSessions.value = (Array.isArray(response.data) ? response.data : [response.data]).filter(session => {
