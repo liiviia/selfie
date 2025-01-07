@@ -265,7 +265,7 @@ exports.iniziaPomodoro = async (req, res) => {
 
 
 // Trovare mai avviata  
-/*exports.markUnstartedSessions = async (currentDate) => {
+exports.markUnstartedSessions = async (currentDate) => {
   try {
     const today = new Date(currentDate);
     today.setHours(0, 0, 0, 0);
@@ -312,10 +312,10 @@ exports.getUnstartedSessions = async (req, res) => {
     console.error('Errore durante il recupero delle sessioni non avviate:', error);
     res.status(500).json({ error: 'Errore durante il recupero delle sessioni non avviate' });
   }
-};*/
+};
 
 
-exports.pomNonCompl = async (req, res) => {
+/*exports.pomNonCompl = async (req, res) => {
   try {
     const username = req.query.username;
     const timeMachineDate = getTimeMachineDate1();
@@ -340,12 +340,11 @@ exports.pomNonCompl = async (req, res) => {
 };
 
 const getTimeMachineDate1 = async () => {
-  /*
-  console.log("time machine get return", moment(timeMachineConfig.getTimeMachineDate()).tz('Europe/Rome'))
+  //console.log("time machine get return", moment(timeMachineConfig.getTimeMachineDate()).tz('Europe/Rome'))
 
-  return moment(timeMachineConfig.getTimeMachineDate()).tz('Europe/Rome');*/
+  //return moment(timeMachineConfig.getTimeMachineDate()).tz('Europe/Rome');
   const rawDate = timeMachineConfig.getTimeMachineDate();
   const isoDate = moment(rawDate).toISOString(); // Assicura che sia in UTC
   const romeTime = moment(isoDate).tz('Europe/Rome');
   return romeTime;
-};
+};*/

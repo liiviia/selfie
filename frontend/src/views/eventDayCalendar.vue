@@ -420,7 +420,7 @@ export default {
     };
 
 
-  /*const fetchIncompleteSessions = async () => {
+  const fetchIncompleteSessions = async () => {
       const token = sessionStorage.getItem('token');
       const username = localStorage.getItem('username');
 
@@ -448,10 +448,10 @@ export default {
       } catch (error) {
         console.error('Errore nel recupero delle sessioni incomplete:', error);
       }
-    };*/
+    };
 
-
-    const fetchIncompleteSessions = async () => {
+// CON SESSIONI MAI AVVIATE
+    /*const fetchIncompleteSessions = async () => {
   const token = sessionStorage.getItem('token');
   const username = localStorage.getItem('username');
   const queryDate = queryDate.value;
@@ -487,7 +487,7 @@ export default {
   } catch (error) {
     console.error('Errore nel recupero delle sessioni:', error);
   }
-};
+};*/
 
 
     const resumePomodoro = (session) => {
@@ -602,7 +602,7 @@ export default {
     }
    };
 
-/*const fetchUnstartedSessions = async () => {
+const fetchUnstartedSessions = async () => {
   try {
         const token = sessionStorage.getItem('token');
         const username = localStorage.getItem('username');
@@ -618,7 +618,7 @@ export default {
         console.error('Errore nel recupero delle sessioni mai avviate:', error);
         this.unstartedSessions = []; // Array vuoto in caso di errore
       }
-};*/
+};
 
 
 
@@ -628,7 +628,7 @@ export default {
       fetchActivities();
       fetchOverdueActivities();
       fetchIncompleteSessions();
-      //fetchUnstartedSessions(); 
+      fetchUnstartedSessions(); 
       setInterval(getTimeMachine, 1000);    });
 
     return {
