@@ -15,7 +15,12 @@ const timeMachineRoutes = require('./routes/timeMachineRoutes');
 const timeMachineConfig = require('./timeMachineConfig');
 const alertRoutes = require('./routes/alertRoutes');
 const Pom = require('./models/pom'); 
+<<<<<<< HEAD
 const {initializeScheduler} = require('./scheduler.js'); 
+=======
+const { checkPomodoroAgainstTimeMachine } = require('./scheduler');
+
+>>>>>>> 8cd6bfd994d72ff4a7a1c6f99d7f6d1e7849df8c
 
 // Aggiungi la rotta per gli alert
 const moment = require('moment-timezone');
@@ -45,14 +50,21 @@ app.use(cors({
 
 connectDB();
 
-initializeScheduler(); 
+//initializeScheduler(); 
 
 const incrementTimeMachine = () => {
   const currentTime = moment(timeMachineConfig.getTimeMachineDate()).tz('Europe/Rome');
   const updatedTime = currentTime.add(1, 'seconds').toDate();
   timeMachineConfig.setTimeMachineDate(updatedTime);
-
 };
+
+setInterval(async () => {
+  console.log('Esecuzione controllo Pomodoro...');
+  const rawDate = timeMachineConfig.getTimeMachineDate();
+  const isoDate = moment(rawDate).toISOString(); 
+  const romeTime = moment(isoDate).tz('Europe/Rome');
+  await checkPomodoroAgainstTimeMachine(romeTime); 
+}, 1000); 
 
 setInterval(incrementTimeMachine, 1000);
 

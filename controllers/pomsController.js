@@ -1,7 +1,8 @@
 const Pom = require('../models/pom');
 const User = require('../models/User');
 const notificationPom = require('../models/notificationPom');
-const { getTimeMachineDate } = require('../controllers/timeMachineController'); 
+const timeMachineConfig = require('../timeMachineConfig');
+const moment = require('moment-timezone');
 
 exports.createPom = async (req, res) => {
   try {
@@ -314,8 +315,7 @@ exports.getUnstartedSessions = async (req, res) => {
   }
 };
 
-
-/*exports.pomNonCompl = async (req, res) => {
+exports.pomNonCompl = async (req, res) => {
   try {
     const username = req.query.username;
     const timeMachineDate = getTimeMachineDate1();
@@ -340,11 +340,14 @@ exports.getUnstartedSessions = async (req, res) => {
 };
 
 const getTimeMachineDate1 = async () => {
-  //console.log("time machine get return", moment(timeMachineConfig.getTimeMachineDate()).tz('Europe/Rome'))
+  /*
+  console.log("time machine get return", moment(timeMachineConfig.getTimeMachineDate()).tz('Europe/Rome'))
 
-  //return moment(timeMachineConfig.getTimeMachineDate()).tz('Europe/Rome');
+  return moment(timeMachineConfig.getTimeMachineDate()).tz('Europe/Rome');*/
   const rawDate = timeMachineConfig.getTimeMachineDate();
   const isoDate = moment(rawDate).toISOString(); // Assicura che sia in UTC
   const romeTime = moment(isoDate).tz('Europe/Rome');
   return romeTime;
-};*/
+};
+
+

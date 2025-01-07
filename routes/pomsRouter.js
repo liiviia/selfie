@@ -29,6 +29,6 @@ router.post('/sessioniNonPartite', authenticateToken, pomController.markUnstarte
 
 router.get('/getSessioniNonPartite', authenticateToken, pomController.getUnstartedSessions); 
 
-//router.get('/getPomNonPart', authenticateToken, pomController.pomNonCompl);
+router.get('/getPomNonPart', authenticateToken, pomController.pomNonCompl);
 
 module.exports = router;
