@@ -423,8 +423,7 @@ export default {
 const fetchIncompleteSessions = async () => {
   const token = sessionStorage.getItem('token');
   const username = localStorage.getItem('username');
-  const queryDate = queryDate.value;
-  const queryDateMs = queryDate ? new Date(queryDate).valueOf() : null;
+  const queryDateMs = queryDate.value ? new Date(queryDate.value).valueOf() : null;
 
   try {
     // Prima chiamata: recupera le sessioni incomplete
