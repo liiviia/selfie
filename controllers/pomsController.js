@@ -338,10 +338,10 @@ exports.pomNonPartiti = async (req, res) => {
       const nextDayStart = currentDate.clone().add(1, 'day').startOf('day');
 
       const pomodoriNonPartiti = await Pom.find({
-          isStarted: false,
-          giorno: { $gte: nextDayStart.toDate() }, // Dal giorno successivo in poi
-          username: username,
-      });
+        isStarted: false,
+        giorno: { $lt: currentDate.toDate() }, // Inferiore alla Time Machine Date
+        username: username,
+    });
 
       console.log('Pomodori non partiti:', pomodoriNonPartiti);
 
