@@ -327,7 +327,7 @@ const getTimeMachineDate1 = async () => {
 
 exports.pomNonPartiti = async (req, res) => {
   try {
-      const currentDate = await getTimeMachineDate1(); // Data simulata dalla Time Machine
+      const currentDate = await getTimeMachineDate1();
       const username = req.query.username; 
 
       if (!username) {
@@ -339,11 +339,10 @@ exports.pomNonPartiti = async (req, res) => {
 
       const pomodoriNonPartiti = await Pom.find({
           isStarted: false,
-          giorno: { $lt: startOfDay.toDate() }, // Inferiore all'inizio del giorno della Time Machine
+          giorno: { $lt: startOfDay.toDate() },
           username: username,
       });
 
-      console.log('Pomodori non partiti:', pomodoriNonPartiti);
 
       if (pomodoriNonPartiti.length === 0) {
           return res.status(200).json({ message: 'Nessun pomodoro non avviato trovato.' });
