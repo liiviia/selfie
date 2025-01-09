@@ -140,7 +140,7 @@
             <p>Tempo di studio: {{ session.tempoStudio }} minuti</p>
             <p>Tempo di pausa: {{ session.tempoPausa }} minuti</p>
             <p>Ripetizioni: {{ session.ripetizioni }}</p>
-            <button @click="confirmDeletePomodoro(pomodoro._id)" class="delete-btn-cq">🗑️</button>
+            <button @click="confirmDeletePomodoro(session._id)" class="delete-btn-cq">🗑️</button>
             <button @click="iniziaPomodoro(session._id, session.remainingTime, session.giorno, session.tempoStudio, session.tempoPausa, session.ripetizioni)"
                     class="action-button" style="background:#f4a460;">
                 Inizia Sessione
