@@ -423,7 +423,6 @@ export default {
 const fetchIncompleteSessions = async () => {
   const token = sessionStorage.getItem('token');
   const username = localStorage.getItem('username');
-  console.log("query date", queryDate);
   const queryDate = queryDate.value;
   const queryDateMs = queryDate ? new Date(queryDate).valueOf() : null;
 
@@ -478,10 +477,11 @@ const pomNonAvviati = async () => {
         });
 
         const data = response.data;
+        console.log("risposta pom non avviati", data);
 
         if (data.message) {
-                    console.log(data.message); // Messaggio se non ci sono sessioni
-                    unstartedSessions.value = []; // Imposta come vuoto
+                    console.log(data.message); 
+                    unstartedSessions.value = []; 
                 } else {
                     unstartedSessions.value = data; 
                 }
