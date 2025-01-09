@@ -63,7 +63,7 @@ setInterval(incrementTimeMachine, 1000);
 
 startNotificationMonitoring();
 
-cron.schedule('0 0 * * *', async () => { 
+/*cron.schedule('0 0 * * *', async () => { 
   try {
     console.log('Esecuzione del controllo sessioni incomplete...');
 
@@ -89,7 +89,7 @@ cron.schedule('0 0 * * *', async () => {
   } catch (error) {
     console.error('Errore durante il controllo delle sessioni incomplete:', error);
   }
-});
+});*/
 
 app.use(express.json());  
 app.use('/api/auth', authRoutes);
