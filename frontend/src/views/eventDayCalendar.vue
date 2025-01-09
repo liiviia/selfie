@@ -419,7 +419,7 @@ export default {
       }
     };
 
-    const fetchIncompleteSessions = async () => {
+const fetchIncompleteSessions = async () => {
   const token = sessionStorage.getItem('token');
   const username = localStorage.getItem('username');
   console.log("query date", queryDate);
@@ -458,44 +458,6 @@ export default {
   }
 };
 
-// CON SESSIONI MAI AVVIATE
-    /*const fetchIncompleteSessions = async () => {
-  const token = sessionStorage.getItem('token');
-  const username = localStorage.getItem('username');
-  const queryDate = queryDate.value;
-  const queryDateMs = queryDate ? new Date(queryDate).valueOf() : null;
-
-  try {
-    // Prima chiamata: recupera le sessioni incomplete
-    const response = await axios.get('/api/poms/incomplete', {
-      headers: { Authorization: `Bearer ${token}` },
-      params: { username }
-    });
-
-    const incompleteData = (Array.isArray(response.data) ? response.data : [response.data]).filter(session => {
-      return (
-        session.studyCycles > 0 &&
-        session.remainingTime > 0 &&
-        session.tempoStudio &&
-        session.tempoPausa &&
-        new Date(session.giorno).valueOf() <= queryDateMs
-      );
-    });
-
-    // Seconda chiamata: recupera le sessioni non completate dal backend
-    const nonCompletedResponse = await axios.get('/api/poms/getPomNonPart', {
-      headers: { Authorization: `Bearer ${token}` },
-      params: { username }
-    });
-
-    const nonCompletedData = Array.isArray(nonCompletedResponse.data) ? nonCompletedResponse.data : [];
-
-    // Concatena i dati delle due chiamate
-    incompleteSessions.value = [...incompleteData, ...nonCompletedData];
-  } catch (error) {
-    console.error('Errore nel recupero delle sessioni:', error);
-  }
-};*/
 
 
     const resumePomodoro = (session) => {

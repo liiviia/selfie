@@ -1,28 +1,25 @@
-const Pom = require('./models/pom'); 
+const schedule = require('node-schedule');
+const { markUnstartedSessions } = require('./controllers/pomsController');
+const timeMachineConfig = require('./timeMachineConfig');
 
+function initializeScheduler() {
+  const jobInterval = 60000;
 
-const checkPomodoroAgainstTimeMachine = async (timeMachineDate) => {
-
-  
+  setInterval(async () => {
+    console.log('Esecuzione job basato sull\'orario attuale o Time Machine...');
     try {
-        const results = await Pom.find({
-            giorno: { $lt: timeMachineDate },
-            isStarted: false,
-        });
+      const currentDate = timeMachineConfig.isActive()
+        ? timeMachineConfig.getTimeMachineDate()
+        : new Date();
 
-        results.forEach((pom) => {
-            console.log(`Pomodoro da controllare:`, pom);
-        });
+      console.log(`Data usata per il controllo: ${currentDate}`);
 
-        if (results.length === 0) {
-            console.log('Nessun pomodoro da controllare rispetto alla Time Machine.');
-        }
+      await markUnstartedSessions(currentDate);
+      console.log('Job completato: sessioni mai avviate aggiornate.');
     } catch (error) {
-        console.error('Errore durante il controllo dei pomodoros:', error);
+      console.error('Errore durante il job di verifica sessioni:', error);
     }
-};
+  }, jobInterval);
+}
 
-module.exports = {
-  checkPomodoroAgainstTimeMachine
-};
-
+module.exports = { initializeScheduler };
