@@ -315,40 +315,33 @@ exports.getUnstartedSessions = async (req, res) => {
   }
 };
 
-exports.pomNonCompl = async (req, res) => {
+
+exports.pomNonPartiti = async (req, res) => {
   try {
-    const username = req.query.username;
-    const timeMachineDate = getTimeMachineDate1();
-    if (!username) {
-      return res.status(400).json({ message: 'Username è necessario' });
-    }
+      const currentDate = new Date();
+      const username = req.query.username; 
 
-    const sessions = await Pom.find({ 
-      username,
-      giorno: { $lt: timeMachineDate },
-      isStarted: false
-    });
+      if (!username) {
+          return res.status(400).json({ error: 'Username non fornito.' });
+      }
 
-    if (!sessions.length) {
-      return res.status(200).json({ message: 'Nessuna sessione non completata trovata' });
-    }
-    res.status(200).json(sessions);
+      const pomodoriNonPartiti = await Pom.find({
+          isStarted: false,
+          giorno: { $gt: currentDate },
+          username: username, 
+      });
+
+      if (pomodoriNonPartiti.length === 0) {
+          return res.status(200).json({ message: 'Nessun pomodoro non avviato trovato.' });
+      }
+
+      res.status(200).json(pomodoriNonPartiti);
   } catch (error) {
-    console.error('Errore durante il recupero delle sessioni non completate:', error);
-    res.status(500).json({ error: 'Errore durante il recupero delle sessioni non completate' });
+      res.status(500).json({ error: 'Errore nel recupero dei pomodori non avviati' });
   }
 };
 
-const getTimeMachineDate1 = async () => {
-  /*
-  console.log("time machine get return", moment(timeMachineConfig.getTimeMachineDate()).tz('Europe/Rome'))
 
-  return moment(timeMachineConfig.getTimeMachineDate()).tz('Europe/Rome');*/
-  const rawDate = timeMachineConfig.getTimeMachineDate();
-  const isoDate = moment(rawDate).toISOString(); // Assicura che sia in UTC
-  const romeTime = moment(isoDate).tz('Europe/Rome');
-  return romeTime;
-};
 
 
 

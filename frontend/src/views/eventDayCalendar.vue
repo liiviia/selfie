@@ -134,20 +134,21 @@
   <div class="section unstarted-pomodoros-section">
     <h3>POMODORI NON AVVIATI</h3>
     <div v-if="unstartedSessions && unstartedSessions.length > 0">
-      <div v-for="session in unstartedSessions" :key="session._id" class="item-container">
-        <h4>Sessione non avviata</h4>
-        <p>Data: {{ formatDate(session.giorno) }}</p>
-        <p>Tempo di studio: {{ session.tempoStudio }} minuti</p>
-        <p>Tempo di pausa: {{ session.tempoPausa }} minuti</p>
-        <p>Ripetizioni: {{ session.ripetizioni }}</p>
-        <button @click="iniziaPomodoro(session._id, session.remainingTime, session.giorno, session.tempoStudio, session.tempoPausa, session.ripetizioni)"
-                class="action-button" style="background:#f4a460;">
-          Inizia Sessione
-        </button>
-      </div>
+        <div v-for="session in unstartedSessions" :key="session._id" class="item-container">
+            <h4>Sessione non avviata</h4>
+            <p>Data: {{ formatDate(session.giorno) }}</p>
+            <p>Tempo di studio: {{ session.tempoStudio }} minuti</p>
+            <p>Tempo di pausa: {{ session.tempoPausa }} minuti</p>
+            <p>Ripetizioni: {{ session.ripetizioni }}</p>
+            <button @click="iniziaPomodoro(session._id, session.remainingTime, session.giorno, session.tempoStudio, session.tempoPausa, session.ripetizioni)"
+                    class="action-button" style="background:#f4a460;">
+                Inizia Sessione
+            </button>
+        </div>
     </div>
     <p v-else>Nessun pomodoro non avviato trovato.</p>
-  </div>
+</div>
+
 </div>
 
   
@@ -459,6 +460,39 @@ const fetchIncompleteSessions = async () => {
 };
 
 
+const pomNonAvviati = async () => {
+    try {
+        const token = sessionStorage.getItem('token'); 
+        const username = localStorage.getItem('username'); 
+
+        if (!username) {
+            console.error('Username non trovato nel localStorage.');
+            return [];
+        }
+
+        const response = await axios.get(`/api/sessioniNonPartiteq`, {
+            headers: {
+                'Authorization': `Bearer ${token}`, 
+            },
+            params: { username }, 
+        });
+
+        const data = response.data;
+
+        if (data.message) {
+                    console.log(data.message); // Messaggio se non ci sono sessioni
+                    unstartedSessions.value = []; // Imposta come vuoto
+                } else {
+                    unstartedSessions.value = data; 
+                }
+            } catch (error) {
+                console.error('Errore:', error.response?.data || error.message);
+                unstartedSessions.value = [];
+            }
+};
+
+
+
 
     const resumePomodoro = (session) => {
     const plainSession = JSON.parse(JSON.stringify(session));
@@ -604,6 +638,7 @@ const fetchUnstartedSessions = async () => {
       fetchOverdueActivities();
       fetchIncompleteSessions();
       fetchUnstartedSessions(); 
+      pomNonAvviati();
       setInterval(getTimeMachine, 1000);    });
 
     return {
@@ -628,6 +663,7 @@ const fetchUnstartedSessions = async () => {
       filteredOverdueActivities,
       discardActivity,
       iniziaPomodoro,
+      pomNonAvviati,
       timeMachine,
       isSameDay,
       currentUser,
