@@ -52,12 +52,7 @@ const incrementTimeMachine = () => {
   timeMachineConfig.setTimeMachineDate(updatedTime);
 };
 
-setInterval(async () => {
-  console.log('Esecuzione controllo Pomodoro...');
-  const rawDate = timeMachineConfig.getTimeMachineDate();
-  const isoDate = moment(rawDate).toISOString(); 
-  const romeTime = moment(isoDate).tz('Europe/Rome');
-}, 1000); 
+
 
 setInterval(incrementTimeMachine, 1000);
 
