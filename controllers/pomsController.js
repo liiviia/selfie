@@ -316,19 +316,31 @@ exports.getUnstartedSessions = async (req, res) => {
 };
 
 
+const getTimeMachineDate1 = async () => {
+  const rawDate = timeMachineConfig.getTimeMachineDate();
+  const isoDate = moment(rawDate).toISOString(); 
+  return moment(isoDate).tz('Europe/Rome');
+};
+
+
+
+
 exports.pomNonPartiti = async (req, res) => {
   try {
-      const currentDate = new Date();
+      const currentDate = await getTimeMachineDate1(); 
       const username = req.query.username; 
 
       if (!username) {
           return res.status(400).json({ error: 'Username non fornito.' });
       }
 
+      const nextDayStart = currentDate.clone().add(1, 'day').startOf('day'); // Inizio del giorno successivo
+      const nextDayEnd = nextDayStart.clone().endOf('day'); // Fine del giorno successivo
+      
       const pomodoriNonPartiti = await Pom.find({
           isStarted: false,
-          giorno: { $gt: currentDate },
-          username: username, 
+          giorno: { $gte: nextDayStart.toDate(), $lt: nextDayEnd.toDate() }, // Solo il giorno successivo
+          username: username,
       });
 
       if (pomodoriNonPartiti.length === 0) {
@@ -337,6 +349,7 @@ exports.pomNonPartiti = async (req, res) => {
 
       res.status(200).json(pomodoriNonPartiti);
   } catch (error) {
+      console.error('Errore:', error); // Logga l'errore per debug
       res.status(500).json({ error: 'Errore nel recupero dei pomodori non avviati' });
   }
 };
