@@ -334,14 +334,14 @@ exports.pomNonPartiti = async (req, res) => {
           return res.status(400).json({ error: 'Username non fornito.' });
       }
 
-      // Calcola l'inizio del giorno successivo
-      const nextDayStart = currentDate.clone().add(1, 'day').startOf('day');
+      // Calcola l'inizio del giorno corrente
+      const startOfDay = currentDate.clone().startOf('day');
 
       const pomodoriNonPartiti = await Pom.find({
-        isStarted: false,
-        giorno: { $lt: currentDate.toDate() }, // Inferiore alla Time Machine Date
-        username: username,
-    });
+          isStarted: false,
+          giorno: { $lt: startOfDay.toDate() }, // Inferiore all'inizio del giorno della Time Machine
+          username: username,
+      });
 
       console.log('Pomodori non partiti:', pomodoriNonPartiti);
 
@@ -355,6 +355,7 @@ exports.pomNonPartiti = async (req, res) => {
       res.status(500).json({ error: 'Errore nel recupero dei pomodori non avviati' });
   }
 };
+
 
 
 
