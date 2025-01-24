@@ -269,7 +269,7 @@
 
 import axios from 'axios';
 import { marked } from 'marked';
-import homePageImage from '@/assets/images/home page design with calendar, activities, study management, and notes preview.jpeg';
+import homePageImage from '@/assets/images/homer.png';
 import gestisciImmagine from '@/assets/images/img1.jpeg'; 
 export default {
   name: 'HomePrincipale',
