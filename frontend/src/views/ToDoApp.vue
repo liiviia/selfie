@@ -45,9 +45,10 @@
         <h2>{{ note.heading }}</h2>
         <div class="note-content" v-html="renderMarkdown(note.content)"></div>
         <p>Autore: {{ note.author }}</p>
-        <p v-if="note.access === 'public' || (note.access === 'restricted' && note.allowedUsers && note.allowedUsers.includes(username))">
-          Condivisa con te da: {{ note.author }}
+        <p v-if="(note.access === 'public' || (note.access === 'restricted' && note.allowedUsers && note.allowedUsers.includes(username))) && note.author !== username">
+           Condivisa con te da: {{ note.author }}
         </p>
+
         <div class="note-actions">
           <button @click="editNote(note._id)" class="edit-btn">Modifica</button>
           <button @click="deleteNote(note._id)" class="delete-btn">Elimina</button>

@@ -42,6 +42,12 @@ const sendReminderEmail = (email, activities) => {
 
 
 const sendNotifEmail = (recipientEmail, eventDetails) => {
+  const formattedDate = new Date(eventDetails.date).toLocaleDateString('it-IT', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+
   const mailOptions = {
     from: '"Servizio Sito SELFIE"<appp4905@gmail.com>',
     to: recipientEmail,
@@ -50,7 +56,7 @@ const sendNotifEmail = (recipientEmail, eventDetails) => {
        <div style="font-family: Arial, sans-serif;">
         <h2 style="color: #2c3e50;">L'evento "${eventDetails.title}"</h2>
         <p style="font-size: 16px;">
-          <strong>📅 Data:</strong> ${eventDetails.date}<br>
+          <strong>📅 Data:</strong> ${formattedDate}<br>
           <strong>🕒 Ora di inizio:</strong> ${eventDetails.startTime}<br>
           <strong>📍 Luogo:</strong> ${eventDetails.location}<br>
           <strong>⏳ Durata:</strong> ${eventDetails.duration} minuti
@@ -61,19 +67,25 @@ const sendNotifEmail = (recipientEmail, eventDetails) => {
     `
   };
   sendMail(mailOptions);
-} ;
+};
 
-const sendNotifEmailActivity = (recipientEmail , activityDetails) => {
- 
+
+const sendNotifEmailActivity = (recipientEmail, activityDetails) => {
+  const formattedDeadline = new Date(activityDetails.deadline).toLocaleDateString('it-IT', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+
   const mailOptions = {
     from: '"Servizio sito SELFIE"<app4905@gmail.com>',
-    to:recipientEmail,
+    to: recipientEmail,
     subject: 'NON DIMENTICARTI L ATTIVITÀ:',
     html: `
        <div style="font-family: Arial, sans-serif;">
         <h2 style="color: #2c3e50;">L'attività "${activityDetails.title}"</h2>
         <p style="font-size: 16px;">
-          <strong>📅 Scadenza:</strong> ${activityDetails.deadline}<br>
+          <strong>📅 Scadenza:</strong> ${formattedDeadline}<br>
           <strong>🕒 Descrizione:</strong> ${activityDetails.description}<br>
           <p style="font-size: 14px;">Non mancare! </p>
         <p style="font-size: 14px;">Grazie,<br>Il Team SELFIE</p>
@@ -82,8 +94,8 @@ const sendNotifEmailActivity = (recipientEmail , activityDetails) => {
     `
   };
   sendMail(mailOptions);
-
 };
+
 
 
 
