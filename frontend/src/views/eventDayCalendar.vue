@@ -113,7 +113,7 @@
     </div>
   </div>
 
-
+<!--
   <div class="section pomodorosScaduti-section">
     <h3>POMODORI INCOMPLETI</h3>
     <div v-if="incompleteSessions.length > 0">
@@ -148,6 +148,29 @@
         </div>
     </div>
     <p v-else>Nessun pomodoro non avviato trovato.</p>
+</div>-->
+<div class="section combined-pomodoros-section">
+  <h3>POMODORI INCOMPLETI E NON AVVIATI</h3>
+  <div v-if="combinedPomodoros.length > 0">
+    <div v-for="pomodoro in combinedPomodoros" :key="pomodoro._id" class="item-container">
+      <h4 v-if="pomodoro.isIncomplete">Pomodoro Incompleto</h4>
+      <h4 v-else>Pomodoro Non Avviato</h4>
+      <p>Data: {{ formatDate(pomodoro.giorno) }}</p>
+      <p v-if="pomodoro.isIncomplete">Tempo rimanente: {{ Math.floor(pomodoro.remainingTime / 60) }}:{{ pomodoro.remainingTime % 60 }}</p>
+      <p v-else>Tempo di studio: {{ pomodoro.tempoStudio }} minuti</p>
+      <p>Tempo di pausa: {{ pomodoro.tempoPausa }} minuti</p>
+      <p>Ripetizioni: {{ pomodoro.ripetizioni }}</p>
+      <button v-if="pomodoro.isIncomplete" @click="resumePomodoro(pomodoro)" class="action-button" style="background:#f4a460;">
+        Riprendi Sessione
+      </button>
+      <button v-else @click="iniziaPomodoro(pomodoro._id, pomodoro.remainingTime, pomodoro.giorno, pomodoro.tempoStudio, pomodoro.tempoPausa, pomodoro.ripetizioni)"
+              class="action-button" style="background:#f4a460;">
+        Inizia Sessione
+      </button>
+      <button @click="discardPomodoro(pomodoro)" class="delete-btn-cq">🗑️</button>
+    </div>
+  </div>
+  <p v-else>Nessun pomodoro incompleto o non avviato trovato.</p>
 </div>
 
 </div>
@@ -267,6 +290,23 @@ export default {
 
 
     };
+
+
+
+    const combinedPomodoros = computed(() => {
+  const incomplete = incompleteSessions.value.map(session => ({
+    ...session,
+    isIncomplete: true 
+  }));
+
+  const unstarted = unstartedSessions.value.map(session => ({
+    ...session,
+    isIncomplete: false 
+  }));
+
+  return [...incomplete, ...unstarted];
+});
+
 
     const deleteEvents = async (id) => {
       try {
@@ -646,6 +686,7 @@ const fetchUnstartedSessions = async () => {
       activities,
       pomodoros, 
       incompleteSessions, 
+      combinedPomodoros,
       unstartedSessions, 
       overdueActivities,
       formatDate,
