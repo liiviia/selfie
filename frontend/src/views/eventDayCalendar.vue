@@ -768,15 +768,7 @@ button:hover {
   background-color: #45a049;
 }
 
-.activities-section {
-  flex: 1.5; 
-  background-color: #f9f9f9;
-}
 
-.events-section {
-  flex: 1.5; 
-  background-color: #e6f7ff;
-}
 
 
 
@@ -807,7 +799,6 @@ button:hover {
   background-color: rgba(230, 247, 255, 0.8); 
 }
 
-.pomodoros-section,
 .combined-pomodoros-section {
   width: 100%; 
   margin-bottom: 20px; 
