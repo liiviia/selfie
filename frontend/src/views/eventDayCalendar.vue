@@ -800,7 +800,7 @@ button:hover {
 }
 
 .combined-pomodoros-section {
-  width: 100%; 
+  width: 200%; 
   margin-bottom: 20px; 
   background-color: red;  
   border: 1px solid #ddd;
