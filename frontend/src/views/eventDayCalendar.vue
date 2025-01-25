@@ -467,7 +467,6 @@ const fetchIncompleteSessions = async () => {
   const queryDateMs = queryDate.value ? new Date(queryDate.value).valueOf() : null;
 
   try {
-    // Prima chiamata: recupera le sessioni incomplete
     const response = await axios.get('/api/poms/incomplete', {
       headers: { Authorization: `Bearer ${token}` },
       params: { username }
@@ -483,7 +482,6 @@ const fetchIncompleteSessions = async () => {
       );
     });
 
-    // Seconda chiamata: recupera le sessioni non completate dal backend
     const nonCompletedResponse = await axios.get('/api/poms/getPomNonPart', {
       headers: { Authorization: `Bearer ${token}` },
       params: { username }
@@ -491,7 +489,6 @@ const fetchIncompleteSessions = async () => {
 
     const nonCompletedData = Array.isArray(nonCompletedResponse.data) ? nonCompletedResponse.data : [];
 
-    // Concatena i dati delle due chiamate
     incompleteSessions.value = [...incompleteData, ...nonCompletedData];
   } catch (error) {
     console.error('Errore nel recupero delle sessioni:', error);
@@ -738,6 +735,13 @@ const fetchUnstartedSessions = async () => {
 }
 
 .content-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 40px;
+  padding: 20px;
+}
+
+.pomodoro-container {
   display: flex;
   justify-content: space-between;
   gap: 40px;
