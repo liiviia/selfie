@@ -85,8 +85,8 @@
   </div>
 
     
-    <div class="pomodoro-container">
-  <div class="section pomodoros-section">
+    <div class="content-container">
+  <div class="section activities-section">
     <h3>POMODORI PER QUESTO GIORNO:</h3>
     <div v-if="pomodoros.length > 0">
       <div v-for="pomodoro in pomodoros" :key="pomodoro._id" class="item-container">
@@ -149,7 +149,7 @@
     </div>
     <p v-else>Nessun pomodoro non avviato trovato.</p>
 </div>-->
-<div class="section combined-pomodoros-section">
+<div class="section activities-section">
   <h3>POMODORI INCOMPLETI E NON AVVIATI</h3>
   <div v-if="combinedPomodoros.length > 0">
     <div v-for="pomodoro in combinedPomodoros" :key="pomodoro._id" class="item-container">
