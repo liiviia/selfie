@@ -10,7 +10,7 @@
   <p>Descrizione: {{ event.description }}</p>
   <p>Ora di inizio: {{ event.startTime }}</p>
   <p>Luogo: {{ event.location }}</p>
-  <p>Durata: {{ event.duration }}</p>
+  <p>Durata: {{ event.duration }} minuti</p>
   <p v-if="event.type === 'gruppo'" style="color: #FF6347;">
     Evento di gruppo creato da: {{ event.author }} <br>
     gruppo composto da: {{ event.participants.join(', ') }}
