@@ -777,10 +777,7 @@ button:hover {
   background-color: #e6f7ff;
 }
 
-.pomodoros-section {
-  flex: 1.5; 
-  background-color: #ffe6e6;
-}
+
 
 .section {
   margin-right: 100px;
@@ -808,14 +805,12 @@ button:hover {
   background-color: rgba(230, 247, 255, 0.8); 
 }
 
-.pomodoros-section {
-  background-color: rgba(255, 230, 230, 0.8);
-}
+
 .pomodoros-section,
 .combined-pomodoros-section {
   width: 100%; 
   margin-bottom: 20px; 
-  background-color: rgba(230, 247, 255, 0.8); 
+  background-color: rgba(249, 249, 249, 0.8);  
   border: 1px solid #ddd;
   border-radius: 10px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
