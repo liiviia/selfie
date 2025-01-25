@@ -798,7 +798,6 @@ button:hover {
   transform: scale(1.02); 
 }
 
-/* Stili specifici per le sezioni delle attività */
 .activities-section {
   background-color: rgba(249, 249, 249, 0.8); 
 }
@@ -807,17 +806,16 @@ button:hover {
   background-color: rgba(230, 247, 255, 0.8); 
 }
 
-/* Stili specifici per le sezioni dei pomodori */
 .pomodoros-section,
 .combined-pomodoros-section {
   width: 100%; 
   margin-bottom: 20px; 
-  background-color: rgba(249, 249, 249, 0.8);  
+  background-color: red;  
   border: 1px solid #ddd;
   border-radius: 10px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   padding: 25px;
-  flex: 1.5; /* Aggiungi questa proprietà per rendere le sezioni dei pomodori più grandi */
+  flex: 1.5; 
 }
 
 
