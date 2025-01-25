@@ -62,7 +62,7 @@
       
       
       <div class="content-container">
-       <div class="section overdue-activities-section">
+       <div class="section activities-section">
         <h3>ATTIVITÀ INCOMPLETE:</h3>
         <div v-if="filteredOverdueActivities.length > 0">
           <div v-for="activity in filteredOverdueActivities" :key="activity._id" class="item-container overdue">
