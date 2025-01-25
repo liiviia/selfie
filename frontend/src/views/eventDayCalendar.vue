@@ -746,7 +746,6 @@ const fetchUnstartedSessions = async () => {
   justify-content: space-between;
   gap: 40px;
   padding: 20px;
-  background-color: red;
 }
 
 .button-container {
