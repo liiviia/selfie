@@ -119,7 +119,7 @@ const handleRepeatedNotifications = (event, repeatTime) => {
         clearInterval(intervalId);
 
       }
-    }, 300000);  
+    }, 60000);  
   }
 };
 
