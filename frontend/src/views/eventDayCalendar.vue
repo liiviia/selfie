@@ -559,11 +559,13 @@ const pomNonAvviati = async () => {
 
     const discardPomodoro = async (session) => {
       const token = sessionStorage.getItem('token');
+
       try {
         await axios.delete(`/api/pomRemove/${session._id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
         incompleteSessions.value = incompleteSessions.value.filter(s => s._id !== session._id);
+        window.location.reload();
       } catch (error) {
         console.error('Errore nello scartare la sessione pomodoro:', error.response?.data || error);
       }
