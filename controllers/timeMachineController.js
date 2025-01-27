@@ -17,7 +17,6 @@ exports.updateTimeMachineDate = (req, res) => {
         return res.status(400).json({ message: 'Data non fornita' });
     }
 
-    // Forza il formato UTC per evitare errori
     const dateTimeUTC = moment.tz(date, 'Europe/Rome').utc().format(); 
 
     if (!moment(dateTimeUTC).isValid()) {
@@ -38,13 +37,3 @@ exports.resetTimeMachineDate = (req, res) => {
     res.status(200).json({ message: 'Time Machine resettata alla data di sistema' });
 };
 
-exports.activateTimeMachine = (req, res) => {
-    timeMachineConfig.activate();
-    res.json({ message: 'Time Machine attivata' });
-  };
-  
-  exports.deactivateTimeMachine = (req, res) => {
-    timeMachineConfig.deactivate();
-    res.json({ message: 'Time Machine disattivata, utilizzo orario reale' });
-  };
-  

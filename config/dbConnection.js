@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-require("dotenv").config(); // Carica le variabili d'ambiente dal file .env
+require("dotenv").config(); 
 
 const mongoURI = `mongodb://site232432:ohSh3EeX@mongo_site232432:27017/site232432?authSource=admin&retryWrites=true&w=majority`;
 
@@ -8,7 +8,7 @@ const connectDB = async () => {
         console.log("Inizio connessione a MongoDB...");
 
         await mongoose.connect(mongoURI, {
-		serverSelectionTimeoutMS: 30000, // 30 sec
+		serverSelectionTimeoutMS: 30000, 
 	});
 
         console.log("Connessione a MongoDB riuscita!");

@@ -257,19 +257,6 @@ exports.deleteEvents = async (req, res) => {
 };
 
 
-exports.sendEmailNotificationCreate = async (req, res) => {
-  const { emailRicevente, eventDetails } = req.body;
-
-  try {
-    await sendNotifEmail(emailRicevente, eventDetails);
-    res.status(200).json({ message: 'Email inviata con successo' });
-
-  } catch (error) {
-    console.error('Errore durante invio della notifica email:', error);
-    res.status(500).json({ error: 'Errore durante invio dell email' });
-  }
-
-};
 
 exports.nonDisponibile = async (req, res) => {
   try {

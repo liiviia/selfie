@@ -17,7 +17,6 @@ const alertRoutes = require('./routes/alertRoutes');
 const Pom = require('./models/pom'); 
 
 
-// Aggiungi la rotta per gli alert
 const moment = require('moment-timezone');
 const { startNotificationMonitoring } = require('./controllers/notificheEventi');
 const http = require('http');
@@ -58,33 +57,7 @@ setInterval(incrementTimeMachine, 1000);
 
 startNotificationMonitoring();
 
-/*cron.schedule('0 0 * * *', async () => { 
-  try {
-    console.log('Esecuzione del controllo sessioni incomplete...');
 
-    const currentTime = moment(timeMachineConfig.getTimeMachineDate()).tz('Europe/Rome');
-    currentTime.setHours(0, 0, 0, 0);
-
-    // Per trovare sessioni incomplete
-    const incompleteSessions = await Pom.find({
-      giorno: { $lte: currentTime },
-      $or: [
-        { remainingTime: { $gt: 0 } },
-        { studyCycles: { $gt: 0 } }
-      ]
-    });
-
-    // Per aggiornre tutte le sessioni incomplete
-    for (const session of incompleteSessions) {
-      session.isStarted = true; // Se è iniziata 
-      await session.save();
-    }
-
-    console.log(`Controllo completato: ${incompleteSessions.length} sessioni incomplete aggiornate.`);
-  } catch (error) {
-    console.error('Errore durante il controllo delle sessioni incomplete:', error);
-  }
-});*/
 
 app.use(express.json());  
 app.use('/api/auth', authRoutes);

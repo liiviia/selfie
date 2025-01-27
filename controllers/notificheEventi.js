@@ -15,7 +15,7 @@ const getTimeMachineDate1 = async () => {
 
   return moment(timeMachineConfig.getTimeMachineDate()).tz('Europe/Rome');*/
   const rawDate = timeMachineConfig.getTimeMachineDate();
-  const isoDate = moment(rawDate).toISOString(); // Assicura che sia in UTC
+  const isoDate = moment(rawDate).toISOString(); 
   const romeTime = moment(isoDate).tz('Europe/Rome');
   return romeTime;
 };

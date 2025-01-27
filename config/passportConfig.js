@@ -25,16 +25,16 @@ passport.use(
   
   
 passport.serializeUser((user, done) => {
-    done(null, user._id); // serializza l'id utente
+    done(null, user._id); 
 });
   
   
 passport.deserializeUser(async (id, done) => {
     try {
       const user = await User.findById(id);
-      done(null, user); //chiama done(), funzione di passport che gestisce success/error o fail
+      done(null, user); 
     } catch (err) {
-      done(err); // Handle errors during deserialization
+      done(err); 
     }
 });
 

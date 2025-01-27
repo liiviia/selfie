@@ -16,8 +16,7 @@ exports.createPom = async (req, res) => {
       cicliRimanenti, 
       remainingTime, 
       isStudyPhase, 
-      studyCycles, 
-      stato: "pianificata", 
+      studyCycles
     });
 
     const savedPom = await newPom.save();
@@ -265,55 +264,9 @@ exports.iniziaPomodoro = async (req, res) => {
 };
 
 
-// Trovare mai avviata  
-exports.markUnstartedSessions = async (currentDate) => {
-  try {
-    const today = new Date(currentDate);
-    today.setHours(0, 0, 0, 0);
 
-    const unstartedSessions = await Pom.find({
-      giorno: { $lt: today },
-      isStarted: false,
-      stato: 'pianificata' 
-    });
 
-    const result = await Pom.updateMany(
-      {
-        giorno: { $lt: today },
-        isStarted: false,
-        stato: 'pianificata',
-      },
-      { $set: { stato: 'mai_avviata' } }
-    );
 
-    console.log(`${result.modifiedCount} sessioni contrassegnate come mai avviate.`);
-  } catch (error) {
-    console.error('Errore durante il controllo delle sessioni mai avviate:', error);
-  }
-};
-
-exports.getUnstartedSessions = async (req, res) => {
-  try {
-    const username = req.query.username;
-    if (!username) {
-      return res.status(400).json({ message: 'Username è necessario' });
-    }
-
-    const sessions = await Pom.find({
-      username,
-      stato: 'mai_avviata', 
-    }).sort({ giorno: -1 });
-
-    if (!sessions.length) {
-      return res.status(404).json({ message: 'Nessuna sessione non avviata trovata' });
-    }
-
-    res.status(200).json(sessions);
-  } catch (error) {
-    console.error('Errore durante il recupero delle sessioni non avviate:', error);
-    res.status(500).json({ error: 'Errore durante il recupero delle sessioni non avviate' });
-  }
-};
 
 
 const getTimeMachineDate1 = async () => {
@@ -334,7 +287,6 @@ exports.pomNonPartiti = async (req, res) => {
           return res.status(400).json({ error: 'Username non fornito.' });
       }
 
-      // Calcola l'inizio del giorno corrente
       const startOfDay = currentDate.clone().startOf('day');
 
       const pomodoriNonPartiti = await Pom.find({
@@ -350,7 +302,7 @@ exports.pomNonPartiti = async (req, res) => {
 
       res.status(200).json(pomodoriNonPartiti);
   } catch (error) {
-      console.error('Errore:', error); // Log dell'errore
+      console.error('Errore:', error);
       res.status(500).json({ error: 'Errore nel recupero dei pomodori non avviati' });
   }
 };
