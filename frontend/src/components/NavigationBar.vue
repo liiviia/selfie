@@ -136,6 +136,7 @@ import moment from 'moment-timezone';
         this.selectedTime = ''; 
 
         alert('Time Machine resettata alla data di sistema!');
+        window.location.reload();
         console.log(response.data);
         this.fetchData(); 
     } catch (error) {
