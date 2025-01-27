@@ -25,10 +25,7 @@
       </form>
     </div>
 
- <!--   <div class="delete-account">
-      <h2>Elimina Account</h2>
-      <button class="btn btn-danger" @click="confirmDeleteAccount">Elimina Account</button>
-    </div> -->
+
   </div>
 </template>
 

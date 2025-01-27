@@ -517,7 +517,6 @@ input[type="date"]::placeholder {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Modal Header */
 .modal-header {
   background: linear-gradient(to bottom, #f4a460, #eee8aa);
   padding: 15px;
@@ -531,7 +530,6 @@ input[type="date"]::placeholder {
   color: #333;
 }
 
-/* Modal Body */
 .modal-body {
   padding: 20px;
   background: #fafafa;
@@ -565,7 +563,6 @@ input[type="number"]:focus, input[type="date"]:focus {
   outline: none;
 }
 
-/* Submit Button */
 button[type="submit"], .btn-secondary {
   padding: 10px 20px;
   font-size: 1rem;
@@ -581,13 +578,11 @@ button[type="submit"]:hover, .btn-secondary:hover {
   background: #e5943a;
 }
 
-/* Custom Styles for Checkboxes */
 input[type="checkbox"] {
   margin-right: 10px;
   transform: scale(1.2);
 }
 
-/* Footer */
 .modal-footer {
   display: flex;
   justify-content: flex-end;
@@ -799,10 +794,10 @@ button.rounded-btn {
 
 @media (max-width: 600px) {
   .fixed-button {
-  position: fixed; /* Assicurati che l'elemento sia posizionato rispetto alla finestra */
-    right: 10px; /* Distanza dal lato destro */
-  padding: 8px 15px; /* Riduci il padding per renderli più piccoli */
-  font-size: 0.8rem; /* Riduci la dimensione del testo */
+  position: fixed;
+    right: 10px; 
+  padding: 8px 15px; 
+  font-size: 0.8rem; 
 }
   .fixed-button:nth-of-type(1) {
     bottom: 70px;  

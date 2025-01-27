@@ -127,22 +127,21 @@ const router = createRouter({
 });
 
 
-// Guard globale per controllare il token
 router.beforeEach((to, from, next) => {
-  const token = sessionStorage.getItem('token'); // Recupera il token dal sessionStorage
+  const token = sessionStorage.getItem('token');
 
   if (to.matched.some(record => record.meta.requiresAuth)) {
-    // Se la rotta richiede autenticazione e il token non è presente, reindirizza al login
+
     if (!token) {
       next({
         path: '/',
-        query: { redirect: to.fullPath } // Dopo il login, reindirizza alla pagina richiesta
+        query: { redirect: to.fullPath } 
       });
     } else {
-      next(); // Se il token è presente, consenti l'accesso alla rotta
+      next(); 
     }
   } else {
-    next(); // Se la rotta non richiede autenticazione, consenti l'accesso
+    next(); 
   }
 });
 

@@ -182,7 +182,7 @@ export default {
         const eventDate = new Date(newEvent.value.date);
         const eventStartTime = newEvent.value.startTime;
         const [eventStartHour, eventStartMinute] = eventStartTime.split(':').map(Number);
-        const eventStartInMinutes = eventStartHour * 60 + eventStartMinute; // Converte l'orario evento in minuti
+        const eventStartInMinutes = eventStartHour * 60 + eventStartMinute; 
 
 
         if (time.repeatDaily) {

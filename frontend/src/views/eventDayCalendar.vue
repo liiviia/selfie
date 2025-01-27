@@ -374,32 +374,6 @@ export default {
 
 
 
-    /* const fetchPoms = async () => {
-      try {
-        const token = sessionStorage.getItem('token');
-        const username = localStorage.getItem('username');
-        const response = await axios.get('/api/poms', {
-          headers: {
-            Authorization: `Bearer ${token}`
-          },
-          params: { username: username }
-        });
-
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        this.poms = response.data.filter(pom => {
-          const sessionDate = new Date(pom.giorno);
-          sessionDate.setHours(0, 0, 0, 0);
-          return sessionDate >= today;
-        });
-
-      } catch (error) {
-        console.error('Errore durante il recupero delle sessioni Pomodoro:', error);
-      }
-    }
-*/
-
     const fetchEvents = async () => {
       try {
         const author = route.query.author;
@@ -574,7 +548,6 @@ const pomNonAvviati = async () => {
           headers: { Authorization: `Bearer ${token}` },
         });
         activity.completed = true;
-        // Aggiorna la lista localmente
         activities.value = activities.value.filter(a => a._id !== activity._id);
         overdueActivities.value = overdueActivities.value.filter(a => a._id !== activity._id);
         window.location.reload();
@@ -736,11 +709,10 @@ button:hover {
 
 
 
-/* Stili comuni per tutte le sezioni */
 .section {
   margin-right: 100px;
   min-width: 500px;
-  flex: 1.5; /* Aggiungi questa proprietà per rendere le sezioni dei pomodori più grandi */
+  flex: 1.5; 
   padding: 25px;
   border: 1px solid #ddd; 
   border-radius: 10px; 
