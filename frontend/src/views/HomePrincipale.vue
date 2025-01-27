@@ -18,7 +18,7 @@
         </div>
         <div class="col-md-3 d-flex flex-column align-items-center justify-content-center">
           <div class="img-description-container-2">
-            <p class="img-description-2">SELFIE ti permette di creare delle note per gestire i tuoi appunti, condividendoli anche con altre persone, e ti permette di studiare comodamente con cicli di studio e pausa programmabili a piacere.</p>
+            <p class="img-description-2">SELFIE ti permette di creare delle note e di studiare con cicli di studio programmabili!</p>
           </div>
           <img :src="img2Path" alt="Immagine a destra" class="img-right" />
         </div>
