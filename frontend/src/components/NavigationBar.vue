@@ -178,6 +178,7 @@ import moment from 'moment-timezone';
 
         alert('Time Machine attivata con successo!');
         console.log(response.data);
+        window.location.reload();
         this.fetchData();
     } catch (error) {
         console.error('Errore nell\'attivazione della Time Machine:', error);
