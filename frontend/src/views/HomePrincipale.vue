@@ -791,7 +791,7 @@ export default {
   height: auto;
   max-height: 60%;
   margin-right: -250px;
-  margin-top: 200px;
+  margin-top: 150px;
 
 }
 
